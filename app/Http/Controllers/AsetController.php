@@ -142,7 +142,7 @@ class AsetController extends Controller
 
                 Media::create([
                     'ref_table' => 'aset',
-                    'ref_id'    => $aset->aset_id,
+                    'ref_id'    => $aset->id,
                     'file_name' => $filename,
                     'mime_type' => $mimeType,
                     'caption'   => $file->getClientOriginalName(),

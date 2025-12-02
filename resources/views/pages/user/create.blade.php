@@ -64,6 +64,18 @@
                                         value="{{ old('name') }}">
                                 </div>
 
+                                <!-- Role -->
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role</label>
+                                    <select id="role" name="role" class="form-select" name="role"
+                                        value="{{ old('role') }}">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="staff">Staff</option>
+                                        <option value="pimpinan">Pimpinan</option>
+                                    </select>
+                                </div>
+
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>

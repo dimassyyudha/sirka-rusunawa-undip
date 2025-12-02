@@ -51,6 +51,7 @@
                                 <th>Nama Lengkap</th>
                                 <th>Email</th>
                                 <th>Password</th>
+                                <th>Role</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -62,6 +63,7 @@
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->email }}</td>
                                     <td>{{ $item->password }}</td> {{-- Menampilkan password (bahkan yang ter-hash) tidak disarankan --}}
+                                    <td>{{ $item->role }}</td>
                                     <td>
                                         {{-- Menggunakan route dari file Anda dan icon Bootstrap --}}
                                         <a href="{{ route('user.edit', $item->id) }}" class="btn btn-warning btn-sm">
