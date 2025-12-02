@@ -1,11 +1,9 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class CreateFirstUser extends Seeder
 {
@@ -14,9 +12,28 @@ class CreateFirstUser extends Seeder
      */
     public function run(): void
     {
-        $data['name']     = 'Admin2';
-        $data['email']    = 'admin2@inventaris.test';
-        $data['password'] = Hash::make('admin_dzakwan');
-        User::create($data);
+        // Admin (Si Paling Berkuasa)
+        User::create([
+            'name'     => 'Dzakwan (Admin)',
+            'email'    => 'admin@desa.id',
+            'password' => Hash::make('password'),
+            'role'     => 'admin',
+        ]);
+
+        // Staff (Si Tukang Input)
+        User::create([
+            'name'     => 'Budi (Staff)',
+            'email'    => 'staff@desa.id',
+            'password' => Hash::make('password'),
+            'role'     => 'staff',
+        ]);
+
+        // Pimpinan (Si Pemantau)
+        User::create([
+            'name'     => 'Pak Kades (Pimpinan)',
+            'email'    => 'kades@desa.id',
+            'password' => Hash::make('password'),
+            'role'     => 'pimpinan',
+        ]);
     }
 }
