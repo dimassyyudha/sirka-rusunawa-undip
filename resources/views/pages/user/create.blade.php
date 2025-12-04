@@ -73,6 +73,7 @@
                                         <option value="admin">Admin</option>
                                         <option value="staff">Staff</option>
                                         <option value="pimpinan">Pimpinan</option>
+                                        <option value="kades">Kades</option>
                                     </select>
                                 </div>
 

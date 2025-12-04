@@ -36,9 +36,9 @@ Route::group(['middleware' => ['checkislogin']], function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     // -----------------------------------------------------------
-    // LEVEL 1: AKSES UMUM (Admin, Staff, Pimpinan)
+    // LEVEL 1: AKSES UMUM (Admin, Staff, Kades)
     // -----------------------------------------------------------
-    Route::group(['middleware' => ['checkrole:admin,staff,pimpinan']], function () {
+    Route::group(['middleware' => ['checkrole:admin,staff,kades']], function () {
         Route::get('/dashboard', [InventarisController::class, 'index'])->name('dashboard');
     });
 
