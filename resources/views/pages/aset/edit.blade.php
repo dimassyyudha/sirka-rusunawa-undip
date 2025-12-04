@@ -38,7 +38,7 @@
                 @endif
 
                 {{-- Perhatikan enctype="multipart/form-data" agar bisa upload file --}}
-                <form action="{{ route('aset.update', $aset->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('aset.update', $aset->aset_id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -76,28 +76,14 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Perolehan</label>
-                                <input type="date" name="tanggal_perolehan" class="form-control" value="{{ old('tanggal_perolehan', $aset->tanggal_perolehan) }}" required>
+                                <input type="date" name="tgl_perolehan" class="form-control" value="{{ old('tgl_perolehan', $aset->tgl_perolehan) }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Nilai Perolehan (Rp)</label>
                                 <input type="number" name="nilai_perolehan" class="form-control" value="{{ old('nilai_perolehan', $aset->nilai_perolehan) }}" required>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Lokasi</label>
-                                <input type="text" name="lokasi" class="form-control" value="{{ old('lokasi', $aset->lokasi) }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Penanggung Jawab</label>
-                                <input type="text" name="penanggung_jawab" class="form-control" value="{{ old('penanggung_jawab', $aset->penanggung_jawab) }}" required>
-                            </div>
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Keterangan</label>
-                        <textarea name="keterangan" class="form-control" rows="3">{{ old('keterangan', $aset->keterangan) }}</textarea>
-                    </div>
-
                     {{-- INPUT FILE BARU --}}
                     <div class="mb-4 p-3 border rounded bg-light">
                         <label class="form-label fw-bold text-primary"><i class="bi bi-upload"></i> Upload File Baru (Opsional)</label>

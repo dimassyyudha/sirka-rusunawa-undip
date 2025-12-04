@@ -79,7 +79,6 @@
                                 <th>Nama Aset</th>
                                 <th>Kategori</th>
                                 <th>Kondisi</th>
-                                <th>Lokasi</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -99,15 +98,14 @@
                                             <span class="badge bg-danger">Rusak Berat</span>
                                         @endif
                                     </td>
-                                    <td>{{ $aset->lokasi }}</td>
                                     <td>
-                                        <a href="{{ route('aset.show', $aset->id) }}" class="btn btn-info btn-sm">
+                                        <a href="{{ route('aset.show', $aset->aset_id) }}" class="btn btn-info btn-sm">
                                             <i class="bi bi-eye"></i> Detail
                                         </a>
-                                        <a href="{{ route('aset.edit', $aset->id) }}" class="btn btn-warning btn-sm">
+                                        <a href="{{ route('aset.edit', $aset->aset_id) }}" class="btn btn-warning btn-sm">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
-                                        <form action="{{ route('aset.destroy', $aset->id) }}" method="POST"
+                                        <form action="{{ route('aset.destroy', $aset->aset_id) }}" method="POST"
                                             class="d-inline">
                                             @csrf
                                             @method('DELETE')

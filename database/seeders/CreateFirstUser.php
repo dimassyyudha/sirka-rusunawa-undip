@@ -33,7 +33,7 @@ class CreateFirstUser extends Seeder
             'name'     => 'Pak Kades (Pimpinan)',
             'email'    => 'kades@desa.id',
             'password' => Hash::make('password'),
-            'role'     => 'pimpinan',
+            'role'     => 'kades',
         ]);
     }
 }

@@ -62,19 +62,7 @@
                                 </tr>
                                 <tr>
                                     <th>Tanggal Perolehan</th>
-                                    <td>{{ \Carbon\Carbon::parse($aset->tanggal_perolehan)->translatedFormat('d F Y') }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Lokasi</th>
-                                    <td>{{ $aset->lokasi }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Penanggung Jawab</th>
-                                    <td>{{ $aset->penanggung_jawab }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Keterangan</th>
-                                    <td>{{ $aset->keterangan ?? '-' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($aset->tgl_perolehan)->translatedFormat('d F Y') }}</td>
                                 </tr>
                             </table>
 
@@ -83,7 +71,7 @@
                                     <i class="bi bi-arrow-left"></i> Kembali
                                 </a>
                                 {{-- Tombol Edit untuk memudahkan navigasi jika ingin mengubah --}}
-                                <a href="{{ route('aset.edit', $aset->id) }}" class="btn btn-warning">
+                                <a href="{{ route('aset.edit', $aset->aset_id) }}" class="btn btn-warning">
                                     <i class="bi bi-pencil-square"></i> Edit Data
                                 </a>
                             </div>

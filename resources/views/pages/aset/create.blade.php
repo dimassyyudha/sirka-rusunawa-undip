@@ -62,7 +62,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tanggal Perolehan</label>
-                        <input type="date" name="tanggal_perolehan" class="form-control" value="{{ old('tanggal_perolehan') }}" required>
+                        <input type="date" name="tgl_perolehan" class="form-control" value="{{ old('tgl_perolehan') }}" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Nilai Perolehan</label>
@@ -76,18 +76,6 @@
                             <option value="Rusak Ringan" {{ old('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan</option>
                             <option value="Rusak Berat" {{ old('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
                         </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Lokasi</label>
-                        <input type="text" name="lokasi" class="form-control" value="{{ old('lokasi') }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Penanggung Jawab</label>
-                        <input type="text" name="penanggung_jawab" class="form-control" value="{{ old('penanggung_jawab') }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Keterangan</label>
-                        <textarea name="keterangan" class="form-control" rows="3">{{ old('keterangan') }}</textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Upload Foto/Dokumen</label>

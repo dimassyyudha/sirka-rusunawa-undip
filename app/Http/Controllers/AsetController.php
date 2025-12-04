@@ -39,16 +39,14 @@ class AsetController extends Controller
     {
         // 1. Validasi Data Aset + File
         $request->validate([
-            'kode_aset' => 'required|unique:asets,kode_aset',
+            'kode_aset' => 'required|unique:aset,kode_aset', // table: aset
             'nama_aset' => 'required',
-            'kategori_id' => 'required|exists:kategori_asets,kategori_id',
-            'tanggal_perolehan' => 'required|date',
+            'kategori_id' => 'required|exists:kategori_aset,kategori_id', // table: kategori_aset
+            'tgl_perolehan' => 'required|date', // Sesuaikan nama input
             'nilai_perolehan' => 'required|numeric',
             'kondisi' => 'required|in:Baik,Rusak Ringan,Rusak Berat',
-            'lokasi' => 'required',
-            'penanggung_jawab' => 'required',
-            // Validasi File (Nullable artinya boleh tidak ada file)
-            'files.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120',
+            // Hapus validasi lokasi/penanggung jawab jika tidak ada di tabel
+            'files.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         // 2. Simpan Data Aset Terlebih Dahulu (Agar dapat ID)
@@ -70,7 +68,7 @@ class AsetController extends Controller
                 // Simpan ke tabel Media dengan ID aset yang baru dibuat
                 Media::create([
                     'ref_table' => 'aset',        // Hardcode 'aset'
-                    'ref_id'    => $aset->id, // Ambil ID dari variabel $aset
+                    'ref_id'    => $aset->aset_id, // Ambil ID dari variabel $aset
                     'file_name' => $filename,
                     'mime_type' => $mimeType,
                     'caption'   => $file->getClientOriginalName(),
@@ -89,7 +87,7 @@ class AsetController extends Controller
     {
         // Ambil data media
     $files = Media::where('ref_table', 'aset') // Coba pakai nama singular
-              ->where('ref_id', $aset->id)
+              ->where('ref_id', $aset->aset_id)
               ->latest()
               ->get();
 
@@ -105,7 +103,7 @@ class AsetController extends Controller
 
         // Ambil file yang sudah ada untuk ditampilkan di form edit
         $files = Media::where('ref_table', 'aset')
-                      ->where('ref_id', $aset->id)
+                      ->where('ref_id', $aset->aset_id)
                       ->get();
 
         return view('pages.aset.edit', compact('aset', 'kategoris', 'files'));
@@ -118,14 +116,12 @@ class AsetController extends Controller
     {
         // 1. Validasi Data Aset + File
         $request->validate([
-            'kode_aset' => 'required|unique:asets,kode_aset,' . $aset->id . ',id',
+            'kode_aset' => 'required|unique:aset,kode_aset,' . $aset->aset_id . ',aset_id',
             'nama_aset' => 'required',
-            'kategori_id' => 'required|exists:kategori_asets,kategori_id', // Validasi baru
-            'tanggal_perolehan' => 'required|date',
+            'kategori_id' => 'required|exists:kategori_aset,kategori_id', // Validasi baru
+            'tgl_perolehan' => 'required|date',
             'nilai_perolehan' => 'required|numeric',
             'kondisi' => 'required|in:Baik,Rusak Ringan,Rusak Berat',
-            'lokasi' => 'required',
-            'penanggung_jawab' => 'required',
             'files.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120'
         ]);
 
@@ -142,7 +138,7 @@ class AsetController extends Controller
 
                 Media::create([
                     'ref_table' => 'aset',
-                    'ref_id'    => $aset->id,
+                    'ref_id'    => $aset->aset_id,
                     'file_name' => $filename,
                     'mime_type' => $mimeType,
                     'caption'   => $file->getClientOriginalName(),

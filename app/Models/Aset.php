@@ -4,47 +4,36 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder; // Import Builder
-use Illuminate\Http\Request; // Import Request
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class Aset extends Model
 {
     use HasFactory;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+
+    protected $table = 'aset'; // Nama tabel singular
+    protected $primaryKey = 'aset_id'; // PK kustom
+
     protected $fillable = [
         'kode_aset',
         'nama_aset',
-        'kategori_id',      // <-- PERBAIKAN 1: Ganti 'kategori' menjadi 'kategori_id'
-        'tanggal_perolehan',
-        'nilai_perolehan',  // <-- PERBAIKAN 2: Pastikan ini ada (sudah ada di file Anda)
-        'kondisi',
-        'lokasi',
-        'penanggung_jawab',
-        'keterangan'
+        'kategori_id',
+        'tgl_perolehan',   // Sesuaikan nama kolom
+        'nilai_perolehan',
+        'kondisi'
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected $casts = [
-        'tanggal_perolehan' => 'date',
+        'tgl_perolehan' => 'date',
         'nilai_perolehan' => 'decimal:2'
     ];
 
-    /**
-     * Relasi ke model KategoriAset
-     */
     public function kategoriAset()
     {
         return $this->belongsTo(KategoriAset::class, 'kategori_id', 'kategori_id');
     }
 
+    // Scope Filter (Tetap sama)
     public function scopeFilter(Builder $query, Request $request, array $filterableColumns): Builder
     {
         foreach ($filterableColumns as $column) {

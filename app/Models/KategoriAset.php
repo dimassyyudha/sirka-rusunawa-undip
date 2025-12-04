@@ -10,8 +10,8 @@ class KategoriAset extends Model
 {
     use HasFactory;
 
-    // Tentukan primary key kustom
-    protected $primaryKey = 'kategori_id';
+    protected $table = 'kategori_aset'; // Nama tabel singular
+    protected $primaryKey = 'kategori_id'; // PK kustom
 
     protected $fillable = [
         'nama',

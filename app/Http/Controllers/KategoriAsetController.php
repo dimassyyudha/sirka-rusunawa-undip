@@ -22,7 +22,7 @@ class KategoriAsetController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:100',
-            'kode' => 'required|string|max:20|unique:kategori_asets,kode',
+            'kode' => 'required|string|max:20|unique:kategori_aset,kode',
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -39,7 +39,7 @@ class KategoriAsetController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:100',
-            'kode' => 'required|string|max:20|unique:kategori_asets,kode,' . $kategori->kategori_id . ',kategori_id',
+            'kode' => 'required|string|max:20|unique:kategori_aset,kode,' . $kategori->kategori_id . ',kategori_id',
             'deskripsi' => 'nullable|string',
         ]);
 

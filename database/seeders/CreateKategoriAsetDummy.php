@@ -29,7 +29,7 @@ class CreateKategoriAsetDummy extends Seeder
         ];
 
         foreach ($daftarKategori as $kategori) {
-            DB::table('kategori_asets')->insert([
+            DB::table('kategori_aset')->insert([
                 // 'nama' VARCHAR(100)
                 'nama' => $kategori['nama'],
 
