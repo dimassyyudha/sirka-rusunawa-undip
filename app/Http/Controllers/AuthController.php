@@ -49,7 +49,8 @@ class AuthController extends Controller
     {
         $request->validate([
             'nama' => 'required|max:100',
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => ['required', 'email', 'unique:user,email'],
+            'role' => 'required|in:admin,staff,kades',
             'password' => 'required|min:8|confirmed',
         ], [
             'nama.required' => 'Nama tidak boleh kosong',
@@ -64,6 +65,7 @@ class AuthController extends Controller
         $data['name']     = $request->nama;
         $data['email']    = $request->email;
         $data['password'] = Hash::make($request->password);
+        $data['role']     = $request->role; // <-- Tambahkan Simpan Role
 
         User::create($data);
 
