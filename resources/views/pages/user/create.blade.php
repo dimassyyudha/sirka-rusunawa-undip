@@ -25,7 +25,8 @@
                 <p class="mb-0">Form untuk menambahkan data user baru.</p>
             </div>
             <div>
-                <a href="{{ route('user.index') }}" class="btn btn-primary"><i class="far fa-question-circle me-1"></i> Kembali</a>
+                <a href="{{ route('user.index') }}" class="btn btn-primary"><i class="far fa-question-circle me-1"></i>
+                    Kembali</a>
             </div>
         </div>
     </div>
@@ -39,21 +40,21 @@
             <div class="card border-0 shadow components-section">
                 <div class="card-body">
                     @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                        @if (session('info'))
-                            <div class="alert alert-info">
-                                {!! session('info') !!}
-                            </div>
-                        @endif
-                    <form action="{{ route('user.store') }}" method="POST">
+                    @if (session('info'))
+                        <div class="alert alert-info">
+                            {!! session('info') !!}
+                        </div>
+                    @endif
+                    <form action="{{ route('user.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row mb-4">
                             <div class="col-lg-4 col-sm-6">
@@ -77,6 +78,12 @@
                                     </select>
                                 </div>
 
+                                <!-- profile_photo -->
+                                <div class="mb-3">
+                                    <label>Foto Profil</label>
+                                    <input type="file" name="profile_photo" class="form-control">
+                                </div>
+
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
@@ -92,23 +99,23 @@
 
                                 <!--Password Confirmation -->
                                 <div class="mb-3">
-                                <label for="password" class="form-label">Password Confirmation</label>
-                                <input type="text" id="password" class="form-control"
-                                    name="password" value="{{ old('password') }}">
-                            </div>
+                                    <label for="password" class="form-label">Password Confirmation</label>
+                                    <input type="text" id="password" class="form-control" name="password"
+                                        value="{{ old('password') }}">
+                                </div>
 
-                            <!-- Buttons -->
-                            <div class="">
-                                <button type="submit" class="btn btn-primary">Simpan</button>
-                                <a href="{{ route('user.index') }}" class="btn btn-outline-secondary ms-2">Batal</a>
+                                <!-- Buttons -->
+                                <div class="">
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                    <a href="{{ route('user.index') }}" class="btn btn-outline-secondary ms-2">Batal</a>
+                                </div>
                             </div>
                         </div>
                 </div>
+                </form>
             </div>
-            </form>
-        </div>
 
-    </div>
+        </div>
     </div>
     </div>
     {{-- End Main Content --}}

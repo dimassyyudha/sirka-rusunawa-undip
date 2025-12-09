@@ -2,46 +2,43 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Faker\Factory;
+use App\Models\KategoriAset;
+use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
-class CreateKategoriAsetDummy extends Seeder
+class KategoriAsetSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $faker = Factory::create('id_ID');
+        // Inisialisasi Faker dengan locale Indonesia (opsional, tapi disarankan)
+        $faker = Faker::create('id_ID');
 
-        // Kita buat data kategori yang "masuk akal" untuk aplikasi Inventaris
-        $daftarKategori = [
-            ['nama' => 'Elektronik', 'kode' => 'ELK'],
-            ['nama' => 'Furniture Kantor', 'kode' => 'FUR'],
-            ['nama' => 'Kendaraan Dinas', 'kode' => 'KND'],
-            ['nama' => 'Alat Tulis Kantor', 'kode' => 'ATK'],
-            ['nama' => 'Peralatan Kebersihan', 'kode' => 'KBR'],
-            ['nama' => 'Mesin & Alat Berat', 'kode' => 'MSN'],
-            ['nama' => 'Tanah & Bangunan', 'kode' => 'TNB'],
-            ['nama' => 'Aset Tak Berwujud', 'kode' => 'ATB'],
-        ];
+        // Loop untuk membuat 100 data
+        for ($i = 1; $i <= 100; $i++) {
 
-        foreach ($daftarKategori as $kategori) {
-            DB::table('kategori_aset')->insert([
-                // 'nama' VARCHAR(100)
-                'nama' => $kategori['nama'],
+            // 1. Generate Nama Kategori unik (misalnya: Kursi Kantor, Alat Kebersihan Publik)
+            $namaUnik = $faker->unique()->word() . ' ' . $faker->randomElement(['Kantor', 'Desa', 'Peralatan', 'Inventaris', 'Publik']);
 
-                // 'kode' VARCHAR(20) - Harus Unik
-                'kode' => $kategori['kode'],
+            // 2. Generate Kode Unik 5 karakter (misalnya: HGR12, KPL45)
+            // Menggunakan unique() pada Faker untuk menjamin kode tidak ada yang sama dalam 100 loop ini
+            $kodeUnik = Str::upper($faker->unique()->lexify('???') . $faker->randomNumber(2, true));
 
-                // 'deskripsi' TEXT
-                'deskripsi' => 'Kategori untuk ' . $kategori['nama'] . '. ' . $faker->sentence(10),
-
-                'created_at' => now(),
-                'updated_at' => now(),
+            KategoriAset::create([
+                'nama' => $namaUnik,
+                'kode' => $kodeUnik,
+                'deskripsi' => $faker->sentence(10), // Deskripsi acak 10 kata
             ]);
         }
+
+        // Opsional: Tambahkan 1 kategori utama manual agar lebih mudah diuji
+        KategoriAset::create([
+            'nama' => 'Peralatan Testing Manual',
+            'kode' => 'TST01',
+            'deskripsi' => 'Kategori khusus untuk pengujian manual.',
+        ]);
     }
 }

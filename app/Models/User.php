@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'profile_photo',
     ];
 
     /**
@@ -44,5 +46,35 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
         ];
+    }
+
+    public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
+    {
+        // Search by name or email
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        // Other filters
+        foreach ($filterableColumns as $column) {
+            if ($request->filled($column)) {
+                $value = $request->input($column);
+
+                if ($column === 'email_verified_at') {
+                    // Verified / unverified filter
+                    $value === 'verified'
+                        ? $query->whereNotNull('email_verified_at')
+                        : $query->whereNull('email_verified_at');
+                } else {
+                    $query->where($column, $value);
+                }
+            }
+        }
+
+        return $query;
     }
 }

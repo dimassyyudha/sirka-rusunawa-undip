@@ -3,7 +3,6 @@
 @section('title', 'Data User')
 
 @push('css')
-    {{-- Tambahkan CSS untuk Simple Datatables --}}
     <link rel="stylesheet" href="{{ asset('assets-admin/vendors/simple-datatables/style.css') }}">
 @endpush
 
@@ -29,14 +28,12 @@
         <section class="section">
             <div class="card">
                 <div class="card-header">
-                    {{-- Menggunakan route dari file Anda: user.create --}}
                     <a href="{{ route('user.create') }}" class="btn btn-primary d-inline-flex align-items-center">
                         <i class="bi bi-plus-circle me-2"></i> Tambah User Baru
                     </a>
                 </div>
                 <div class="card-body">
 
-                    {{-- Menggunakan notifikasi 'success' yang ada di file Anda --}}
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {!! session('success') !!}
@@ -48,34 +45,52 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Foto</th>
                                 <th>Nama Lengkap</th>
                                 <th>Email</th>
-                                <th>Password</th>
                                 <th>Role</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Menggunakan variabel dari file Anda: $dataUser as $item --}}
                             @foreach ($dataUser as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td>
+                                        {{-- LOGIKA MENAMPILKAN FOTO --}}
+                                        @if ($item->profile_picture)
+                                            <img src="{{ asset('uploads/profile_pictures/' . $item->profile_picture) }}"
+                                                alt="Foto Profil" class="rounded-circle"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                        @else
+                                            {{-- Foto Default jika belum upload --}}
+                                            <img src="{{ asset('assets-admin/images/faces/1.jpg') }}" alt="Default"
+                                                class="rounded-circle"
+                                                style="width: 50px; height: 50px; object-fit: cover; opacity: 0.5">
+                                        @endif
+                                    </td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->email }}</td>
-                                    <td>{{ $item->password }}</td> {{-- Menampilkan password (bahkan yang ter-hash) tidak disarankan --}}
-                                    <td>{{ $item->role }}</td>
                                     <td>
-                                        {{-- Menggunakan route dari file Anda dan icon Bootstrap --}}
+                                        @if ($item->role == 'admin')
+                                            <span class="badge bg-primary">Admin</span>
+                                        @elseif($item->role == 'staff')
+                                            <span class="badge bg-success">Staff</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ $item->role }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
                                         <a href="{{ route('user.edit', $item->id) }}" class="btn btn-warning btn-sm">
-                                            <i class="bi bi-pencil-square"></i> Edit
+                                            <i class="bi bi-pencil-square"></i>
                                         </a>
                                         <form action="{{ route('user.destroy', $item->id) }}" method="POST"
                                             class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Anda yakin?')">
-                                                <i class="bi bi-trash-fill"></i> Hapus
+                                                onclick="return confirm('Yakin ingin menghapus user ini?')">
+                                                <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </form>
                                     </td>
@@ -90,10 +105,8 @@
 @endsection
 
 @push('scripts-bottom')
-    {{-- Tambahkan JS untuk Simple Datatables --}}
     <script src="{{ asset('assets-admin/vendors/simple-datatables/simple-datatables.js') }}"></script>
     <script>
-        // Inisialisasi Datatable
         let table1 = document.querySelector('#table1');
         let dataTable = new simpleDatatables.DataTable(table1);
     </script>

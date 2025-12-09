@@ -40,7 +40,7 @@
         <div class="col-12 mb-4">
             <div class="card border-0 shadow components-section">
                 <div class="card-body">
-                    <form action="{{ route('user.update', $dataUser->id) }}" method="POST">
+                    <form action="{{ route('user.update', $dataUser->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="row mb-4">
@@ -62,6 +62,20 @@
                                     <option value="pimpinan">Pimpinan</option>
                                     <option value="kades">Kades</option>
                                 </select>
+                            </div>
+
+                            {{-- FOTO PROFIL SAAT INI (PREVIEW) --}}
+                            <div class="mb-3">
+                                <label>Foto Profil</label>
+                                <br>
+                                @if ($dataUser->profile_picture)
+                                    <img src="{{ asset('uploads/profile_pictures/' . $dataUser->profile_picture) }}"
+                                        width="100" class="mb-2 rounded-circle">
+                                @else
+                                    <span class="text-muted">Belum ada foto</span>
+                                @endif
+                                <input type="file" name="profile_photo" class="form-control">
+                                <small class="text-muted">Kosongkan jika tidak ingin mengubah foto.</small>
                             </div>
 
                             <!-- Email -->

@@ -2,62 +2,78 @@
 
 namespace Database\Seeders;
 
-use Faker\Factory;
+use Illuminate\Database\Seeder;
 use App\Models\Aset;
 use App\Models\KategoriAset;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Media; // Import Model Media
+use Faker\Factory as Faker;
+use Illuminate\Support\Facades\File; // Import Facade File
 
 class CreateAsetDummy extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $faker = Factory::create('id_ID'); // Locale Indonesia
+        $faker = Faker::create('id_ID');
 
-        // 1. Ambil semua ID yang sudah ada di tabel kategori_asets
+        // Ambil ID Kategori
         $kategoriIds = KategoriAset::pluck('kategori_id')->toArray();
-
-        // Cek jika tabel kategori masih kosong
         if (empty($kategoriIds)) {
-            echo "⚠️ ERROR: Tabel kategori_asets kosong. Jalankan KategoriAsetSeeder terlebih dahulu.\n";
+            $this->command->error('Error: Kategori kosong!');
             return;
         }
 
-        $lokasiList = ['Kantor Kepala Desa', 'Ruang Rapat Utama', 'Gudang Logistik', 'Lantai 2', 'Area Parkir'];
-        $kondisiList = ['Baik', 'Rusak Ringan', 'Rusak Berat'];
+        // Pastikan folder uploads ada
+        $uploadPath = public_path('uploads');
+        if (!File::exists($uploadPath)) {
+            File::makeDirectory($uploadPath, 0777, true, true);
+        }
 
-        for ($i = 1; $i <= 100; $i++) {
-            // Gabungan kata acak untuk nama aset
-            $namaAset = $faker->randomElement(['Komputer', 'Monitor', 'Meja', 'Kursi', 'Kendaraan']) . ' ' . $faker->randomLetter() . ' ' . $faker->randomNumber(2);
+        // --- SUMBER GAMBAR DUMMY ---
+        // Kita pinjam gambar logo/default template untuk dijadikan dummy aset
+        // Pastikan path ini benar ada di laptop Anda
+        $sourceImage = public_path('assets-admin/images/logo/logo-baru.png');
 
-            Aset::create([
-                // Kode Aset yang dijamin unik dan memiliki format (AST-001 hingga AST-100)
-                'kode_aset' => 'AST-' . str_pad($i, 3, '0', STR_PAD_LEFT),
+        // Jika file logo tidak ada, kode akan skip proses copy agar tidak error
+        $hasSourceImage = File::exists($sourceImage);
 
-                'kategori_id' => $faker->randomElement($kategoriIds), // Pilih ID kategori yang valid
+        $namaBarang = [
+            'Laptop Asus ROG', 'Macbook Pro M1', 'Kamera Canon EOS',
+            'Proyektor Sony', 'Meja Rapat Oval', 'Kursi Direktur',
+            'Lemari Besi', 'Brankas Uang', 'AC Panasonic 2PK',
+            'Motor Honda Vario', 'Mobil Avanza Dinas', 'Server Rakitan'
+        ];
 
-                'nama_aset' => $namaAset,
+        for ($i = 1; $i <= 50; $i++) {
 
-                // Tanggal perolehan dalam 5 tahun terakhir
-                'tanggal_perolehan' => $faker->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
-
-                // Nilai perolehan (DECIMAL 15,2)
-                'nilai_perolehan' => $faker->randomFloat(2, 100000, 50000000),
-
-                // Kondisi (ENUM)
-                'kondisi' => $faker->randomElement($kondisiList),
-
-                'lokasi' => $faker->randomElement($lokasiList),
-
-                'penanggung_jawab' => $faker->name,
-
-                // Keterangan (TEXT)
-                'keterangan' => $faker->paragraphs(1, true),
+            // 1. BUAT DATA ASET
+            $aset = Aset::create([
+                'kode_aset'       => 'AST-' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'nama_aset'       => $faker->randomElement($namaBarang) . ' #' . $i,
+                'kategori_id'     => $faker->randomElement($kategoriIds),
+                'tgl_perolehan'   => $faker->dateTimeBetween('-3 years', 'now')->format('Y-m-d'),
+                'nilai_perolehan' => $faker->numberBetween(1000000, 25000000),
+                'kondisi'         => $faker->randomElement(['Baik', 'Rusak Ringan', 'Rusak Berat']),
             ]);
+
+            // 2. KHUSUS 20 DATA PERTAMA: BUATKAN FOTO DUMMY
+            if ($i <= 20 && $hasSourceImage) {
+
+                // Buat nama file unik baru
+                $newFileName = 'dummy_aset_' . $i . '_' . time() . '.png';
+
+                // Copy file dari sumber (logo) ke folder uploads
+                File::copy($sourceImage, public_path('uploads/' . $newFileName));
+
+                // Input ke tabel Media
+                Media::create([
+                    'ref_table' => 'aset',           // Table tujuan
+                    'ref_id'    => $aset->aset_id,   // ID Aset yang baru dibuat
+                    'file_name' => $newFileName,
+                    'mime_type' => 'image/png',
+                    'caption'   => 'Foto Aset Dummy ' . $i,
+                    'sort_order'=> 0
+                ]);
+            }
         }
     }
 }
