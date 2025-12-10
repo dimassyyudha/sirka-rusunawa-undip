@@ -67,14 +67,12 @@
 
                                 <!-- Role -->
                                 <div class="mb-3">
-                                    <label for="role" class="form-label">Role</label>
-                                    <select id="role" name="role" class="form-select" name="role"
-                                        value="{{ old('role') }}">
-                                        <option value="">-- Pilih --</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="staff">Staff</option>
-                                        <option value="pimpinan">Pimpinan</option>
-                                        <option value="kades">Kades</option>
+                                    <label for="role" class="form-label">Role / Jabatan</label>
+                                    <select name="role" id="role" class="form-select" required>
+                                        <option value="" selected disabled>-- Pilih Role --</option>
+                                        <option value="admin">Administrator</option>
+                                        <option value="staff">Staff Inventaris</option>
+                                        <option value="kades">Kepala Desa (Monitoring)</option>
                                     </select>
                                 </div>
 

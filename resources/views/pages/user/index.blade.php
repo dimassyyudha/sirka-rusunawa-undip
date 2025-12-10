@@ -12,7 +12,6 @@
             <div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>Data User</h3>
-                    <p class="text-subtitle text-muted">Daftar lengkap semua user pengelola sistem.</p>
                 </div>
                 <div class="col-12 col-md-6 order-md-2 order-first">
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
@@ -28,16 +27,15 @@
         <section class="section">
             <div class="card">
                 <div class="card-header">
-                    <a href="{{ route('user.create') }}" class="btn btn-primary d-inline-flex align-items-center">
-                        <i class="bi bi-plus-circle me-2"></i> Tambah User Baru
+                    <a href="{{ route('user.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i> Tambah User
                     </a>
                 </div>
                 <div class="card-body">
-
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {!! session('success') !!}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
 
@@ -46,7 +44,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Foto</th>
-                                <th>Nama Lengkap</th>
+                                <th>Nama</th>
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Aksi</th>
@@ -57,22 +55,19 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>
-                                        {{-- LOGIKA MENAMPILKAN FOTO --}}
-                                        @if ($item->profile_picture)
-                                            <img src="{{ asset('uploads/profile_pictures/' . $item->profile_picture) }}"
-                                                alt="Foto Profil" class="rounded-circle"
-                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                        {{-- PERBAIKAN: Gunakan 'profile_photo' --}}
+                                        @if($item->profile_photo)
+                                            <img src="{{ asset('uploads/profile_pictures/' . $item->profile_photo) }}"
+                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
                                         @else
-                                            {{-- Foto Default jika belum upload --}}
-                                            <img src="{{ asset('assets-admin/images/faces/1.jpg') }}" alt="Default"
-                                                class="rounded-circle"
-                                                style="width: 50px; height: 50px; object-fit: cover; opacity: 0.5">
+                                            <img src="{{ asset('assets-admin/images/faces/1.jpg') }}"
+                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; opacity: 0.5">
                                         @endif
                                     </td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->email }}</td>
                                     <td>
-                                        @if ($item->role == 'admin')
+                                        @if($item->role == 'admin')
                                             <span class="badge bg-primary">Admin</span>
                                         @elseif($item->role == 'staff')
                                             <span class="badge bg-success">Staff</span>
@@ -84,12 +79,9 @@
                                         <a href="{{ route('user.edit', $item->id) }}" class="btn btn-warning btn-sm">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus user ini?')">
+                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST" class="d-inline">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Hapus?')">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </form>
