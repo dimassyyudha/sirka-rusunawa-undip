@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\WargaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\LokasiAsetController;
 use App\Http\Controllers\MutasiAsetController;
 use App\Http\Controllers\KategoriAsetController;
@@ -38,11 +39,13 @@ Route::group(['middleware' => ['checkislogin']], function () {
     // Logout (Bisa diakses siapa saja yang login)
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
+
     // -----------------------------------------------------------
     // LEVEL 1: AKSES UMUM (Admin, Staff, Kades)
     // -----------------------------------------------------------
     Route::group(['middleware' => ['checkrole:admin,staff,kades']], function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/developer', [DeveloperController::class, 'index'])->name('developer.index');
     });
 
     // -----------------------------------------------------------

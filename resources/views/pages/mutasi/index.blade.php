@@ -70,7 +70,7 @@
                                         <div class="d-flex gap-2">
                                             {{-- Tombol Edit --}}
                                             <a href="{{ route('mutasi.edit', $item->mutasi_id) }}" class="btn btn-warning btn-sm" title="Edit Data">
-                                                <i class="bi bi-pencil-square"></i>
+                                                <i class="bi bi-pencil-square"></i> Edit
                                             </a>
 
                                             {{-- Tombol Hapus --}}
@@ -78,7 +78,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data mutasi ini?')" title="Hapus Data">
-                                                    <i class="bi bi-trash-fill"></i>
+                                                    <i class="bi bi-trash-fill"></i> Hapus
                                                 </button>
                                             </form>
                                         </div>

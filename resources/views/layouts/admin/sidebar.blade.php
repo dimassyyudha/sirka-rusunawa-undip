@@ -75,7 +75,7 @@
                 {{-- KELOMPOK 4: PENGATURAN / ADMIN --}}
                 <li class="sidebar-title"><b>Pengaturan</b></li>
 
-                {{-- Menu User hanya muncul untuk Admin (Opsional: Tambahkan @if(Auth::user()->role == 'admin') jika perlu) --}}
+                {{-- Menu User hanya muncul untuk Admin (Opsional: Tambahkan @if (Auth::user()->role == 'admin') jika perlu) --}}
                 <li class="sidebar-item {{ request()->routeIs('user.*') ? 'active' : '' }}">
                     <a href="{{ route('user.index') }}" class='sidebar-link'>
                         <i class="bi bi-person-badge-fill"></i>
@@ -92,6 +92,15 @@
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
+                </li>
+
+                <li class="sidebar-title"><b>Informasi</b></li>
+
+                <li class="sidebar-item {{ request()->routeIs('developer.*') ? 'active' : '' }}">
+                    <a href="{{ route('developer.index') }}" class='sidebar-link'>
+                        <i class="bi bi-code-square"></i>
+                        <span>Tentang Pengembang</span>
+                    </a>
                 </li>
 
             </ul>

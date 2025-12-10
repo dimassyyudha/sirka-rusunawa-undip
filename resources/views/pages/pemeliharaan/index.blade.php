@@ -82,12 +82,12 @@
                                         <div class="d-flex gap-2">
                                             {{-- Tombol Detail --}}
                                             <a href="{{ route('pemeliharaan.show', $item->pemeliharaan_id) }}" class="btn btn-info btn-sm text-white" title="Lihat Detail">
-                                                <i class="bi bi-eye"></i>
+                                                <i class="bi bi-eye"></i> Detail
                                             </a>
 
                                             {{-- Tombol Edit --}}
                                             <a href="{{ route('pemeliharaan.edit', $item->pemeliharaan_id) }}" class="btn btn-warning btn-sm" title="Edit Data">
-                                                <i class="bi bi-pencil-square"></i>
+                                                <i class="bi bi-pencil-square"></i> Edit
                                             </a>
 
                                             {{-- Tombol Hapus --}}
@@ -95,7 +95,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')" title="Hapus Data">
-                                                    <i class="bi bi-trash-fill"></i>
+                                                    <i class="bi bi-trash-fill"></i> Hapus
                                                 </button>
                                             </form>
                                         </div>

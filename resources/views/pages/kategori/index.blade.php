@@ -33,10 +33,14 @@
                         <td>{{ $item->nama }}</td>
                         <td>{{ $item->deskripsi }}</td>
                         <td>
-                            <a href="{{ route('kategori.edit', $item->kategori_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{{ route('kategori.edit', $item->kategori_id) }}" class="btn btn-warning btn-sm" title="Edit Data">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
                             <form action="{{ route('kategori.destroy', $item->kategori_id) }}" method="POST" class="d-inline">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Hapus kategori ini?')">Hapus</button>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Hapus kategori ini?')" title="Hapus Data">
+                                    <i class="bi bi-trash-fill"></i> Hapus
+                                </button>
                             </form>
                         </td>
                     </tr>
