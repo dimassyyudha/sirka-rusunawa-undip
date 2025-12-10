@@ -27,11 +27,32 @@
 
         <section class="section">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title">Tabel Mutasi</h4>
-                    <a href="{{ route('mutasi.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle me-2"></i> Tambah Mutasi
-                    </a>
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        {{-- KIRI: Tombol Tambah --}}
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <a href="{{ route('lokasi-aset.create') }}" class="btn btn-primary d-inline-flex align-items-center">
+                                <i class="bi bi-plus-circle me-2"></i> Tambah Lokasi
+                            </a>
+                        </div>
+                        {{-- KANAN: Filter Dropdown (Jenis Mutasi) --}}
+                        <div class="col-md-6 d-flex justify-content-md-end">
+                            <form action="{{ route('mutasi.index') }}" method="GET" class="d-flex align-items-center w-100 justify-content-end">
+                                <div class="input-group" style="max-width: 300px;">
+                                    <span class="input-group-text bg-white"><i class="bi bi-funnel"></i></span>
+                                    <select name="jenis_mutasi" class="form-select" onchange="this.form.submit()">
+                                        <option value="">Semua Jenis</option>
+                                        @php $jenisList = ['Pindah Lokasi', 'Alih Tanggung Jawab', 'Rusak Berat', 'Hibah', 'Lainnya']; @endphp
+                                        @foreach($jenisList as $jenis)
+                                            <option value="{{ $jenis }}" {{ request('jenis_mutasi') == $jenis ? 'selected' : '' }}>
+                                                {{ $jenis }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if (session('success'))
@@ -69,15 +90,19 @@
                                     <td>
                                         <div class="d-flex gap-2">
                                             {{-- Tombol Edit --}}
-                                            <a href="{{ route('mutasi.edit', $item->mutasi_id) }}" class="btn btn-warning btn-sm" title="Edit Data">
+                                            <a href="{{ route('mutasi.edit', $item->mutasi_id) }}"
+                                                class="btn btn-warning btn-sm" title="Edit Data">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </a>
 
                                             {{-- Tombol Hapus --}}
-                                            <form action="{{ route('mutasi.destroy', $item->mutasi_id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('mutasi.destroy', $item->mutasi_id) }}" method="POST"
+                                                class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data mutasi ini?')" title="Hapus Data">
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Yakin ingin menghapus data mutasi ini?')"
+                                                    title="Hapus Data">
                                                     <i class="bi bi-trash-fill"></i> Hapus
                                                 </button>
                                             </form>

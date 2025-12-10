@@ -80,7 +80,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($wargas as $warga)
+                            @foreach ($warga as $warga)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $warga->no_ktp }}</td>

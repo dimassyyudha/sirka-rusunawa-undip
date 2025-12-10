@@ -15,7 +15,7 @@ class LokasiAsetController extends Controller
         // Mengambil data lokasi beserta relasi aset dan medianya
         $lokasiAset = LokasiAset::with(['aset', 'media'])
             ->latest('lokasi_id')
-            ->paginate(10);
+            ->get();
 
         return view('pages.lokasi_aset.index', compact('lokasiAset'));
     }

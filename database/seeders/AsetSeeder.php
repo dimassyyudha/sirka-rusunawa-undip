@@ -9,7 +9,7 @@ use App\Models\Media; // Import Model Media
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\File; // Import Facade File
 
-class CreateAsetDummy extends Seeder
+class AsetSeeder extends Seeder
 {
     public function run(): void
     {
@@ -31,7 +31,7 @@ class CreateAsetDummy extends Seeder
         // --- SUMBER GAMBAR DUMMY ---
         // Kita pinjam gambar logo/default template untuk dijadikan dummy aset
         // Pastikan path ini benar ada di laptop Anda
-        $sourceImage = public_path('assets-admin/images/logo/logo-baru.png');
+        $sourceImage = public_path('assets-admin/images/seed/office.jpg');
 
         // Jika file logo tidak ada, kode akan skip proses copy agar tidak error
         $hasSourceImage = File::exists($sourceImage);

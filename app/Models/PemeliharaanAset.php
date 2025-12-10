@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Aset;
 use App\Models\Media;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PemeliharaanAset extends Model
@@ -26,6 +27,17 @@ class PemeliharaanAset extends Model
         'tanggal' => 'date',
         'biaya'   => 'decimal:2'
     ];
+
+    // Scope Filter (Tetap sama)
+    public function scopeFilter(Builder $query, Request $request, array $filterableColumns): Builder
+    {
+        foreach ($filterableColumns as $column) {
+            if ($request->filled($column)) {
+                $query->where($column, $request->input($column));
+            }
+        }
+        return $query;
+    }
 
     // Relasi ke Aset
     public function aset()

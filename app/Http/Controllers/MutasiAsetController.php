@@ -10,8 +10,12 @@ class MutasiAsetController extends Controller
 {
     public function index()
     {
-        // Eager load 'aset' agar performa query cepat
-        $dataMutasi = MutasiAset::with('aset')->latest('tanggal')->paginate(10);
+        // Ambil data dengan Filter
+        $dataMutasi = MutasiAset::with('aset')
+            ->latest('tanggal')
+            ->filter(request(['search', 'jenis_mutasi']))
+            ->get();
+
         return view('pages.mutasi.index', compact('dataMutasi'));
     }
 

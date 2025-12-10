@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\KategoriAset;
+use Faker\Factory as Faker;
 
 class KategoriAsetSeeder extends Seeder
 {
@@ -28,7 +29,19 @@ class KategoriAsetSeeder extends Seeder
                 'nama' => $kategori['nama'],
                 'kode' => $kategori['kode'],
                 'deskripsi' => 'Kategori aset untuk ' . $kategori['nama'],
+
             ]);
         }
+
+        $faker = Faker::create('id_ID');
+
+        for ($i = 1; $i <= 50; $i++) {
+            KategoriAset::create([
+                'kode' => Str::upper($faker->bothify('KAT-###')),
+                'nama' => $faker->word . ' ' . $faker->randomElement(['Elektronik', 'Mebel', 'Kendaraan', 'Mesin']),
+                'deskripsi' => $faker->sentence,
+            ]);
+        }
+
     }
 }

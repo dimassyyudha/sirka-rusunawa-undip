@@ -11,8 +11,7 @@ class Warga extends Model
 {
     use HasFactory;
 
-    // Menentukan nama tabel secara eksplisit
-    protected $table = 'wargas';
+    protected $table = 'warga';
 
     // Menentukan primary key
     protected $primaryKey = 'warga_id';

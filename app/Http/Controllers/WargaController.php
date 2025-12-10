@@ -11,10 +11,10 @@ class WargaController extends Controller
     {
         $columns = ['jenis_kelamin'];
 
-        $wargas = Warga::latest()
+        $warga = Warga::latest()
                 ->filter($request, $columns) // Panggil scopeFilter
                 ->get();
-        return view('pages.warga.index', compact('wargas'));
+        return view('pages.warga.index', compact('warga'));
     }
 
     public function create()
@@ -26,13 +26,13 @@ class WargaController extends Controller
     {
         // Validasi input
         $request->validate([
-            'no_ktp'        => 'required|string|size:16|unique:wargas,no_ktp',
+            'no_ktp'        => 'required|string|size:16|unique:warga,no_ktp',
             'nama'          => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'agama'         => 'required|string|max:50',
             'pekerjaan'     => 'required|string|max:100',
             'telp'          => 'nullable|string|max:15',
-            'email'         => 'nullable|email|unique:wargas,email'
+            'email'         => 'nullable|email|unique:warga,email'
         ]);
 
         Warga::create($request->all());
@@ -55,13 +55,13 @@ class WargaController extends Controller
     {
         // Validasi input
         $request->validate([
-            'no_ktp'        => 'required|string|size:16|unique:wargas,no_ktp,' . $warga->warga_id . ',warga_id',
+            'no_ktp'        => 'required|string|size:16|unique:warga,no_ktp,' . $warga->warga_id . ',warga_id',
             'nama'          => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'agama'         => 'required|string|max:50',
             'pekerjaan'     => 'required|string|max:100',
             'telp'          => 'nullable|string|max:15',
-            'email'         => 'nullable|email|unique:wargas,email,' . $warga->warga_id . ',warga_id'
+            'email'         => 'nullable|email|unique:warga,email,' . $warga->warga_id . ',warga_id'
         ]);
 
         $warga->update($request->all());

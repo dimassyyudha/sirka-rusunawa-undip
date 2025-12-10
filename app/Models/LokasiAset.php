@@ -5,7 +5,9 @@ namespace App\Models;
 use App\Models\Aset;
 use App\Models\Media;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Http\Request;
 
 class LokasiAset extends Model
 {

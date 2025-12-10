@@ -12,7 +12,7 @@ class PemeliharaanAsetController extends Controller
 {
     public function index()
     {
-        $dataPemeliharaan = PemeliharaanAset::with(['aset', 'bukti'])->latest('tanggal')->paginate(10);
+        $dataPemeliharaan = PemeliharaanAset::with(['aset', 'bukti'])->latest('tanggal')->get();;
         return view('pages.pemeliharaan.index', compact('dataPemeliharaan'));
     }
 

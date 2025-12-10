@@ -18,7 +18,7 @@ class KategoriAsetSeeder extends Seeder
         $faker = Faker::create('id_ID');
 
         // Loop untuk membuat 100 data
-        for ($i = 1; $i <= 100; $i++) {
+        for ($i = 1; $i <= 50; $i++) {
 
             // 1. Generate Nama Kategori unik (misalnya: Kursi Kantor, Alat Kebersihan Publik)
             $namaUnik = $faker->unique()->word() . ' ' . $faker->randomElement(['Kantor', 'Desa', 'Peralatan', 'Inventaris', 'Publik']);

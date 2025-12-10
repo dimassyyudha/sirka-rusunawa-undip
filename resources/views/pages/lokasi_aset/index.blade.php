@@ -27,11 +27,15 @@
 
         <section class="section">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title">Tabel Lokasi</h4>
-                    <a href="{{ route('lokasi-aset.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle me-2"></i> Tambah Lokasi
-                    </a>
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        {{-- KIRI: Tombol Tambah --}}
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <a href="{{ route('lokasi-aset.create') }}" class="btn btn-primary d-inline-flex align-items-center">
+                                <i class="bi bi-plus-circle me-2"></i> Tambah Lokasi
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if (session('success'))
