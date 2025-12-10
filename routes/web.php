@@ -1,15 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AsetController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\InventarisController;
-use App\Http\Controllers\KategoriAsetController;
-use App\Http\Controllers\LokasiAsetController;
-use App\Http\Controllers\MediaController;
-use App\Http\Controllers\PemeliharaanAsetController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\WargaController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LokasiAsetController;
+use App\Http\Controllers\MutasiAsetController;
+use App\Http\Controllers\KategoriAsetController;
+use App\Http\Controllers\PemeliharaanAsetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,7 @@ Route::group(['middleware' => ['checkislogin']], function () {
     // LEVEL 1: AKSES UMUM (Admin, Staff, Kades)
     // -----------------------------------------------------------
     Route::group(['middleware' => ['checkrole:admin,staff,kades']], function () {
-        Route::get('/dashboard', [InventarisController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     });
 
     // -----------------------------------------------------------
@@ -53,6 +54,7 @@ Route::group(['middleware' => ['checkislogin']], function () {
         Route::resource('kategori', KategoriAsetController::class);
         Route::resource('warga', WargaController::class);
         Route::resource('lokasi-aset', LokasiAsetController::class);
+        Route::resource('mutasi', MutasiAsetController::class);
 
         // --- PERBAIKAN: Letakkan Route Custom DI ATAS Resource ---
         // Agar tidak tertimpa oleh route 'show' milik resource
