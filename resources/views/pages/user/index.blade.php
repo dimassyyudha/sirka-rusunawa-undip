@@ -77,12 +77,12 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('user.edit', $item->id) }}" class="btn btn-warning btn-sm">
-                                            <i class="bi bi-pencil-square"></i>
+                                            <i class="bi bi-pencil-square"></i> Edit
                                         </a>
                                         <form action="{{ route('user.destroy', $item->id) }}" method="POST" class="d-inline">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Hapus?')">
-                                                <i class="bi bi-trash-fill"></i>
+                                                <i class="bi bi-trash-fill"></i> Hapus
                                             </button>
                                         </form>
                                     </td>

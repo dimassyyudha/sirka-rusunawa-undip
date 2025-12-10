@@ -1,29 +1,31 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AsetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InventarisController;
-use App\Http\Controllers\AsetController;
 use App\Http\Controllers\KategoriAsetController;
-use App\Http\Controllers\WargaController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\LokasiAsetController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PemeliharaanAsetController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WargaController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | 1. GROUP GUEST (Belum Login)
 |--------------------------------------------------------------------------
 */
-    // Redirect halaman awal ke login
-    Route::get('/', function () {
-        return redirect()->route('auth.login');
-    });
+// Redirect halaman awal ke login
+Route::get('/', function () {
+    return redirect()->route('auth.login');
+});
 
-    Route::get('login', [AuthController::class, 'showLoginForm'])->name('auth.login');
-    Route::post('login', [AuthController::class, 'login']);
+Route::get('login', [AuthController::class, 'showLoginForm'])->name('auth.login');
+Route::post('login', [AuthController::class, 'login']);
 
-    Route::get('register', [AuthController::class, 'showRegisterForm'])->name('auth.register');
-    Route::post('register', [AuthController::class, 'register']);
+Route::get('register', [AuthController::class, 'showRegisterForm'])->name('auth.register');
+Route::post('register', [AuthController::class, 'register']);
 
 /*
 |--------------------------------------------------------------------------
@@ -46,10 +48,18 @@ Route::group(['middleware' => ['checkislogin']], function () {
     // LEVEL 2: AKSES OPERASIONAL (Admin & Staff)
     // -----------------------------------------------------------
     Route::group(['middleware' => ['checkrole:admin,staff']], function () {
-        // CRUD Utama
+        // CRUD Aset & Lainnya
         Route::resource('aset', AsetController::class);
         Route::resource('kategori', KategoriAsetController::class);
         Route::resource('warga', WargaController::class);
+        Route::resource('lokasi-aset', LokasiAsetController::class);
+
+        // --- PERBAIKAN: Letakkan Route Custom DI ATAS Resource ---
+        // Agar tidak tertimpa oleh route 'show' milik resource
+        Route::get('pemeliharaan/delete-bukti/{id}', [PemeliharaanAsetController::class, 'deleteBukti'])
+            ->name('pemeliharaan.delete-bukti');
+
+        Route::resource('pemeliharaan', PemeliharaanAsetController::class);
 
         // Upload Media
         Route::post('/media/store', [MediaController::class, 'store'])->name('media.store');

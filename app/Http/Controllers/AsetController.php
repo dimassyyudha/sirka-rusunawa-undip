@@ -83,15 +83,18 @@ class AsetController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Aset $aset)
+    public function show($aset_id)
     {
-        // Ambil data media
-    $files = Media::where('ref_table', 'aset') // Coba pakai nama singular
-              ->where('ref_id', $aset->aset_id)
-              ->latest()
-              ->get();
+        // Sesuaikan dengan nama PK Anda (id atau aset_id)
+        $aset = Aset::with('kategoriAset')->findOrFail($aset_id);
 
-    return view('pages.aset.show', compact('aset', 'files'));
+        // Ambil semua file terkait aset ini
+        $files = Media::where('ref_table', 'aset')
+                      ->where('ref_id', $aset_id)
+                      ->latest()
+                      ->get();
+
+        return view('pages.aset.show', compact('aset', 'files'));
     }
 
     /**

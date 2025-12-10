@@ -32,6 +32,18 @@
                         <span>Daftar Aset</span>
                     </a>
                 </li>
+                <li class="sidebar-item {{ request()->routeIs('lokasi-aset.*') ? 'active' : '' }}">
+                    <a href="{{ route('lokasi-aset.index') }}" class='sidebar-link'>
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Lokasi Aset</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ request()->routeIs('pemeliharaan.*') ? 'active' : '' }}">
+                    <a href="{{ route('pemeliharaan.index') }}" class='sidebar-link'>
+                        <i class="bi bi-tools"></i>
+                        <span>Pemeliharaan Aset</span>
+                    </a>
+                </li>
                 <li class="sidebar-item {{ request()->routeIs('warga.*') ? 'active' : '' }}">
                     <a href="{{ route('warga.index') }}" class='sidebar-link'>
                         <i class="bi bi-people"></i>
