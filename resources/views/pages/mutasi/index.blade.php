@@ -122,11 +122,6 @@
                                     <td>{{ $item->keterangan ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-2">
-                                            {{-- Tombol Detail --}}
-                                            <a href="{{ route('mutasi.show', $item->mutasi_id) }}" class="btn btn-info btn-sm text-white" title="Lihat Detail">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-
                                             {{-- Tombol Edit --}}
                                             <a href="{{ route('mutasi.edit', $item->mutasi_id) }}"
                                                 class="btn btn-warning btn-sm" title="Edit Data">
