@@ -5,16 +5,12 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\KategoriAset;
 use Faker\Factory as Faker;
-use Illuminate\Support\Str; // <--- BARIS INI YANG KURANG SEBELUMNYA
+use Illuminate\Support\Str;
 
 class KategoriAsetSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. Buat Kategori Tetap (Static)
         $daftarKategori = [
             ['nama' => 'Elektronik', 'kode' => 'ELK'],
             ['nama' => 'Furniture Kantor', 'kode' => 'FUR'],
@@ -27,19 +23,23 @@ class KategoriAsetSeeder extends Seeder
         ];
 
         foreach ($daftarKategori as $kategori) {
-            KategoriAset::create([
-                'nama' => $kategori['nama'],
-                'kode' => $kategori['kode'],
-                'deskripsi' => 'Kategori aset untuk ' . $kategori['nama'],
-            ]);
+            KategoriAset::firstOrCreate(
+                ['kode' => $kategori['kode']],
+                [
+                    'nama' => $kategori['nama'],
+                    'deskripsi' => 'Kategori aset untuk ' . $kategori['nama']
+                ]
+            );
         }
 
-        // 2. Buat Kategori Dummy Tambahan (50 Data)
+        // 2. Kategori Dummy Tambahan (50 Data)
         $faker = Faker::create('id_ID');
 
         for ($i = 1; $i <= 50; $i++) {
+            $kodeUnik = Str::upper($faker->unique()->bothify('KAT-###'));
+
             KategoriAset::create([
-                'kode' => Str::upper($faker->bothify('KAT-###')), // Sekarang Str sudah dikenali
+                'kode' => $kodeUnik,
                 'nama' => $faker->word . ' ' . $faker->randomElement(['Elektronik', 'Mebel', 'Kendaraan', 'Mesin']),
                 'deskripsi' => $faker->sentence,
             ]);
