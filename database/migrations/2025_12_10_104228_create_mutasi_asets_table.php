@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mutasi_aset', function (Blueprint $table) {
-            $table->id('mutasi_id'); // PK Custom
+            $table->id('mutasi_id');
 
             // FK ke tabel aset
             $table->foreignId('aset_id')
@@ -20,7 +20,13 @@ return new class extends Migration
                   ->onDelete('cascade');
 
             $table->date('tanggal');
-            $table->string('jenis_mutasi'); // Contoh: Pindah Lokasi, Hibah, Rusak
+            $table->enum('jenis_mutasi', [
+                'Pemindahan',
+                'Penghapusan',
+                'Perubahan Status',
+                'Peminjaman',
+                'Pengembalian'
+            ]);
             $table->text('keterangan')->nullable();
 
             $table->timestamps();

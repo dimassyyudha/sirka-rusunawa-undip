@@ -31,8 +31,8 @@
                     <div class="row align-items-center">
                         {{-- KIRI: Tombol Tambah --}}
                         <div class="col-md-6 mb-3 mb-md-0">
-                            <a href="{{ route('lokasi-aset.create') }}" class="btn btn-primary d-inline-flex align-items-center">
-                                <i class="bi bi-plus-circle me-2"></i> Tambah Lokasi
+                            <a href="{{ route('pemeliharaan.create') }}" class="btn btn-primary d-inline-flex align-items-center">
+                                <i class="bi bi-plus-circle me-2"></i> Tambah
                             </a>
                         </div>
                     </div>

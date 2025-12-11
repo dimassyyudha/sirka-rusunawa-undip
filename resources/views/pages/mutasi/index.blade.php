@@ -31,20 +31,30 @@
                     <div class="row align-items-center">
                         {{-- KIRI: Tombol Tambah --}}
                         <div class="col-md-6 mb-3 mb-md-0">
-                            <a href="{{ route('lokasi-aset.create') }}" class="btn btn-primary d-inline-flex align-items-center">
-                                <i class="bi bi-plus-circle me-2"></i> Tambah Lokasi
+                            <a href="{{ route('mutasi.create') }}" class="btn btn-primary d-inline-flex align-items-center">
+                                <i class="bi bi-plus-circle me-2"></i> Tambah Mutasi
                             </a>
                         </div>
                         {{-- KANAN: Filter Dropdown (Jenis Mutasi) --}}
                         <div class="col-md-6 d-flex justify-content-md-end">
-                            <form action="{{ route('mutasi.index') }}" method="GET" class="d-flex align-items-center w-100 justify-content-end">
+                            <form action="{{ route('mutasi.index') }}" method="GET"
+                                class="d-flex align-items-center w-100 justify-content-end">
                                 <div class="input-group" style="max-width: 300px;">
                                     <span class="input-group-text bg-white"><i class="bi bi-funnel"></i></span>
                                     <select name="jenis_mutasi" class="form-select" onchange="this.form.submit()">
                                         <option value="">Semua Jenis</option>
-                                        @php $jenisList = ['Pindah Lokasi', 'Alih Tanggung Jawab', 'Rusak Berat', 'Hibah', 'Lainnya']; @endphp
-                                        @foreach($jenisList as $jenis)
-                                            <option value="{{ $jenis }}" {{ request('jenis_mutasi') == $jenis ? 'selected' : '' }}>
+                                        @php
+                                            $jenisList = [
+                                                'Pemindahan',
+                                                'Penghapusan',
+                                                'Perubahan Status',
+                                                'Peminjaman',
+                                                'Pengembalian',
+                                            ];
+                                        @endphp
+                                        @foreach ($jenisList as $jenis)
+                                            <option value="{{ $jenis }}"
+                                                {{ request('jenis_mutasi') == $jenis ? 'selected' : '' }}>
                                                 {{ $jenis }}
                                             </option>
                                         @endforeach
@@ -84,15 +94,43 @@
                                         <small class="text-muted">{{ $item->aset->kode_aset }}</small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-light-primary text-primary">{{ $item->jenis_mutasi }}</span>
+                                        @switch($item->jenis_mutasi)
+                                            @case('Pemindahan')
+                                                <span class="badge bg-primary">Pemindahan</span>
+                                            @break
+
+                                            @case('Penghapusan')
+                                                <span class="badge bg-danger">Penghapusan</span>
+                                            @break
+
+                                            @case('Perubahan Status')
+                                                <span class="badge bg-warning text-dark">Perubahan Status</span>
+                                            @break
+
+                                            @case('Peminjaman')
+                                                <span class="badge bg-info text-dark">Peminjaman</span>
+                                            @break
+
+                                            @case('Pengembalian')
+                                                <span class="badge bg-success">Pengembalian</span>
+                                            @break
+
+                                            @default
+                                                <span class="badge bg-secondary">{{ $item->jenis_mutasi }}</span>
+                                        @endswitch
                                     </td>
                                     <td>{{ $item->keterangan ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-2">
+                                            {{-- Tombol Detail --}}
+                                            <a href="{{ route('mutasi.show', $item->mutasi_id) }}" class="btn btn-info btn-sm text-white" title="Lihat Detail">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
                                             {{-- Tombol Edit --}}
                                             <a href="{{ route('mutasi.edit', $item->mutasi_id) }}"
                                                 class="btn btn-warning btn-sm" title="Edit Data">
-                                                <i class="bi bi-pencil-square"></i> Edit
+                                                <i class="bi bi-pencil-square"></i>
                                             </a>
 
                                             {{-- Tombol Hapus --}}
@@ -103,7 +141,7 @@
                                                 <button type="submit" class="btn btn-danger btn-sm"
                                                     onclick="return confirm('Yakin ingin menghapus data mutasi ini?')"
                                                     title="Hapus Data">
-                                                    <i class="bi bi-trash-fill"></i> Hapus
+                                                    <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
                                         </div>

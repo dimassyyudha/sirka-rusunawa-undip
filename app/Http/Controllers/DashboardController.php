@@ -41,7 +41,7 @@ class DashboardController extends Controller
         // 5. TABEL: 5 PEMELIHARAAN TERAKHIR
         $latestMt = PemeliharaanAset::with('aset')
                                     ->latest('tanggal')
-                                    ->take(5)
+                                    ->take(2)
                                     ->get();
 
         return view('pages.dashboard.dashboard', compact(

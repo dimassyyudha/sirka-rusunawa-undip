@@ -29,7 +29,7 @@ class WargaController extends Controller
             'no_ktp'        => 'required|string|size:16|unique:warga,no_ktp',
             'nama'          => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'agama'         => 'required|string|max:50',
+            'agama'         => 'required|in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu',
             'pekerjaan'     => 'required|string|max:100',
             'telp'          => 'nullable|string|max:15',
             'email'         => 'nullable|email|unique:warga,email'
@@ -58,7 +58,7 @@ class WargaController extends Controller
             'no_ktp'        => 'required|string|size:16|unique:warga,no_ktp,' . $warga->warga_id . ',warga_id',
             'nama'          => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'agama'         => 'required|string|max:50',
+            'agama'         => 'required|in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu',
             'pekerjaan'     => 'required|string|max:100',
             'telp'          => 'nullable|string|max:15',
             'email'         => 'nullable|email|unique:warga,email,' . $warga->warga_id . ',warga_id'

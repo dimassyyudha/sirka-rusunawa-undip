@@ -5,12 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistem Inventaris Aset</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets-admin/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('assets-admin/vendors/bootstrap-icons/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('assets-admin/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('assets-admin/css/pages/auth.css') }}">
+
+    {{-- CSS TAMBAHAN AGAR PAS 1 LAYAR (TIDAK SCROLL) --}}
+    <style>
+        body, html { height: 100%; overflow: hidden; }
+        #auth, #auth .row { height: 100vh !important; }
+        #auth-left {
+            padding: 3rem 5rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        @media (max-width: 767px) {
+            #auth-left { padding: 2rem; overflow-y: auto; } /* Mobile tetap scroll jika perlu */
+        }
+    </style>
 </head>
 
 <body>
@@ -18,67 +33,50 @@
         <div class="row h-100">
             <div class="col-lg-5 col-12">
                 <div id="auth-left">
-                    <div class="logo" style="text-align: center; margin-bottom: 1rem;">
+                    <div class="logo text-center mb-3">
                         <a href="{{ route('dashboard') }}">
-                            <img style="width: 350px; height: auto; max-width: 90%;"
-                                 src="{{ asset('assets-admin/images/logo/logo-baru.png') }}" alt="Logo">
+                            <img src="{{ asset('assets-admin/images/logo/lg_vertikal.png') }}"
+                                 alt="Logo"
+                                 style="height: 160px; width: auto; object-fit: contain;">
                         </a>
                     </div>
-                    <h1 class="auth-title">Sistem Inventaris Aset</h1>
-                    <p class="auth-subtitle mb-5">Silakan masuk untuk mengelola data aset.</p>
 
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                aria-label="Close"></button>
-                        </div>
-                    @endif
+                    {{-- JUDUL LEBIH RAPAT --}}
+                    <h1 class="auth-title fs-2 mb-2">Log in.</h1>
+                    <p class="auth-subtitle fs-6 mb-3 text-muted">Masuk ke sistem inventaris.</p>
+
                     @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            @foreach ($errors->all() as $error)
-                                <div>{{ $error }}</div>
-                            @endforeach
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                aria-label="Close"></button>
+                        <div class="alert alert-danger py-2 fs-6">
+                            {{ $errors->first() }}
                         </div>
                     @endif
 
                     <form action="{{ route('auth.login') }}" method="POST">
                         @csrf
-                        <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="email" class="form-control form-control-xl" placeholder="Email"
-                                name="email" value="{{ old('email') }}" required>
+                        <div class="form-group position-relative has-icon-left mb-3">
+                            <input type="email" name="email" class="form-control form-control-lg" placeholder="Email" required value="{{ old('email') }}">
                             <div class="form-control-icon">
-                                <i class="bi bi-envelope"></i>
+                                <i class="bi bi-person"></i>
                             </div>
                         </div>
-                        <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="password" class="form-control form-control-xl" placeholder="Password"
-                                name="password" required>
+                        <div class="form-group position-relative has-icon-left mb-3">
+                            <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" required>
                             <div class="form-control-icon">
                                 <i class="bi bi-shield-lock"></i>
                             </div>
                         </div>
-                        <div class="form-check form-check-lg d-flex align-items-end">
-                            <input class="form-check-input me-2" type="checkbox" id="rememberMe" name="remember">
-                            <label class="form-check-label text-gray-600" for="rememberMe">
-                                Ingat saya
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Log in</button>
                     </form>
-                    <div class="text-center mt-5 text-lg fs-4">
-                        <p class="text-gray-600">Belum punya akun? <a href="{{ route('auth.register') }}"
-                                class="font-bold">Sign up</a>.</p>
+                    <div class="text-center mt-3 text-sm">
+                        <p class="text-gray-600 mb-0">Belum punya akun? <a href="{{ route('auth.register') }}" class="font-bold">Daftar</a>.</p>
                     </div>
                 </div>
             </div>
 
-            {{-- Bagian Kanan (Gambar Background) --}}
-            <div class="col-lg-7 d-none d-lg-block">
-                <div id="auth-right"
-                    style="
+            <div class="col-lg-7 d-none d-lg-block p-0">
+                <div id="auth-right" style="
+                    height: 100vh;
                     background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ asset('assets-admin/images/bg/inventaris-bg.jpg') }}');
                     background-size: cover;
                     background-position: center;
@@ -86,18 +84,14 @@
                     align-items: center;
                     justify-content: center;
                     flex-direction: column;
-                    padding: 2rem;
                     text-align: center;
                     color: white;
                 ">
-                    <h2>Manajemen Aset Digital</h2>
-                    <p style="font-size: 1.2rem;">
-                        Kelola semua aset Anda dengan mudah, terpusat, dan efisien.
-                    </p>
+                    <h2 class="text-white mb-2">Manajemen Aset Digital</h2>
+                    <p class="text-white px-5">Sistem pengelolaan inventaris yang transparan dan akuntabel.</p>
                 </div>
             </div>
         </div>
     </div>
 </body>
-
 </html>

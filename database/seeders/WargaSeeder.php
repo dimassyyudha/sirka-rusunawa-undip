@@ -21,7 +21,7 @@ class WargaSeeder extends Seeder
                 'no_ktp' => $faker->unique()->nik(),
                 'nama' => $faker->name,
                 'jenis_kelamin' => $faker->randomElement(['Laki-laki', 'Perempuan']),
-                'agama' => $faker->randomElement(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu']),
+                'agama' => $faker->randomElement(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu']),
                 'pekerjaan' => $faker->jobTitle,
                 'telp' => $faker->numerify('08##########'),
                 'email' => $faker->unique()->safeEmail,

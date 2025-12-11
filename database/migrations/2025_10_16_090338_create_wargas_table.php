@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('no_ktp', 16)->unique(); // Unique: no_ktp
             $table->string('nama');
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
-            $table->string('agama');
+            $table->enum('agama', ['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu']);
             $table->string('pekerjaan');
             $table->string('telp', 15)->nullable(); // Boleh kosong
             $table->string('email')->unique()->nullable(); // Boleh kosong dan harus unik

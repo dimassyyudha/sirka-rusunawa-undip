@@ -30,7 +30,7 @@ class MutasiAsetController extends Controller
         $request->validate([
             'aset_id'      => 'required|exists:aset,aset_id',
             'tanggal'      => 'required|date',
-            'jenis_mutasi' => 'required|string|max:100',
+            'jenis_mutasi' => 'required|in:Pemindahan,Penghapusan,Perubahan Status,Peminjaman,Pengembalian',
             'keterangan'   => 'nullable|string',
         ]);
 
@@ -53,7 +53,7 @@ class MutasiAsetController extends Controller
         $request->validate([
             'aset_id'      => 'required|exists:aset,aset_id',
             'tanggal'      => 'required|date',
-            'jenis_mutasi' => 'required|string|max:100',
+            'jenis_mutasi' => 'required|in:Pemindahan,Penghapusan,Perubahan Status,Peminjaman,Pengembalian',
             'keterangan'   => 'nullable|string',
         ]);
 

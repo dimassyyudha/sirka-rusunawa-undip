@@ -16,11 +16,14 @@ class MutasiAsetSeeder extends Seeder
 
         if (empty($asetIds)) return;
 
+        // Daftar Enum Baru
+        $jenisList = ['Pemindahan', 'Penghapusan', 'Perubahan Status', 'Peminjaman', 'Pengembalian'];
+
         for ($i = 1; $i <= 50; $i++) {
             MutasiAset::create([
                 'aset_id' => $faker->randomElement($asetIds),
                 'tanggal' => $faker->dateTimeBetween('-6 months', 'now'),
-                'jenis_mutasi' => $faker->randomElement(['Pindah Lokasi', 'Hibah', 'Rusak Berat', 'Alih Fungsi']),
+                'jenis_mutasi' => $faker->randomElement($jenisList), // Pakai list baru
                 'keterangan' => $faker->sentence,
             ]);
         }
