@@ -9,11 +9,22 @@ use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        $dataUser = User::all();
-        return view('pages.user.index', compact('dataUser'));
+    public function index(Request $request)
+{
+    // 1. Mulai Query User
+    $query = User::query();
+
+    // 2. Cek apakah ada filter 'role' yang dikirim
+    if ($request->filled('role')) {
+        $query->where('role', $request->role);
     }
+
+    // 3. Ambil data (menggunakan latest agar data baru dipaling atas)
+    $dataUser = $query->latest()->get();
+
+    // 4. Return view
+    return view('pages.user.index', compact('dataUser'));
+}
 
     public function create()
     {

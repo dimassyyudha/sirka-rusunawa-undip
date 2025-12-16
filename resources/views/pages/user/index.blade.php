@@ -26,10 +26,34 @@
 
         <section class="section">
             <div class="card">
-                <div class="card-header">
-                    <a href="{{ route('user.create') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i> Tambah User
-                    </a>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    {{-- BAGIAN KIRI: Tombol Tambah --}}
+                    <div>
+                        <a href="{{ route('user.create') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i> Tambah User
+                        </a>
+                    </div>
+
+                    {{-- BAGIAN KANAN: Filter Role --}}
+                    <div class="d-flex align-items-center">
+                        <form action="{{ route('user.index') }}" method="GET" class="d-flex gap-2">
+
+                            {{-- Dropdown Filter --}}
+                            <select name="role" class="form-select" onchange="this.form.submit()" style="width: 200px;">
+                                <option value="">-- Semua Role --</option>
+                                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrator</option>
+                                <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Staff Inventaris</option>
+                                <option value="kades" {{ request('role') == 'kades' ? 'selected' : '' }}>Kepala Desa</option>
+                            </select>
+
+                            {{-- Tombol Reset (Muncul hanya jika sedang memfilter) --}}
+                            @if(request('role'))
+                                <a href="{{ route('user.index') }}" class="btn btn-secondary" title="Reset Filter">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            @endif
+                        </form>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if (session('success'))
