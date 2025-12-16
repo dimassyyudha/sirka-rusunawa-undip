@@ -26,7 +26,6 @@ class DashboardController extends Controller
         $totalBiayaMt   = PemeliharaanAset::sum('biaya');
 
         // 3. CHART DATA: ASET BERDASARKAN KONDISI
-        // Output: [ 'Baik' => 10, 'Rusak Ringan' => 5, 'Rusak Berat' => 2 ]
         $chartKondisi = Aset::select('kondisi', DB::raw('count(*) as total'))
                             ->groupBy('kondisi')
                             ->pluck('total', 'kondisi')
@@ -51,3 +50,4 @@ class DashboardController extends Controller
         ));
     }
 }
+

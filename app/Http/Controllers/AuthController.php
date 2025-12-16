@@ -65,11 +65,10 @@ class AuthController extends Controller
         $data['name']     = $request->nama;
         $data['email']    = $request->email;
         $data['password'] = Hash::make($request->password);
-        $data['role']     = $request->role; // <-- Tambahkan Simpan Role
+        $data['role']     = $request->role;
 
         User::create($data);
 
-        // 3. Redirect ke login dengan pesan sukses
         return redirect()->route('auth.login')->with('success', 'Registrasi berhasil! Silakan Login');
     }
 
