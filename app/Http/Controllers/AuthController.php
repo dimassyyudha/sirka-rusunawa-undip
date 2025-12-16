@@ -49,7 +49,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'nama' => 'required|max:100',
-            'email' => ['required', 'email', 'unique:user,email'],
+            'email' => ['required', 'email', 'unique:users,email'],
             'role' => 'required|in:admin,staff,kades',
             'password' => 'required|min:8|confirmed',
         ], [

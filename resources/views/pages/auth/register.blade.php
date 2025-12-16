@@ -57,7 +57,7 @@
                         @csrf
                         {{-- Input lebih rapat (mb-2) --}}
                         <div class="form-group position-relative has-icon-left mb-2">
-                            <input type="text" class="form-control" name="name" placeholder="Nama Lengkap" required>
+                            <input type="text" class="form-control" name="nama" placeholder="Nama Lengkap" required>
                             <div class="form-control-icon">
                                 <i class="bi bi-person"></i>
                             </div>
@@ -68,8 +68,25 @@
                                 <i class="bi bi-envelope"></i>
                             </div>
                         </div>
+                        <div class="form-group position-relative has-icon-left mb-2">
+                            <select name="role" class="form-select" style="padding-left: 2.5rem;" required>
+                                <option value="" disabled selected>-- Pilih Role Pengguna --</option>
+                                <option value="admin">Administrator</option>
+                                <option value="staff">Staff Inventaris</option>
+                                <option value="kades">Kepala Desa</option>
+                            </select>
+                            <div class="form-control-icon">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+                        </div>
                         <div class="form-group position-relative has-icon-left mb-3">
                             <input type="password" class="form-control" name="password" placeholder="Password" required>
+                            <div class="form-control-icon">
+                                <i class="bi bi-shield-lock"></i>
+                            </div>
+                        </div>
+                        <div class="form-group position-relative has-icon-left mb-3">
+                            <input type="password" class="form-control" name="password_confirmation" placeholder="Ulangi Password" required>
                             <div class="form-control-icon">
                                 <i class="bi bi-shield-lock"></i>
                             </div>
