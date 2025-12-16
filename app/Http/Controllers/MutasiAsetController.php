@@ -39,6 +39,11 @@ class MutasiAsetController extends Controller
         return redirect()->route('mutasi.index')->with('success', 'Data mutasi berhasil dicatat!');
     }
 
+    public function show()
+    {
+        //
+    }
+
     public function edit($id)
     {
         $mutasi = MutasiAset::findOrFail($id);
