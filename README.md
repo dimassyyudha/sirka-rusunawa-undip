@@ -42,7 +42,7 @@ Sistem membedakan hak akses menggunakan **Middleware** untuk 3 tipe pengguna:
 
 Sistem ini menggunakan basis data relasional yang kompleks. Berikut adalah desain **Entity Relationship Diagram (ERD)** yang digunakan:
 
-![ERD Database Sistem Inventaris](public/assets-admin/images/erd.png)
+![ERD Database Sistem Inventaris](public/assets-admin/images/screenshots/erd.png)
 
 *Keterangan: Relasi mencakup tabel Users, Aset (Inti), Mutasi, Pemeliharaan, dan Media (Polymorphic).*
 
@@ -52,9 +52,6 @@ Sistem ini menggunakan basis data relasional yang kompleks. Berikut adalah desai
 - **Database:** MySQL
 - **Frontend:** Blade Templating + Bootstrap 5
 - **Template Admin:** Mazer Dashboard
-- **Library Tambahan:**
-  - `intervention/image` (Kompresi gambar)
-  - `barryvdh/laravel-dompdf` (Cetak PDF)
 
 ## 🚀 Cara Instalasi (Localhost)
 
