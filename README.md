@@ -1,61 +1,66 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Informasi Inventaris Aset Desa (Bina Desa)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Final-success?style=for-the-badge)
 
-## About Laravel
+Sistem Informasi Inventaris Aset Desa adalah aplikasi berbasis web yang dirancang untuk mendigitalisasi proses pencatatan, pemantauan, dan pelaporan aset milik desa. Sistem ini menggantikan pencatatan manual dengan *database* terpusat yang transparan dan akuntabel.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Project ini dikembangkan sebagai bagian dari tugas **Finalisasi Project Mata Kuliah Pemrograman Framework**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📸 Screenshots
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Halaman Login | Dashboard Statistik |
+|:---:|:---:|
+| <img src="public/assets-admin/images/screenshots/login.png" width="400"> | <img src="public/assets-admin/images/screenshots/dashboard.png" width="400"> |
+| *Tampilan login dengan keamanan enkripsi dan validasi role pengguna.* | *Dashboard interaktif menampilkan total aset dan grafik kondisi barang.* |
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## ✨ Fitur Unggulan
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1. Manajemen Aset Terpadu
+- **CRUD Aset Lengkap:** Input data aset detail (Kode, Harga, Tanggal Perolehan, Kondisi).
+- **Galeri Foto:** Upload foto aset.
+- **Kategorisasi:** Pengelompokan aset berdasarkan kategori dan lokasi (RT/RW/Ruangan).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Transaksi & Riwayat (Tracking)
+- **Mutasi Aset:** Mencatat perpindahan lokasi, perubahan kondisi (Baik -> Rusak), atau penghapusan aset.
+- **Pemeliharaan (Maintenance):** Mencatat riwayat servis aset lengkap dengan biaya dan **Multiple File Upload** (Bukti Nota/Foto Pengerjaan).
 
-## Laravel Sponsors
+### 3. Keamanan & Hak Akses (RBAC)
+Sistem membedakan hak akses menggunakan **Middleware** untuk 3 tipe pengguna:
+- **Administrator:** *Full Access* (Kelola User, Master Data, CRUD Aset, Laporan).
+- **Staff Inventaris:** Fokus operasional (Input Aset, Mutasi, Pemeliharaan).
+- **Kepala Desa (Kades):** *Read-Only* (Hanya bisa melihat Dashboard statistik dan Detail Aset untuk monitoring).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 4. Fitur Teknis Lainnya
+- **Dashboard Statistik:** Grafik visual total aset dan kondisi barang.
+- **Filter & Pencarian:** Server-side filtering untuk menangani data besar.
+- **Cetak Laporan:** Export data aset dan riwayat mutasi.
 
-### Premium Partners
+## 🗂️ Struktur Database (ERD)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Sistem ini menggunakan basis data relasional yang kompleks. Berikut adalah desain **Entity Relationship Diagram (ERD)** yang digunakan:
 
-## Contributing
+![ERD Database Sistem Inventaris](public/assets-admin/images/erd.png)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+*Keterangan: Relasi mencakup tabel Users, Aset (Inti), Mutasi, Pemeliharaan, dan Media (Polymorphic).*
 
-## Code of Conduct
+## 🛠️ Teknologi yang Digunakan
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- **Framework:** Laravel 11 (PHP 8.2+)
+- **Database:** MySQL
+- **Frontend:** Blade Templating + Bootstrap 5
+- **Template Admin:** Mazer Dashboard
+- **Library Tambahan:**
+  - `intervention/image` (Kompresi gambar)
+  - `barryvdh/laravel-dompdf` (Cetak PDF)
 
-## Security Vulnerabilities
+## 🚀 Cara Instalasi (Localhost)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Ikuti langkah-langkah berikut untuk menjalankan project di komputer lokal:
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. **Clone Repository**
+   ```bash
+   git clone (https://github.com/dzakwan24si/inventaris-admin.git)
+   cd nama-repo
