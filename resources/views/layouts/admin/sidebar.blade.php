@@ -3,19 +3,21 @@
         <div class="sidebar-header">
             <div class="d-flex justify-content-between">
                 <div class="logo">
-                    <a href="{{ route('dashboard') }}"><img src="{{ asset('assets-admin/images/logo/logo-baru.png') }}"
-                            alt="Logo"></a>
+                    <a href="{{ route('dashboard') }}">
+                        {{-- Pastikan path logo sesuai --}}
+                        <img src="{{ asset('assets-admin/images/logo/logo-baru.png') }}" alt="Logo" style="height: 50px;">
+                    </a>
                 </div>
                 <div class="toggler">
                     <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
                 </div>
             </div>
         </div>
-        
+
         <div class="sidebar-menu">
             <ul class="menu">
 
-                {{-- KELOMPOK 1: MENU UTAMA --}}
+                {{-- KELOMPOK 1: MENU UTAMA (SEMUA ROLE) --}}
                 <li class="sidebar-title"><b>Menu Utama</b></li>
 
                 <li class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -25,7 +27,8 @@
                     </a>
                 </li>
 
-                {{-- KELOMPOK 2: INVENTARISASI (INTI) --}}
+                {{-- KELOMPOK 2: INVENTARISASI (SEMUA ROLE) --}}
+                {{-- Kades & Staff tetap bisa lihat menu ini (Read Only untuk Kades) --}}
                 <li class="sidebar-title"><b>Inventarisasi</b></li>
 
                 <li class="sidebar-item {{ request()->routeIs('aset.*') ? 'active' : '' }}">
@@ -49,7 +52,7 @@
                     </a>
                 </li>
 
-                {{-- KELOMPOK 3: MASTER DATA (REFERENSI) --}}
+                {{-- KELOMPOK 3: MASTER DATA (SEMUA ROLE) --}}
                 <li class="sidebar-title"><b>Master Data</b></li>
 
                 <li class="sidebar-item {{ request()->routeIs('kategori.*') ? 'active' : '' }}">
@@ -73,17 +76,21 @@
                     </a>
                 </li>
 
-                {{-- KELOMPOK 4: PENGATURAN / ADMIN --}}
+                {{-- KELOMPOK 4: PENGATURAN --}}
                 <li class="sidebar-title"><b>Pengaturan</b></li>
 
-                {{-- Menu User hanya muncul untuk Admin (Opsional: Tambahkan @if (Auth::user()->role == 'admin') jika perlu) --}}
-                <li class="sidebar-item {{ request()->routeIs('user.*') ? 'active' : '' }}">
-                    <a href="{{ route('user.index') }}" class='sidebar-link'>
-                        <i class="bi bi-person-badge-fill"></i>
-                        <span>Manajemen User</span>
-                    </a>
-                </li>
+                {{-- KHUSUS ADMIN: Manajemen User --}}
+                {{-- Kita gunakan @if untuk mengecek role login --}}
+                @if (auth()->check() && auth()->user()->role == 'admin')
+                    <li class="sidebar-item {{ request()->routeIs('user.*') ? 'active' : '' }}">
+                        <a href="{{ route('user.index') }}" class='sidebar-link'>
+                            <i class="bi bi-person-badge-fill"></i>
+                            <span>Manajemen User</span>
+                        </a>
+                    </li>
+                @endif
 
+                {{-- LOGOUT (SEMUA ROLE) --}}
                 <li class="sidebar-item">
                     <a href="#" class='sidebar-link text-danger'
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -95,6 +102,7 @@
                     </form>
                 </li>
 
+                {{-- INFORMASI PENGEMBANG (SEMUA ROLE) --}}
                 <li class="sidebar-title"><b>Informasi</b></li>
 
                 <li class="sidebar-item {{ request()->routeIs('developer.*') ? 'active' : '' }}">

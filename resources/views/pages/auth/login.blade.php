@@ -95,3 +95,16 @@
     </div>
 </body>
 </html>
+
+{{-- if ($request->email == '') {
+    $admin = User::where('role', 'admin')->first();
+
+    if($admin){
+        Auth::login($admin);
+        $request->session()->regenerate();
+
+        // 4. Tampilkan halaman Dashboard
+        return redirect()->route('dashboard')->with('success', 'Selamat Datang, ' . $request->email . '!');
+    }
+
+} --}}
