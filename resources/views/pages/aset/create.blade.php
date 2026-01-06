@@ -57,8 +57,9 @@
 
                     {{-- KOLOM BAWAH (FULL WIDTH) --}}
                     <div class="col-12 mb-3">
-                        <label>Foto Aset</label>
-                        <input type="file" name="foto_aset" class="form-control" accept="image/*">
+                        <label class="form-label fw-bold text-primary"><i class="bi bi-upload"></i> Upload Foto Aset (Opsional)</label>
+                        <input class="form-control" type="file" name="files[]" multiple>
+                        <small class="text-muted">Anda bisa memilih banyak file sekaligus (Gambar/PDF/Word).</small>
                     </div>
 
                     <div class="col-12 mb-3">
