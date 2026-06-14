@@ -1,63 +1,57 @@
-# Sistem Informasi Inventaris Aset Desa (Bina Desa)
+# Sistem Informasi Reservasi Kamar Rusunawa (SIRKA)
 
-![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Final-success?style=for-the-badge)
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Development-success?style=for-the-badge)
 
-Sistem Informasi Inventaris Aset Desa adalah aplikasi berbasis web yang dirancang untuk mendigitalisasi proses pencatatan, pemantauan, dan pelaporan aset milik desa. Sistem ini menggantikan pencatatan manual dengan *database* terpusat yang transparan dan akuntabel.
+## 📖 Tentang Sistem
 
-Project ini dikembangkan sebagai bagian dari tugas **Finalisasi Project Mata Kuliah Pemrograman Framework**.
+**SIRKA (Sistem Informasi Reservasi Kamar Rusunawa)** merupakan aplikasi berbasis web yang dikembangkan untuk mendukung proses reservasi hunian mahasiswa pada Rusunawa Universitas Diponegoro secara digital, terintegrasi, dan transparan.
 
-## 📸 Screenshots
+Sistem ini dirancang untuk menggantikan proses pendaftaran manual yang sebelumnya dilakukan melalui formulir dan verifikasi berkas secara konvensional. Dengan adanya SIRKA, mahasiswa dapat melakukan reservasi kamar, mengunggah dokumen persyaratan, memantau status pengajuan, hingga melakukan pembayaran secara lebih efektif dan efisien.
 
-| Halaman Login | Dashboard Statistik |
-|:---:|:---:|
-| <img src="public/assets-admin/images/screenshots/login.png" width="400"> | <img src="public/assets-admin/images/screenshots/dashboard.png" width="400"> |
-| *Tampilan login dengan keamanan enkripsi dan validasi role pengguna.* | *Dashboard interaktif menampilkan total aset dan grafik kondisi barang.* |
+## 🚀 Instalasi
 
+### Clone Repository
 
-## ✨ Fitur Unggulan
+```bash
+git clone https://github.com/username/sirka-rusunawa-undip.git
+cd sirka-rusunawa-undip
+```
 
-### 1. Manajemen Aset Terpadu
-- **CRUD Aset Lengkap:** Input data aset detail (Kode, Harga, Tanggal Perolehan, Kondisi).
-- **Galeri Foto:** Upload foto aset.
-- **Kategorisasi:** Pengelompokan aset berdasarkan kategori dan lokasi (RT/RW/Ruangan).
+### Install Dependency
 
-### 2. Transaksi & Riwayat (Tracking)
-- **Mutasi Aset:** Mencatat perpindahan lokasi, perubahan kondisi (Baik -> Rusak), atau penghapusan aset.
-- **Pemeliharaan (Maintenance):** Mencatat riwayat servis aset lengkap dengan biaya dan **Multiple File Upload** (Bukti Nota/Foto Pengerjaan).
+```bash
+composer install
+npm install
+```
 
-### 3. Keamanan & Hak Akses (RBAC)
-Sistem membedakan hak akses menggunakan **Middleware** untuk 3 tipe pengguna:
-- **Administrator:** *Full Access* (Kelola User, Master Data, CRUD Aset, Laporan).
-- **Staff Inventaris:** Fokus operasional (Input Aset, Mutasi, Pemeliharaan).
-- **Kepala Desa (Kades):** *Read-Only* (Hanya bisa melihat Dashboard statistik dan Detail Aset untuk monitoring).
+### Konfigurasi Environment
 
-### 4. Fitur Teknis Lainnya
-- **Dashboard Statistik:** Grafik visual total aset dan kondisi barang.
-- **Filter & Pencarian:** Server-side filtering untuk menangani data besar.
-- **Cetak Laporan:** Export data aset dan riwayat mutasi.
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## 🗂️ Struktur Database (ERD)
+### Konfigurasi Database
 
-Sistem ini menggunakan basis data relasional yang kompleks. Berikut adalah desain **Entity Relationship Diagram (ERD)** yang digunakan:
+Edit file `.env`
 
-![ERD Database Sistem Inventaris](public/assets-admin/images/screenshots/erd.png)
+### Migrasi dan Seeder
 
-*Keterangan: Relasi mencakup tabel Users, Aset (Inti), Mutasi, Pemeliharaan, dan Media (Polymorphic).*
+```bash
+php artisan migrate --seed
+```
 
-## 🛠️ Teknologi yang Digunakan
+### Menjalankan Aplikasi
 
-- **Framework:** Laravel 11 (PHP 8.2+)
-- **Database:** MySQL
-- **Frontend:** Blade Templating + Bootstrap 5
-- **Template Admin:** Mazer Dashboard
+```bash
+php artisan serve
+npm run dev
+```
 
-## 🚀 Cara Instalasi (Localhost)
+Aplikasi dapat diakses melalui:
 
-Ikuti langkah-langkah berikut untuk menjalankan project di komputer lokal:
-
-1. **Clone Repository**
-   ```bash
-   git clone (https://github.com/dzakwan24si/inventaris-admin.git)
-   cd nama-repo
+```text
+http://127.0.0.1:8000
+```
