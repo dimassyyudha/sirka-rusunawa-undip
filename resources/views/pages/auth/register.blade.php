@@ -4,48 +4,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Sistem Inventaris Aset</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets-admin/css/bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets-admin/vendors/bootstrap-icons/bootstrap-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets-admin/css/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets-admin/css/pages/auth.css') }}">
+    <title>Register - SIRKA Rusunawa</title>
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets-admin/images/logo/logo-undip-01.png') }}">
     <style>
-        body, html { height: 100%; overflow: hidden; }
-        #auth, #auth .row { height: 100vh !important; }
-        #auth-left {
-            padding: 2rem 4rem;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .iti {
+            width: 100%;
         }
-        @media (max-width: 767px) {
-            #auth-left { padding: 2rem; overflow-y: auto; }
+
+        .iti__country-list {
+            z-index: 999999 !important;
+            max-height: 280px !important;
+            overflow-y: auto !important;
+        }
+
+        .iti__dropdown-content {
+            z-index: 999999 !important;
+        }
+
+        .iti--container {
+            z-index: 999999 !important;
         }
     </style>
 </head>
 
 <body>
-    <div id="auth">
-        <div class="row h-100">
-            <div class="col-lg-5 col-12">
-                <div id="auth-left">
-                    <div class="logo text-center mb-3">
-                        <a href="{{ route('dashboard') }}">
-                            <img src="{{ asset('assets-admin/images/logo/lg_vertikal.png') }}"
-                                 alt="Logo"
-                                 style="height: 160px; width: auto; object-fit: contain;">
+    <section class="relative min-h-screen overflow-visible bg-cover bg-center bg-no-repeat"
+        style="background-image: url('{{ asset('assets-admin/images/hero-1.jpg') }}')">
+
+        <div class="absolute inset-0 bg-black/55"></div>
+
+        <div class="relative z-10 flex h-screen items-center justify-center px-4">
+            <div class="w-full max-w-[450px] rounded-[24px] bg-white shadow-2xl">
+                <div class="px-5 py-4">
+
+                    <div class="flex flex-col items-center text-center">
+                        <a href="{{ route('page.beranda') }}">
+                            <img src="{{ asset('assets-admin/images/logo/Logo_UNDIP.png') }}" alt="Logo UNDIP"
+                                class="h-14 md:h-16 w-auto object-contain">
                         </a>
+
+                        <p class="mt-2 text-[9px] font-extrabold uppercase tracking-[0.15em] text-primary-600">
+                            Sistem Informasi Reservasi Kamar <br> Rusunawa Universitas Diponegoro
+                        </p>
+
+                        <p class="mt-1 text-xs text-gray-500">
+                            Buat akun untuk mengajukan reservasi kamar Rusunawa UNDIP.
+                        </p>
                     </div>
 
-                    <h1 class="auth-title fs-3 mb-1">Sign Up</h1>
-                    <p class="auth-subtitle fs-6 mb-3 text-muted">Daftar akun baru.</p>
-
                     @if ($errors->any())
-                        <div class="alert alert-danger py-1 fs-7 mb-2">
-                            <ul class="mb-0 ps-3">
+                        <div class="mt-4 rounded-xl bg-red-100 px-4 py-2 text-sm text-red-700">
+                            <ul class="list-disc pl-4">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -53,72 +66,149 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('auth.register') }}" method="POST">
+
+                    <form class="mt-3 space-y-2" action="{{ route('register.store') }}" method="POST">
                         @csrf
-                        {{-- Input lebih rapat (mb-2) --}}
-                        <div class="form-group position-relative has-icon-left mb-2">
-                            <input type="text" class="form-control" name="nama" placeholder="Nama Lengkap" required>
-                            <div class="form-control-icon">
-                                <i class="bi bi-person"></i>
+
+                        <div>
+                            <label for="nama" class="mb-1 block text-sm font-bold text-gray-700">
+                                Nama Lengkap
+                            </label>
+
+                            <input type="text" name="nama" id="nama" value="{{ old('nama') }}"
+                                placeholder="Nama Lengkap" required
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-200">
+                        </div>
+
+                        <div>
+                            <label for="email" class="mb-1 block text-sm font-bold text-gray-700">
+                                Email
+                            </label>
+
+                            <input type="email" name="email" id="email" value="{{ old('email') }}"
+                                placeholder="name@gmail.com" required
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-200">
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-sm font-bold text-gray-700">
+                                Jenis Kelamin
+                            </label>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <label
+                                    class="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-primary-50">
+                                    <input type="radio" name="gender" value="laki-laki" required
+                                        {{ old('gender', 'laki-laki') === 'laki-laki' ? 'checked' : '' }}
+                                        class="text-primary-600 focus:ring-primary-500">
+                                    Laki-laki
+                                </label>
+
+                                <label
+                                    class="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-primary-50">
+                                    <input type="radio" name="gender" value="perempuan" required
+                                        {{ old('gender') === 'perempuan' ? 'checked' : '' }}
+                                        class="text-primary-600 focus:ring-primary-500">
+                                    Perempuan
+                                </label>
                             </div>
                         </div>
-                        <div class="form-group position-relative has-icon-left mb-2">
-                            <input type="email" class="form-control" name="email" placeholder="Email" required>
-                            <div class="form-control-icon">
-                                <i class="bi bi-envelope"></i>
-                            </div>
+
+                        <div>
+
+                            <label class="block mb-2 text-sm font-bold text-slate-800">
+                                Nomor WhatsApp <span class="text-red-500">*</span>
+                            </label>
+
+                            <input type="tel" id="number_phone" name="number_phone" required
+                                value="{{ old('number_phone') }}"
+                                class="w-full rounded-2xl border border-slate-300 px-4 py-2 text-sm focus:border-orange-500 focus:ring-orange-500">
+                            <p class="mt-2 text-xs text-slate-500">
+                                Gunakan nomor WhatsApp aktif.
+                            </p>
+                            {{-- <input type="tel" name="number_phone" id="number_phone"
+                                value="{{ old('number_phone') }}" placeholder="8xxxxxxxxxx" required
+                                class="w-full rounded-2xl border border-slate-300 px-4 py-2 text-sm focus:border-orange-500 focus:ring-orange-500"> --}}
                         </div>
-                        <div class="form-group position-relative has-icon-left mb-2">
-                            <select name="role" class="form-select" style="padding-left: 2.5rem;" required>
-                                <option value="" disabled selected>-- Pilih Role Pengguna --</option>
-                                <option value="admin">Administrator</option>
-                                <option value="staff">Staff Inventaris</option>
-                                <option value="kades">Kepala Desa</option>
-                            </select>
-                            <div class="form-control-icon">
-                                <i class="bi bi-person-badge"></i>
-                            </div>
+
+                        <div>
+                            <label for="password" class="mb-1 block text-sm font-bold text-gray-700">
+                                Password
+                            </label>
+
+                            <input type="password" name="password" id="password" placeholder="Minimal 8 karakter"
+                                required
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-200">
                         </div>
-                        <div class="form-group position-relative has-icon-left mb-3">
-                            <input type="password" class="form-control" name="password" placeholder="Password" required>
-                            <div class="form-control-icon">
-                                <i class="bi bi-shield-lock"></i>
-                            </div>
+
+                        <div>
+                            <label for="password_confirmation" class="mb-1 block text-sm font-bold text-gray-700">
+                                Ulangi Password
+                            </label>
+
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                placeholder="Ulangi password" required
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-200">
                         </div>
-                        <div class="form-group position-relative has-icon-left mb-3">
-                            <input type="password" class="form-control" name="password_confirmation" placeholder="Ulangi Password" required>
-                            <div class="form-control-icon">
-                                <i class="bi bi-shield-lock"></i>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-block shadow-lg mt-2">Daftar Sekarang</button>
+
+                        <button type="submit"
+                            class="w-full rounded-xl bg-primary-600 px-5 py-2 text-center text-sm font-bold text-white transition-all duration-200 hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-[0.98]">
+                            Daftar Sekarang
+                        </button>
+
+                        <p class="text-center text-sm text-gray-500">
+                            Sudah punya akun?
+                            <a href="{{ route('login') }}" class="font-bold text-primary-600 hover:underline">
+                                Log in
+                            </a>
+                        </p>
                     </form>
 
-                    <div class="text-center mt-3 text-sm">
-                        <p class='text-gray-600 mb-0'>Sudah punya akun? <a href="{{ route('auth.login') }}" class="font-bold">Log in</a>.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-7 d-none d-lg-block p-0">
-                <div id="auth-right" style="
-                    height: 100vh;
-                    background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ asset('assets-admin/images/bg/inventaris-bg.jpg') }}');
-                    background-size: cover;
-                    background-position: center;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-direction: column;
-                    text-align: center;
-                    color: white;
-                ">
-                   <h2 class="text-white">Bergabunglah Bersama Kami</h2>
-                   <p class="text-white px-5">Daftarkan diri Anda untuk mulai mengelola aset desa secara digital.</p>
-                   </p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            function initPhoneInput(selector) {
+
+                const input = document.querySelector(selector);
+
+                if (!input || !window.intlTelInput) {
+                    return null;
+                }
+
+                return window.intlTelInput(input, {
+                    initialCountry: 'id',
+                    preferredCountries: ['id', 'sg', 'my'],
+                    separateDialCode: true,
+                    nationalMode: false,
+                    autoPlaceholder: 'aggressive',
+                    utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/js/utils.js',
+                });
+
+            }
+
+            const phone = initPhoneInput('#number_phone');
+
+            const form = document.querySelector('form');
+
+            if (form) {
+                form.addEventListener('submit', function() {
+
+                    const input = document.querySelector('#number_phone');
+
+                    if (phone && input) {
+                        input.value = phone.getNumber();
+                    }
+
+                });
+            }
+
+        });
+    </script>
 </body>
+
 </html>

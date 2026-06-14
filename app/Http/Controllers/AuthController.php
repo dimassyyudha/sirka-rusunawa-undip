@@ -9,8 +9,22 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
+    // public function showLoginForm(Request $request)
+    // {
+    //     dd(session()->all());
+    //     if ($request->filled('redirect')) {
+    //         session(['url.intended' => $request->redirect]);
+    //     }
+
+    //     return view('pages.auth.login');
+    // }
+    public function showLoginForm(Request $request)
     {
+        // session()->flash('success', 'TES BERHASIL');
+        if ($request->filled('redirect')) {
+            session(['url.intended' => $request->redirect]);
+        }
+
         return view('pages.auth.login');
     }
 
@@ -21,89 +35,83 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ], [
+            'email.required' => 'Email tidak boleh kosong.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password tidak boleh kosong.',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $credentials['email'])->first();
 
-        // 3. Cek password menggunakan Hash::check
-        if ($user && Hash::check($request->password, $user->password)) {
-
-            // Loginkan user
-            Auth::login($user);
-            $request->session()->regenerate();
-
-            // 4. Tampilkan halaman Dashboard
-            return redirect()->route('dashboard')->with('success', 'Selamat Datang, ' . $user->name . '!');
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return back()
+                ->with('error', 'Email atau password salah.')
+                ->withInput();
         }
 
-        // 5. Jika tidak sama, kembali ke login dengan error
-        return back()->withErrors([
-            'email' => 'Email atau Password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        if ($user->role === 'admin') {
+            session()->forget('url.intended');
+
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('success', 'Selamat datang, ' . $user->name . '!');
+        }
+
+        return redirect()
+            ->intended(route('page.beranda'))
+            ->with('success', 'Selamat datang, ' . $user->name . '!');
     }
 
     public function register(Request $request)
     {
-        $request->validate([
-            'nama' => 'required|max:100',
-            'email' => ['required', 'email', 'unique:users,email'],
-            'role' => 'required|in:admin,staff,kades',
-            'password' => 'required|min:8|confirmed',
+        $validated = $request->validate([
+            'nama' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'gender' => ['required', 'in:laki-laki,perempuan'],
+            'number_phone' => ['required', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong',
-            'email.required' => 'Email tidak boleh kosong',
-            'email.email' => 'Email tidak valid',
-            'email.unique' => 'Email sudah terdaftar',
-            'password.required' => 'Password tidak boleh kosong',
-            'password.min' => 'Password minimal 8 karakter',
-            'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'nama.required' => 'Nama tidak boleh kosong.',
+            'email.required' => 'Email tidak boleh kosong.',
+            'email.email' => 'Email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'gender.required' => 'Jenis kelamin wajib dipilih.',
+            'gender.in' => 'Jenis kelamin tidak valid.',
+            'number_phone.required' => 'Nomor HP tidak boleh kosong.',
+            'password.required' => 'Password tidak boleh kosong.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $data['name']     = $request->nama;
-        $data['email']    = $request->email;
-        $data['password'] = Hash::make($request->password);
-        $data['role']     = $request->role;
+        User::create([
+            'name' => $validated['nama'],
+            'email' => $validated['email'],
+            'gender' => $validated['gender'],
+            'number_phone' => $validated['number_phone'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'mahasiswa',
+        ]);
 
-        User::create($data);
-
-        return redirect()->route('auth.login')->with('success', 'Registrasi berhasil! Silakan Login');
+        return redirect()
+            ->route('login')
+            ->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('auth.login');
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()
+            ->route('page.beranda')
+            ->with('success', 'Berhasil logout.');
     }
 }

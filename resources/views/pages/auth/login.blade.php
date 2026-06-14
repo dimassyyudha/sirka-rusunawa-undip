@@ -4,107 +4,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistem Inventaris Aset</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets-admin/css/bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets-admin/vendors/bootstrap-icons/bootstrap-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets-admin/css/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets-admin/css/pages/auth.css') }}">
+    <title>Login - SIRKA Rusunawa</title>
 
-    {{-- CSS TAMBAHAN AGAR PAS 1 LAYAR (TIDAK SCROLL) --}}
-    <style>
-        body, html { height: 100%; overflow: hidden; }
-        #auth, #auth .row { height: 100vh !important; }
-        #auth-left {
-            padding: 3rem 5rem;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        @media (max-width: 767px) {
-            #auth-left { padding: 2rem; overflow-y: auto; } /* Mobile tetap scroll jika perlu */
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets-admin/images/logo/logo-undip-01.png') }}">
 </head>
 
-<body>
-    <div id="auth">
-        <div class="row h-100">
-            <div class="col-lg-5 col-12">
-                <div id="auth-left">
-                    <div class="logo text-center mb-3">
-                        <a href="{{ route('dashboard') }}">
-                            <img src="{{ asset('assets-admin/images/logo/lg_vertikal.png') }}"
-                                 alt="Logo"
-                                 style="height: 160px; width: auto; object-fit: contain;">
-                        </a>
-                    </div>
+<body style="font-family: 'Nunito', sans-serif;">
+    <section class="relative min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat"
+        style="background-image: url('{{ asset('assets-admin/images/hero-1.jpg') }}')">
 
-                    {{-- JUDUL LEBIH RAPAT --}}
-                    <h1 class="auth-title fs-2 mb-2">Log in.</h1>
-                    <p class="auth-subtitle fs-6 mb-3 text-muted">Masuk ke sistem inventaris.</p>
+        <div class="absolute inset-0 bg-black/55"></div>
+
+        <div class="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
+            <div class="w-full max-w-md rounded-[28px] bg-white shadow-2xl">
+                <div class="px-8 py-7">
+
+                    <div class="flex flex-col items-center text-center">
+                        <a href="{{ route('page.beranda') }}">
+                            <img src="{{ asset('assets-admin/images/logo/Logo_UNDIP.png') }}" alt="Logo UNDIP"
+                                class="h-24 w-auto object-contain">
+                        </a>
+
+                        <p class="mt-4 text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary-600">
+                            Sistem Informasi Reservasi Kamar <br> Rusunawa Universitas Diponegoro
+                        </p>
+
+                        <p class="mt-3 max-w-[320px] text-[15px] leading-6 text-gray-500">
+                            Masuk untuk mengakses sistem reservasi kamar Rusunawa UNDIP.
+                        </p>
+                    </div>
+                    {{-- <div style="background:red;color:white;padding:10px;">
+                        SUCCESS = {{ session('success') }}
+                    </div> --}}
+                    @if (session('success'))
+                        <div class="mt-5 rounded-2xl bg-emerald-100 px-4 py-3 text-sm text-emerald-700">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="mt-5 rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700">
+                            {{ session('error') }}
+                        </div>
+                    @endif
 
                     @if ($errors->any())
-                        <div class="alert alert-danger py-2 fs-6">
+                        <div class="mt-5 rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700">
                             {{ $errors->first() }}
                         </div>
                     @endif
 
-                    <form action="{{ route('auth.login') }}" method="POST">
+                    <form class="mt-6 space-y-5" action="{{ route('login.store') }}" method="POST">
                         @csrf
-                        <div class="form-group position-relative has-icon-left mb-3">
-                            <input type="email" name="email" class="form-control form-control-lg" placeholder="Email" required value="{{ old('email') }}">
-                            <div class="form-control-icon">
-                                <i class="bi bi-person"></i>
-                            </div>
-                        </div>
-                        <div class="form-group position-relative has-icon-left mb-3">
-                            <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" required>
-                            <div class="form-control-icon">
-                                <i class="bi bi-shield-lock"></i>
-                            </div>
+
+                        <div>
+                            <label for="email" class="mb-2 block text-sm font-bold text-gray-700">
+                                Email
+                            </label>
+
+                            <input type="email" name="email" id="email" value="{{ old('email') }}"
+                                placeholder="name@gmail.com" required
+                                class="block w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-200">
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Log in</button>
+                        <div>
+                            <label for="password" class="mb-2 block text-sm font-bold text-gray-700">
+                                Password
+                            </label>
+
+                            <input type="password" name="password" id="password" placeholder="••••••••" required
+                                class="block w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-200">
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <label class="flex cursor-pointer items-center gap-2">
+                                <input id="remember" name="remember" type="checkbox"
+                                    class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+
+                                <span class="text-sm text-gray-600">
+                                    Remember me
+                                </span>
+                            </label>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full rounded-2xl bg-primary-600 px-5 py-3 text-sm font-bold text-white transition-all duration-200 hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-[0.98]">
+                            Sign In
+                        </button>
+
+                        <p class="text-center text-sm text-gray-500">
+                            Belum punya akun?
+                            <a href="{{ route('register') }}" class="font-bold text-primary-600 hover:underline">
+                                Daftar
+                            </a>
+                        </p>
                     </form>
-                    <div class="text-center mt-3 text-sm">
-                        <p class="text-gray-600 mb-0">Belum punya akun? <a href="{{ route('auth.register') }}" class="font-bold">Daftar</a>.</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-lg-7 d-none d-lg-block p-0">
-                <div id="auth-right" style="
-                    height: 100vh;
-                    background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ asset('assets-admin/images/bg/inventaris-bg.jpg') }}');
-                    background-size: cover;
-                    background-position: center;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-direction: column;
-                    text-align: center;
-                    color: white;
-                ">
-                    <h2 class="text-white mb-2">Manajemen Aset Digital</h2>
-                    <p class="text-white px-5">Sistem pengelolaan inventaris yang transparan dan akuntabel.</p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
 </body>
+
 </html>
-
-{{-- if ($request->email == '') {
-    $admin = User::where('role', 'admin')->first();
-
-    if($admin){
-        Auth::login($admin);
-        $request->session()->regenerate();
-
-        // 4. Tampilkan halaman Dashboard
-        return redirect()->route('dashboard')->with('success', 'Selamat Datang, ' . $request->email . '!');
-    }
-
-} --}}

@@ -1,0 +1,279 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+
+' ==========================
+' BOUNDARY
+' ==========================
+
+class LoginPage <<Boundary>>
+class RegisterPage <<Boundary>>
+class LandingPage <<Boundary>>
+class DashboardMahasiswaPage <<Boundary>>
+class DashboardAdminPage <<Boundary>>
+class CariKamarPage <<Boundary>>
+class DetailKamarPage <<Boundary>>
+class ReservasiPage <<Boundary>>
+class PembayaranPage <<Boundary>>
+class ProfilMahasiswaPage <<Boundary>>
+class InformasiHunianPage <<Boundary>>
+class TestimoniPage <<Boundary>>
+class PeriodeHunianPage <<Boundary>>
+class VerifikasiReservasiPage <<Boundary>>
+class ManajemenGedungPage <<Boundary>>
+class ManajemenLantaiPage <<Boundary>>
+class ManajemenKamarPage <<Boundary>>
+class ManajemenPenghuniPage <<Boundary>>
+class LaporanKeuanganPage <<Boundary>>
+class PengaturanSistemPage <<Boundary>>
+
+' ==========================
+' CONTROL
+' ==========================
+
+class AuthController <<Control>> {
++showLoginForm()
++showRegisterForm()
++login()
++register()
++logout()
+}
+
+class DashboardController <<Control>> {
++index()
++admin()
++redirectByRole()
+}
+
+class ReservationController <<Control>> {
++index()
++create()
++store()
++show()
++downloadTicket()
++checkReservation()
+}
+
+class ReservationVerificationController <<Control>> {
++index()
++show()
++approve()
++reject()
+}
+
+class OccupancyPeriodController <<Control>> {
++index()
++create()
++store()
++update()
++destroy()
++openRegistration()
++closeRegistration()
+}
+
+class BuildingController <<Control>> {
++index()
++store()
++update()
++destroy()
+}
+
+class FloorController <<Control>> {
++index()
++store()
++update()
++destroy()
+}
+
+class RoomController <<Control>> {
++index()
++store()
++update()
++destroy()
+}
+
+class PenghuniController <<Control>> {
++index()
++store()
++update()
++destroy()
+}
+
+class FinancialController <<Control>> {
++index()
++export()
+}
+
+class SiteSettingController <<Control>> {
++berandaIndex()
++berandaUpdate()
++tentangKamiUpdate()
++faqUpdate()
++alurUpdate()
+}
+
+class MahasiswaController <<Control>> {
++mahasiswa()
++kamarSaya()
++reservasi()
++pembayaran()
++profil()
++updateProfil()
++review()
+}
+
+class RegistrationPeriodController <<Control>> {
++extendStore()
++transferStore()
++checkoutStore()
+}
+
+class InvoiceController <<Control>> {
++show()
++pay()
++finish()
+}
+
+class PaymentTransactionController <<Control>> {
++index()
++show()
+}
+
+class CariKamarController <<Control>> {
++index()
++show()
+}
+
+' ==========================
+' ENTITY
+' ==========================
+
+class User <<Entity>>
+class StudentProfile <<Entity>>
+class Building <<Entity>>
+class Floor <<Entity>>
+class Room <<Entity>>
+class OccupancyPeriod <<Entity>>
+class Reservation <<Entity>>
+class ReservationDocument <<Entity>>
+class Invoice <<Entity>>
+class PaymentTransaction <<Entity>>
+class Occupant <<Entity>>
+class RoomReview <<Entity>>
+class RoomPhoto <<Entity>>
+class Recommendation <<Entity>>
+class SiteSetting <<Entity>>
+
+' ==========================
+' BOUNDARY -> CONTROL
+' ==========================
+
+LoginPage --> AuthController
+RegisterPage --> AuthController
+
+DashboardMahasiswaPage --> MahasiswaController
+DashboardAdminPage --> DashboardController
+
+CariKamarPage --> CariKamarController
+DetailKamarPage --> CariKamarController
+
+ReservasiPage --> ReservationController
+PembayaranPage --> InvoiceController
+
+ProfilMahasiswaPage --> MahasiswaController
+InformasiHunianPage --> MahasiswaController
+TestimoniPage --> MahasiswaController
+
+PeriodeHunianPage --> OccupancyPeriodController
+VerifikasiReservasiPage --> ReservationVerificationController
+
+ManajemenGedungPage --> BuildingController
+ManajemenLantaiPage --> FloorController
+ManajemenKamarPage --> RoomController
+ManajemenPenghuniPage --> PenghuniController
+
+LaporanKeuanganPage --> FinancialController
+PengaturanSistemPage --> SiteSettingController
+
+' ==========================
+' CONTROL -> ENTITY
+' ==========================
+
+AuthController --> User
+AuthController --> StudentProfile
+
+MahasiswaController --> User
+MahasiswaController --> StudentProfile
+MahasiswaController --> Occupant
+MahasiswaController --> Reservation
+MahasiswaController --> Invoice
+MahasiswaController --> PaymentTransaction
+MahasiswaController --> RoomReview
+
+CariKamarController --> Room
+CariKamarController --> RoomPhoto
+CariKamarController --> Building
+
+ReservationController --> Reservation
+ReservationController --> Room
+ReservationController --> StudentProfile
+ReservationController --> Invoice
+ReservationController --> PaymentTransaction
+ReservationController --> ReservationDocument
+ReservationController --> OccupancyPeriod
+
+InvoiceController --> Invoice
+InvoiceController --> PaymentTransaction
+
+PaymentTransactionController --> PaymentTransaction
+
+ReservationVerificationController --> Reservation
+ReservationVerificationController --> Invoice
+ReservationVerificationController --> Occupant
+
+OccupancyPeriodController --> OccupancyPeriod
+OccupancyPeriodController --> Reservation
+
+BuildingController --> Building
+FloorController --> Floor
+
+RoomController --> Room
+RoomController --> RoomPhoto
+
+PenghuniController --> Occupant
+PenghuniController --> StudentProfile
+PenghuniController --> Room
+
+FinancialController --> Invoice
+FinancialController --> PaymentTransaction
+
+SiteSettingController --> SiteSetting
+
+' ==========================
+' ENTITY RELATION
+' ==========================
+
+User "1" -- "1" StudentProfile
+
+Building "1" *-- "1..*" Floor
+Floor "1" *-- "1..*" Room
+
+User "1" -- "0..*" Reservation
+Room "1" -- "0..*" Reservation
+OccupancyPeriod "1" -- "0..*" Reservation
+
+Reservation "1" -- "0..*" ReservationDocument
+
+Reservation "1" -- "0..*" Invoice
+Invoice "1" -- "0..*" PaymentTransaction
+
+User "1" -- "0..1" Occupant
+Room "1" -- "0..*" Occupant
+
+User "1" -- "0..*" RoomReview
+Room "1" -- "0..*" RoomReview
+
+Room "1" -- "0..*" RoomPhoto
+Room "1" -- "0..*" Recommendation
+
+@enduml

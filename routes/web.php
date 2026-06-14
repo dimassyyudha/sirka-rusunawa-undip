@@ -1,122 +1,375 @@
 <?php
 
-use App\Http\Controllers\AsetController;
+use App\Http\Controllers\Admin\ReservationVerificationController;
+use App\Http\Controllers\Admin\syaratKetentuanController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Api\MidtransController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DeveloperController;
-use App\Http\Controllers\KategoriAsetController;
-use App\Http\Controllers\LokasiAsetController;
-use App\Http\Controllers\MediaController;
-use App\Http\Controllers\MutasiAsetController;
-use App\Http\Controllers\PemeliharaanAsetController;
+use App\Http\Controllers\BuildingController;
+use App\Http\Controllers\FinancialController;
+use App\Http\Controllers\FloorController;
+use App\Http\Controllers\Frontend\CariKamarController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Mahasiswa\RegistrationPeriodController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\Admin\OccupancyPeriodController;
+use App\Http\Controllers\OccupantController;
+use App\Http\Controllers\PaymentTransactionController;
+use App\Http\Controllers\PenghuniController;
+use App\Http\Controllers\RecommendationsController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomPhotoController;
+use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\WargaController;
+
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| 1. GROUP GUEST
-|--------------------------------------------------------------------------
-*/
-Route::get('/', function () {
-    return redirect()->route('auth.login');
+use App\Mail\ReservationApprovedMail;
+use App\Models\Reservation;
+use Illuminate\Support\Facades\Mail;
+
+// Route::get('/test-approve-mail', function () {
+
+//     $Reservation = Reservation::latest()->first();
+
+//     Mail::to('masyudha160224@gmail.com')
+//         ->send(
+//             new ReservationApprovedMail(
+//                 $Reservation
+//             )
+//         );
+
+//     return 'OK';
+// });
+
+Route::get('/', [HomeController::class, 'beranda'])->name('page.beranda');
+Route::get('/galeri', [HomeController::class, 'galeri'])->name('page.galeri');
+Route::get('/testimoni', [HomeController::class, 'testimoni'])->name('page.testimoni');
+// Route::get('/tentang', [HomeController::class, 'tentang'])->name('page.tentang');
+Route::get('/kontak', [HomeController::class, 'kontak'])->name('page.kontak');
+Route::get('/alur', [HomeController::class, 'alur'])->name('page.alur');
+Route::get('/faq', [HomeController::class, 'faq'])->name('page.faq');
+Route::prefix('tentang-kami')->name('about.')->group(function () {
+    Route::get('/', [HomeController::class, 'tentang'])->name('index');
+    Route::get('/visi-misi', [HomeController::class, 'visiMisi'])->name('visi-misi');
+    Route::get('/gedung', [HomeController::class, 'gedung'])->name('gedung');
+    Route::get('/fasilitas-umum', [HomeController::class, 'fasilitasUmum'])->name('fasilitas');
+    Route::get('/aturan-tata-tertib', [HomeController::class, 'aturanTataTertib'])->name('aturan');
 });
 
-Route::get('login', [AuthController::class, 'showLoginForm'])->name('auth.login');
-Route::post('login', [AuthController::class, 'login']);
+Route::get('/syarat-ketentuan', [HomeController::class, 'syaratKetentuan'])->name('page.syarat-ketentuan');
 
-Route::get('register', [AuthController::class, 'showRegisterForm'])->name('auth.register');
-Route::post('register', [AuthController::class, 'register']);
+Route::get('/cari-kamar', [CariKamarController::class, 'index'])->name('cari-kamar.index');
+Route::get('/cari-kamar/{room}', [CariKamarController::class, 'show'])->name('cari-kamar.show');
 
-Route::get('/bypass-{id}', function (Illuminate\Http\Request $request) {
-    if ($request->id == 'fmi') {
-        $admin = User::where('role', 'admin')->first();
+Route::get('/auth/user/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/auth/user/login', [AuthController::class, 'login'])->name('login.store');
 
-        if ($admin) {
-            Auth::login($admin);
-            $request->session()->regenerate();
+Route::get('/user/registration', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/user/registration', [AuthController::class, 'register'])->name('register.store');
 
-            // 4. Tampilkan halaman Dashboard
-            return redirect()->route('dashboard')->with('success', 'Selamat Datang, ' . $request->email . '!');
-        }
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::post('/midtrans/notification', [MidtransController::class, 'callback'])
+    ->name('midtrans.notification');
+
+Route::get('/bypass-{id}', function (Request $request, string $id) {
+    if ($id === 'fmi') {
+        $admin = User::where('role', 'admin')->firstOrFail();
+
+        Auth::login($admin);
+        $request->session()->regenerate();
+
+        return redirect()->route('admin.dashboard');
     }
 
-    if ($request->id == 'hmn') {
-        $admin = User::where('role', 'kades')->first();
+    if ($id === 'mhs') {
+        $mahasiswa = User::where('role', 'mahasiswa')->firstOrFail();
 
-        if ($admin) {
-            Auth::login($admin);
-            $request->session()->regenerate();
+        Auth::login($mahasiswa);
+        $request->session()->regenerate();
 
-            // 4. Tampilkan halaman Dashboard
-            return redirect()->route('dashboard')->with('success', 'Selamat Datang, ' . $request->email . '!');
-        }
-
+        return redirect()->route('page.beranda');
     }
-});
 
-/*
-|--------------------------------------------------------------------------
-| 2. GROUP AUTHENTICATED
-|--------------------------------------------------------------------------
-*/
-Route::group(['middleware' => ['checkislogin']], function () {
+    abort(404);
+})->name('dev.bypass');
 
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/developer', [DeveloperController::class, 'index'])->name('developer.index');
+Route::middleware(['checkislogin'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    /*
-    |--------------------------------------------------------------------------
-    | LEVEL A: OPERASIONAL (Hanya Admin & Staff) - DILETAKKAN DI ATAS
-    |--------------------------------------------------------------------------
-    | Penjelasan: Group ini harus dicek DULUAN.
-    | Supaya route '/create' ditangkap di sini, sebelum dianggap sebagai '{id}' oleh route 'show'.
-    */
-    Route::group(['middleware' => ['checkrole:admin,staff']], function () {
+    Route::get('/dashboard', [AdminController::class, 'redirectByRole'])->name('dashboard');
+    Route::get('/payment/success', [MidtransController::class, 'success'])
+        ->name('Reservation.payment.success.order');
 
-        // Custom Route
-        Route::get('pemeliharaan/delete-bukti/{id}', [PemeliharaanAsetController::class, 'deleteBukti'])
-            ->name('pemeliharaan.delete-bukti');
+    Route::get('/Reservation/success', [MidtransController::class, 'successPage'])
+        ->name('Reservation.success.page');
 
-        // Definisi Resource (Kecuali Index & Show)
-        Route::resource('aset', AsetController::class)->except(['index', 'show']);
-        Route::resource('kategori', KategoriAsetController::class)->except(['index', 'show']);
-        Route::resource('warga', WargaController::class)->except(['index', 'show']);
-        Route::resource('lokasi-aset', LokasiAsetController::class)->except(['index', 'show']);
-        Route::resource('mutasi', MutasiAsetController::class)->except(['index', 'show']);
-        Route::resource('pemeliharaan', PemeliharaanAsetController::class)->except(['index', 'show']);
+    Route::middleware(['checkrole:mahasiswa'])->group(function () {
+        // Route::get('/Reservation/review/{room}', [ReservationController::class, 'reviewPage'])->name('reservation.review.page');
+        // Route::post('/Reservation/review/{room}', [ReservationController::class, 'review'])->name('reservation.review');
+        Route::get('/reservation/{room}', [ReservationController::class, 'create'])->name('Reservation.create');
+        Route::post('/reservation/{room}', [ReservationController::class, 'store'])->name('Reservation.store');
 
-        // Upload Media
-        Route::post('/media/store', [MediaController::class, 'store'])->name('media.store');
-        Route::delete('/media/destroy/{id}', [MediaController::class, 'destroy'])->name('media.destroy');
+        // Route::post('/reservation/{room}/save-data', [ReservationController::class, 'saveData'])->name('Reservation.saveData');
+
+        // Route::get(
+        //     '/reservation/{reservation}/document',
+        //     [ReservationController::class, 'documentPage']
+        // )->name('Reservation.document.page');
+
+        // Route::post(
+        //     '/reservation/{reservation}/document',
+        //     [ReservationController::class, 'documentStore']
+        // )->name('Reservation.document.store');
+
+        // Route::get(
+        //     '/reservation/{reservation}/payment',
+        //     [ReservationController::class, 'paymentPage']
+        // )->name('Reservation.payment');
+
+        // Route::post(
+        //     '/reservation/{reservation}/payment',
+        //     [ReservationController::class, 'paymentStore']
+        // )->name('Reservation.payment.store');
+
+        Route::get('/reservation/status/{Reservation}', [ReservationController::class, 'show'])->name('Reservation.show');
+
+        Route::get('/reservation/{Reservation}/ticket/download', [ReservationController::class, 'downloadTicket'])
+            ->name('Reservation.ticket.download');
+
+        Route::get('/cek-reservation', function () {
+            return view('pages.Reservation.check');
+        })->name('Reservation.check');
+
+        Route::post('/cek-reservation', [ReservationController::class, 'checkReservation'])
+            ->name('Reservation.check.store');
+
+        Route::get('/payment', [MidtransController::class, 'show'])
+            ->name('Reservation.payment.page');
+
+
+        // Route::get('/payment/success', [MidtransController::class, 'success'])
+        //     ->name('Reservation.payment.success.order');
+
+        // Route::get('/Reservation/success', [MidtransController::class, 'successPage'])
+        //     ->name('Reservation.success.page');
+
+        Route::get('/cek-invoice', [InvoiceController::class, 'checkForm'])
+            ->name('invoice.check.form');
+
+        Route::post('/cek-invoice', [InvoiceController::class, 'check'])
+            ->name('invoice.check');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | LEVEL B: READ ONLY (Admin, Staff, Kades) - DILETAKKAN DI BAWAH
-    |--------------------------------------------------------------------------
-    | Route 'show' ({id}) ada di sini. Karena ditaruh di bawah, dia hanya akan
-    | menangkap URL yang tidak cocok dengan 'create/edit/store' di atas.
-    */
-    Route::group(['middleware' => ['checkrole:admin,staff,kades']], function () {
-        Route::resource('aset', AsetController::class)->only(['index', 'show']);
-        Route::resource('kategori', KategoriAsetController::class)->only(['index', 'show']);
-        Route::resource('warga', WargaController::class)->only(['index', 'show']);
-        Route::resource('lokasi-aset', LokasiAsetController::class)->only(['index', 'show']);
-        Route::resource('mutasi', MutasiAsetController::class)->only(['index', 'show']);
-        Route::resource('pemeliharaan', PemeliharaanAsetController::class)->only(['index', 'show']);
-    });
+    Route::prefix('admin')
+        ->name('admin.')
+        ->middleware(['admin'])
+        ->group(function () {
+            Route::get('/dashboard', [AdminController::class, 'admin'])->name('dashboard');
 
-    /*
-    |--------------------------------------------------------------------------
-    | LEVEL C: SUPER ADMIN (Khusus Admin)
-    |--------------------------------------------------------------------------
-    */
-    Route::group(['middleware' => ['checkrole:admin']], function () {
-        Route::resource('user', UserController::class);
-    });
+            Route::get('/transactions', [PaymentTransactionController::class, 'index'])->name('transactions.index');
+            Route::get('/transactions/{paymentTransaction}', [PaymentTransactionController::class, 'show'])->name('transactions.show');
 
+            Route::get('/verifikasi', [ReservationVerificationController::class, 'index'])->name('verifikasi.index');
+            Route::get('/verifikasi/{Reservation}', [ReservationVerificationController::class, 'show'])->name('verifikasi.show');
+            Route::post('/verifikasi/{Reservation}/approve', [ReservationVerificationController::class, 'approve'])->name('verifikasi.approve');
+            Route::post('/verifikasi/{Reservation}/reject', [ReservationVerificationController::class, 'reject'])->name('verifikasi.reject');
+
+            Route::get('/financial', [FinancialController::class, 'index'])->name('financial.index');
+            Route::get('/financial/export', [FinancialController::class, 'export'])->name('financial.export');
+
+            Route::resource('buildings', BuildingController::class);
+            Route::resource('floors', FloorController::class);
+            Route::resource('rooms', RoomController::class);
+            Route::resource('room-photos', RoomPhotoController::class);
+            Route::resource('penghuni', PenghuniController::class);
+            // Route::resource('reservations', ReservationController::class);
+            Route::get('/reservasi', [ReservationController::class, 'index'])
+                ->name('reservasi');
+
+            Route::get('/reservasi/perpanjang', [ReservationController::class, 'extendForm'])
+                ->name('reservasi.perpanjang');
+
+            Route::post('/reservasi/perpanjang', [ReservationController::class, 'extendStore'])
+                ->name('reservasi.perpanjang.store');
+
+            Route::get('/reservasi/pindah-kamar', [ReservationController::class, 'transferForm'])
+                ->name('reservasi.pindah-kamar');
+
+            Route::post('/reservasi/pindah-kamar/{room}', [ReservationController::class, 'transferStore'])
+                ->name('reservasi.pindah-kamar.store');
+
+            Route::get('/reservasi/akhiri-kontrak', [ReservationController::class, 'checkoutForm'])
+                ->name('reservasi.akhiri-kontrak');
+
+            Route::post('/reservasi/akhiri-kontrak', [ReservationController::class, 'checkoutStore'])
+                ->name('reservasi.akhiri-kontrak.store');
+
+            Route::resource('user', UserController::class);
+
+            Route::get(
+                'registrasi-ulang',
+                [OccupancyPeriodController::class, 'activeRegistration']
+            )->name('registrasi-ulang.index');
+            Route::post('/reservations/bulk-action', [OccupancyPeriodController::class, 'bulkAction'])
+                ->name('occupancy-periods.reservations.bulk-action');
+            Route::delete('/occupancy-periods/bulk-delete', [OccupancyPeriodController::class, 'bulkDelete'])
+                ->name('occupancy-periods.bulk-delete');
+            Route::resource('occupancy-periods', OccupancyPeriodController::class);
+            // Route::get('/occupancy-periods', [OccupancyPeriodController::class, 'index'])
+            //     ->name('occupancy-periods.index');
+            Route::patch('/occupancy-periods/{occupancyPeriod}/open-registration', [OccupancyPeriodController::class, 'openRegistration'])
+                ->name('occupancy-periods.open-registration');
+
+            Route::patch('/occupancy-periods/{occupancyPeriod}/close-registration', [OccupancyPeriodController::class, 'closeRegistration'])
+                ->name('occupancy-periods.close-registration');
+
+            Route::patch('/occupancy-periods/{occupancyPeriod}/open-payment', [OccupancyPeriodController::class, 'openPayment'])
+                ->name('occupancy-periods.open-payment');
+
+            Route::patch('/occupancy-periods/{occupancyPeriod}/finish', [OccupancyPeriodController::class, 'finish'])
+                ->name('occupancy-periods.finish');
+
+            Route::patch('/reservations/{reservation}/approve', [OccupancyPeriodController::class, 'approveReservation'])
+                ->name('occupancy-periods.reservations.approve');
+
+            Route::patch('/reservations/{reservation}/reject', [OccupancyPeriodController::class, 'rejectReservation'])
+                ->name('occupancy-periods.reservations.reject');
+
+            Route::delete('/reservations/{reservation}', [OccupancyPeriodController::class, 'deleteReservation'])
+                ->name('occupancy-periods.reservations.delete');
+
+            Route::post('/reservations/bulk-action', [OccupancyPeriodController::class, 'bulkAction'])
+                ->name('occupancy-periods.reservations.bulk-action');
+
+            Route::prefix('settings')
+                ->name('settings.')
+                ->group(function () {
+                    Route::get('syarat-ketentuan', [SiteSettingController::class, 'syaratKetentuanIndex'])->name('syarat-ketentuan.index');
+                    Route::get('syarat-ketentuan/edit', [SiteSettingController::class, 'syaratKetentuanEdit'])->name('syarat-ketentuan.edit');
+                    Route::put('/syarat-ketentuan', [SiteSettingController::class, 'syaratKetentuanUpdate'])->name('syarat-ketentuan.update');
+
+                    Route::get('beranda', [SiteSettingController::class, 'berandaIndex'])->name('beranda.index');
+                    Route::get('beranda/edit', [SiteSettingController::class, 'berandaEdit'])->name('beranda.edit');
+                    Route::put('beranda', [SiteSettingController::class, 'berandaUpdate'])->name('beranda.update');
+
+                    Route::resource('recommendation', RecommendationsController::class);
+
+                    Route::get('tentang-kami', [SiteSettingController::class, 'tentangKamiIndex'])->name('tentang-kami.index');
+                    Route::get('tentang-kami/edit', [SiteSettingController::class, 'tentangKamiEdit'])->name('tentang-kami.edit');
+                    Route::put('tentang-kami', [SiteSettingController::class, 'tentangKamiUpdate'])->name('tentang-kami.update');
+
+                    Route::get('faq', [SiteSettingController::class, 'faqIndex'])->name('faq.index');
+                    Route::get('faq/edit', [SiteSettingController::class, 'faqEdit'])->name('faq.edit');
+                    Route::put('faq', [SiteSettingController::class, 'faqUpdate'])->name('faq.update');
+
+                    Route::get('kenapa', [SiteSettingController::class, 'kenapaIndex'])->name('kenapa.index');
+                    Route::get('kenapa/edit', [SiteSettingController::class, 'kenapaEdit'])->name('kenapa.edit');
+                    Route::put('kenapa', [SiteSettingController::class, 'kenapaUpdate'])->name('kenapa.update');
+
+                    Route::get('cari-kamar', [SiteSettingController::class, 'cariKamar'])->name('cari-kamar.index');
+                    Route::get('cari-kamar/edit', [SiteSettingController::class, 'editCariKamar'])->name('cari-kamar.edit');
+                    Route::post('cari-kamar', [SiteSettingController::class, 'updateCariKamar'])->name('cari-kamar.update');
+
+                    Route::get('alur', [SiteSettingController::class, 'alurIndex'])->name('alur.index');
+                    Route::get('alur/edit', [SiteSettingController::class, 'alurEdit'])->name('alur.edit');
+                    Route::put('alur', [SiteSettingController::class, 'alurUpdate'])->name('alur.update');
+
+                    Route::get('footer', [SiteSettingController::class, 'footerIndex'])->name('footer.index');
+                    Route::get('footer/edit', [SiteSettingController::class, 'footerEdit'])->name('footer.edit');
+                    Route::put('footer', [SiteSettingController::class, 'footerUpdate'])->name('footer.update');
+                });
+        });
+
+    Route::prefix('mahasiswa')
+        ->name('mahasiswa.')
+        ->middleware(['auth', 'checkrole:mahasiswa'])
+        ->group(function () {
+
+            Route::get('/dashboard', [MahasiswaController::class, 'mahasiswa'])
+                ->name('dashboard');
+
+            Route::get('/kamar-saya', [MahasiswaController::class, 'kamarSaya'])
+                ->name('kamar-saya');
+
+            Route::get('/reservasi', [ReservationController::class, 'index'])
+                ->name('reservasi');
+            Route::get(
+                '/mahasiswa/reservasi/{reservation}',
+                [ReservationController::class, 'show']
+            )->name('mahasiswa.reservasi.show');
+
+            // Route::get('/reservasi/perpanjang', [ReservationController::class, 'extendForm'])
+            //     ->name('reservasi.perpanjang');
+
+            // Route::post('/reservasi/perpanjang', [ReservationController::class, 'extendStore'])
+            //     ->name('reservasi.perpanjang.store');
+
+            // Route::get('/reservasi/pindah-kamar', [ReservationController::class, 'transferForm'])
+            //     ->name('reservasi.pindah-kamar');
+
+            // Route::post('/reservasi/pindah-kamar/{room}', [ReservationController::class, 'transferStore'])
+            //     ->name('reservasi.pindah-kamar.store');
+
+            // Route::get('/reservasi/akhiri-kontrak', [ReservationController::class, 'checkoutForm'])
+            //     ->name('reservasi.akhiri-kontrak');
+
+            // Route::post('/reservasi/akhiri-kontrak', [ReservationController::class, 'checkoutStore'])
+            //     ->name('reservasi.akhiri-kontrak.store');
+
+            Route::post(
+                '/invoices/{invoice}/pay',
+                [InvoiceController::class, 'pay']
+            )->name('invoices.pay');
+
+            Route::get(
+                '/invoices/{invoice}/finish',
+                [InvoiceController::class, 'finish']
+            )->name('invoices.finish');
+
+            Route::get('/pembayaran', [MahasiswaController::class, 'pembayaran'])
+                ->name('pembayaran');
+
+            Route::get('/profil', [MahasiswaController::class, 'profil'])
+                ->name('profil');
+            Route::get('/profil/edit', [MahasiswaController::class, 'editProfil'])
+                ->name('profil.edit');
+            Route::put('/profil/update', [MahasiswaController::class, 'updateProfil'])
+                ->name('profil.update');
+
+            // Route::put('/profil/update', [MahasiswaController::class, 'updateProfil'])
+            //     ->name('profil.update');
+
+            Route::get('/review', [MahasiswaController::class, 'review'])
+                ->name('review');
+            Route::get('/registrasi-ulang', [RegistrationPeriodController::class, 'index'])
+                ->name('registrasi-ulang.index');
+
+            Route::get('/registrasi-ulang/perpanjang', [RegistrationPeriodController::class, 'extendForm'])
+                ->name('registrasi-ulang.perpanjang');
+
+            Route::post('/registrasi-ulang/perpanjang', [RegistrationPeriodController::class, 'extendStore'])
+                ->name('registrasi-ulang.perpanjang.store');
+
+            Route::get('/registrasi-ulang/pindah-kamar', [RegistrationPeriodController::class, 'transferForm'])
+                ->name('registrasi-ulang.pindah-kamar');
+
+            Route::post('/registrasi-ulang/pindah-kamar/{room}', [RegistrationPeriodController::class, 'transferStore'])
+                ->name('registrasi-ulang.pindah-kamar.store');
+
+            Route::get('/registrasi-ulang/akhiri-kontrak', [RegistrationPeriodController::class, 'checkoutForm'])
+                ->name('registrasi-ulang.akhiri-kontrak');
+
+            Route::post('/registrasi-ulang/akhiri-kontrak', [RegistrationPeriodController::class, 'checkoutStore'])
+                ->name('registrasi-ulang.akhiri-kontrak.store');
+        });
+    Route::resource('/occupants', OccupantController::class);
 });

@@ -7,7 +7,7 @@ use App\Models\KategoriAset;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
 
-class KategoriAsetSeeder extends Seeder
+class CreateKategoriAsetDummy extends Seeder
 {
     /**
      * Run the database seeds.

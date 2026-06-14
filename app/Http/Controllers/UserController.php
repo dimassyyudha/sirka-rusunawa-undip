@@ -10,32 +10,32 @@ use Illuminate\Support\Facades\File;
 class UserController extends Controller
 {
     public function index(Request $request)
-{
-    // 1. Mulai Query User
-    $query = User::query();
+    {
+        // 1. Mulai Query User
+        $query = User::query();
 
-    // 2. Cek apakah ada filter 'role' yang dikirim
-    if ($request->filled('role')) {
-        $query->where('role', $request->role);
+        // 2. Cek apakah ada filter 'role' yang dikirim
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        // 3. Ambil data (menggunakan latest agar data baru dipaling atas)
+        $dataUser = $query->latest()->get();
+
+        // 4. Return view
+        return view('pages.admin.user.index', compact('dataUser'));
     }
-
-    // 3. Ambil data (menggunakan latest agar data baru dipaling atas)
-    $dataUser = $query->latest()->get();
-
-    // 4. Return view
-    return view('pages.user.index', compact('dataUser'));
-}
 
     public function create()
     {
-        return view('pages.user.create');
+        return view('pages.admin.user.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name'  => 'required|max:100',
-            'email' => ['required','email','unique:users,email'],
+            'email' => ['required', 'email', 'unique:users,email'],
             'password' => 'required|min:8',
             'role' => 'required|in:admin,staff,kades',
             // Nama input di form adalah 'profile_photo'
@@ -53,7 +53,7 @@ class UserController extends Controller
             $filename = time() . '_' . $file->getClientOriginalName();
             $path = public_path('uploads/profile_pictures');
 
-            if(!File::exists($path)) {
+            if (!File::exists($path)) {
                 File::makeDirectory($path, 0777, true, true);
             }
 
@@ -65,13 +65,13 @@ class UserController extends Controller
 
         User::create($data);
 
-        return redirect()->route('user.index')->with('success', 'User Berhasil Ditambahkan!');
+        return redirect()->route('admin.user.index')->with('success', 'User Berhasil Ditambahkan!');
     }
 
     public function edit(string $id)
     {
         $dataUser = User::findOrFail($id);
-        return view('pages.user.edit', compact('dataUser'));
+        return view('pages.admin.user.edit', compact('dataUser'));
     }
 
     public function update(Request $request, string $id)
@@ -80,7 +80,7 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|max:100',
-            'email' => ['required','email','unique:users,email,'.$id],
+            'email' => ['required', 'email', 'unique:users,email,' . $id],
             'role' => 'required|in:admin,staff,kades',
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -89,7 +89,7 @@ class UserController extends Controller
         $dataUser->email = $request->email;
         $dataUser->role = $request->role;
 
-        if($request->password) {
+        if ($request->password) {
             $dataUser->password = Hash::make($request->password);
         }
 
@@ -99,7 +99,7 @@ class UserController extends Controller
             $filename = time() . '_' . $file->getClientOriginalName();
             $path = public_path('uploads/profile_pictures');
 
-            if(!File::exists($path)) {
+            if (!File::exists($path)) {
                 File::makeDirectory($path, 0777, true, true);
             }
 
@@ -115,7 +115,7 @@ class UserController extends Controller
         }
 
         $dataUser->save();
-        return redirect()->route('user.index')->with('success','Data Berhasil Diupdate!');
+        return redirect()->route('admin.user.index')->with('success', 'Data Berhasil Diupdate!');
     }
 
     public function destroy(string $id)
@@ -128,6 +128,6 @@ class UserController extends Controller
         }
 
         $user->delete();
-        return redirect()->route('user.index')->with('success','Data Berhasil Dihapus!');
+        return redirect()->route('admin.user.index')->with('success', 'Data Berhasil Dihapus!');
     }
 }

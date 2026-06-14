@@ -2,26 +2,34 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call([
+            // MASTER DATA KAMAR DULU
+            BuildingSeeder::class,
+            FloorSeeder::class,
+            RoomSeeder::class,
+            RoomPhotoSeeder::class,
+
+            // USER & PROFILE
             UserSeeder::class,
-            WargaSeeder::class,
-            KategoriAsetSeeder::class,
-            AsetSeeder::class,
-            LokasiAsetSeeder::class,
-            PemeliharaanAsetSeeder::class,
-            MutasiAsetSeeder::class,   
+            // StudentProfileSeeder::class,
+
+            // DATA TRANSAKSI / PENGHUNI
+
+            ReservationSeeder::class,
+            RoomReviewSeeder::class,
+            RecommendationSeeder::class,
+            // OccupantSeeder::class,
+            // LANDING PAGE CONTENT
+           
+            FaqSeeder::class,
+            AlurSeeder::class,
+            FooterSeeder::class,
         ]);
     }
 }

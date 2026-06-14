@@ -3,10 +3,11 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\File;
 use Faker\Factory as Faker;
+use App\Models\User;
+use App\Models\StudentProfile;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -14,55 +15,66 @@ class UserSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        // Setup Folder Upload
-        $destinationPath = public_path('uploads/profile_pictures');
-        if (!File::exists($destinationPath)) {
-            File::makeDirectory($destinationPath, 0777, true, true);
-        }
-
-        // ----------------------------------------------------
-        // 1. Akun Admin Utama (Dzakwan)
-        // ----------------------------------------------------
-
-        $myPhotoName = null;
-        $sourceMyPhoto = public_path('assets-admin/images/faces/my-photo.png');
-
-        if (File::exists($sourceMyPhoto)) {
-            $myPhotoName = 'admin_dzakwan_' . time() . '.png';
-            File::copy($sourceMyPhoto, $destinationPath . '/' . $myPhotoName);
-        }
-
-        User::create([
-            'name'          => 'Dzakwan',
-            'email'         => 'admin@desa.id',
-            'password'      => Hash::make('admin'),
-            'role'          => 'admin',
-            'profile_photo' => $myPhotoName
-        ]);
-
-        // ----------------------------------------------------
-        // 2. Loop 50 Data Dummy Lainnya
-        // ----------------------------------------------------
-
-        $sourceDummy = public_path('assets-admin/images/faces/2.jpg');
-        $hasDummySource = File::exists($sourceDummy);
-
-        for ($i = 1; $i <= 50; $i++) {
-            $filename = null;
-
-            // 20 Data Pertama: Pakai Foto Dummy
-            if ($i <= 20 && $hasDummySource) {
-                $filename = 'dummy_user_' . $i . '_' . time() . '.jpg';
-                File::copy($sourceDummy, $destinationPath . '/' . $filename);
-            }
-
-            User::create([
-                'name'     => $faker->name,
-                'email'    => $faker->unique()->safeEmail,
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Pengelola Rusunawa',
+                'email' => 'admin@gmail.com',
                 'password' => Hash::make('password'),
-                'role'     => $faker->randomElement(['staff', 'kades']),
-                'profile_photo' => $filename,
-            ]);
-        }
+                'role' => 'admin',
+                'gender' => 'laki-laki',
+                'number_phone' => '081234567890',
+                'profile_photo' => null,
+            ]
+        );
+
+
+        // foreach ($mahasiswaList as $index => $data) {
+
+        //     [$nama, $gender, $nim] = $data;
+
+        //     $nomorUrut = $index + 1;
+
+        //     $emailName = Str::slug($nama, '.');
+
+        //     $user = User::updateOrCreate(
+        //         ['email' => $emailName . '@gmail.com'],
+        //         [
+        //             'name' => $nama,
+        //             'email' => $emailName . '@gmail.com',
+        //             'password' => Hash::make('password'),
+        //             'role' => 'mahasiswa',
+        //             'gender' => $gender,
+        //             'number_phone' => '08' . $faker->numerify('##########'),
+        //             'profile_photo' => null,
+        //         ]
+        //     );
+
+        //     StudentProfile::updateOrCreate(
+        //         ['user_id' => $user->id],
+        //         [
+        //             'nim' => $nim,
+
+        //             'fakultas' => 'FSM',
+        //             'jurusan' => 'Informatika',
+        //             'angkatan' => (int) substr($nim, 6, 4),
+
+        //             'alamat' => $faker->address,
+        //             'no_hp' => $user->number_phone,
+
+        //             'nama_ortu' => $faker->name(),
+        //             'no_hp_ortu' => '08' . $faker->numerify('##########'),
+
+        //             'ktm_path' => null,
+
+        //             'has_vehicle' => false,
+        //             'vehicle_plate_number' => null,
+        //             'stnk_path' => null,
+
+        //             'status_mahasiswa' => 'tidak_penghuni',
+        //             'room_id' => null,
+        //         ]
+        //     );
+        // }
     }
 }

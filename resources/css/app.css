@@ -1,11 +1,145 @@
-@import 'tailwindcss';
+/* Font */
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"); */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap");
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tailwind v4 content sources */
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
+
+/* Theme (optional) */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: "Plus Jakarta Sans", sans-serif;
+}
+
+/* Base */
+@layer base {
+    html {
+        font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    * {
+        font-family: inherit;
+    }
+}
+/* TELEPON SEMUA NEGARA */
+.iti {
+    width: 100%;
+}
+.iti {
+    --iti-path-flags-1x: url("https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/img/flags.webp");
+    --iti-path-flags-2x: url("https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/img/flags@2x.webp");
+    --iti-path-globe-1x: url("https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/img/globe.webp");
+    --iti-path-globe-2x: url("https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/img/globe.webp");
+}
+/* wrapper input */
+.iti--separate-dial-code .iti__selected-country {
+    background-color: #f8fafc;
+    border-radius: 1rem 0 0 1rem;
+    padding: 0 12px;
+}
+
+.iti__tel-input {
+    width: 100%;
+    border-radius: 1rem;
+}
+
+/* dropdown */
+.iti__dropdown-content {
+    width: 390px !important;
+    max-width: calc(100vw - 32px);
+    border-radius: 0.75rem !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18) !important;
+    overflow: hidden !important;
+}
+
+/* search */
+.iti__search-input {
+    width: 100%;
+    height: 52px;
+    padding: 0 14px 0 42px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 14px !important;
+    outline: none !important;
+}
+
+.iti__search-input::placeholder {
+    color: #64748b !important;
+}
+
+/* country list */
+.iti__country-list {
+    max-height: 360px !important;
+    overflow-y: auto !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #f1f5f9;
+}
+
+.iti__country-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.iti__country-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.iti__country-list::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 999px;
+}
+
+/* country row */
+.iti__country {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+}
+
+.iti__country:hover,
+.iti__highlight {
+    background: #f1f5f9 !important;
+}
+
+.iti__country-name {
+    color: #0f172a !important;
+    font-weight: 600;
+}
+
+.iti__dial-code {
+    color: #64748b !important;
+    margin-left: auto;
+    font-weight: 600;
+}
+
+.iti__flag {
+    border-radius: 3px;
+}
+
+/* biar dropdown tidak ketutup */
+.iti__country-container {
+    z-index: 60;
+}
+
+.iti__dropdown-content {
+    z-index: 9999 !important;
 }
