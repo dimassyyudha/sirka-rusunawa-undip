@@ -5,7 +5,11 @@
 
     $capacity = (int) ($room->capacity ?? 2);
 
-    $slots = max(0, $capacity - $occupied);
+    // $slots = max(0, $capacity - $occupied);
+
+    $occupied = (int) ($room->occupied ?? 0);
+
+    $slots = (int) ($room->slots ?? 0);
 
     $isAvailable = ($room->status ?? 'tersedia') === 'tersedia' && $slots > 0;
 
@@ -62,7 +66,7 @@
     class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-orange-300 hover:shadow-xl">
 
     {{-- FULL CARD CLICK --}}
-    <a href="{{ route('cari-kamar.show', $room->id) }}" target="_blank" rel="noopener noreferrer"
+    <a href="{{ route('cari-kamar.show', $room->room_id) }}" target="_blank" rel="noopener noreferrer"
         class="absolute inset-0 z-10" aria-label="Detail Kamar {{ $room->kode_kamar }}">
     </a>
 
@@ -314,7 +318,7 @@ gap-5
 
             </div>
 
-            <a href="{{ route('cari-kamar.show', $room->id) }}" target="_blank" rel="noopener noreferrer"
+            <a href="{{ route('cari-kamar.show', $room->room_id) }}" target="_blank" rel="noopener noreferrer"
                 class="
 relative z-20
 w-full

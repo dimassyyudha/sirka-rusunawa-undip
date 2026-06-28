@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\InvoiceReminderMail;
+use App\Models\Building;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class InvoiceController extends Controller
 {
@@ -112,7 +115,7 @@ class InvoiceController extends Controller
                 ['user_id' => $invoice->user_id],
                 [
                     'room_id' => $reservation->room_id,
-                    'reservation_id' => $reservation->id,
+                    'reservation_id' => $reservation->reservation_id,
                     'status' => 'active',
 
                     // tanggal masuk tetap tanggal pertama kali masuk
@@ -127,5 +130,115 @@ class InvoiceController extends Controller
         return redirect()
             ->route('mahasiswa.kamar-saya')
             ->with('success', 'Pembayaran berhasil. Masa hunian kamu telah diperbarui.');
+    }
+    // reminder
+    public function index(Request $request)
+    {
+        $perPage = $request->integer('per_page', 10);
+
+        $query = Invoice::with([
+            'user.studentProfile',
+            'reservation.room.floor.building',
+            'paymentTransactions',
+        ]);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('jalur')) {
+            $query->whereHas('user.studentProfile', function ($q) use ($request) {
+                $q->where('jalur_pembiayaan', $request->jalur);
+            });
+        }
+
+        if ($request->filled('gedung')) {
+            $query->whereHas('reservation.room.floor.building', function ($q) use ($request) {
+                $q->where('building_id', $request->gedung);
+            });
+        }
+
+        if ($request->filled('search')) {
+
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('invoice_number', 'like', "%$search%")
+
+                    ->orWhereHas('user', function ($qq) use ($search) {
+                        $qq->where('name', 'like', "%$search%");
+                    })
+
+                    ->orWhereHas('user.studentProfile', function ($qq) use ($search) {
+                        $qq->where('nim', 'like', "%$search%");
+                    });
+            });
+        }
+
+        $invoices = $query
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $buildings = Building::orderBy('name')->get();
+
+        return view(
+            'pages.admin.invoices.index',
+            compact('invoices', 'buildings')
+        );
+    }
+
+    public function sendReminder(
+        Invoice $invoice
+    ) {
+        Mail::to(
+            $invoice->user->email
+        )->send(
+            new InvoiceReminderMail(
+                $invoice
+            )
+        );
+
+        $invoice->update([
+            'last_reminder_at' => now()
+        ]);
+
+        return back()->with(
+            'success',
+            'Reminder berhasil dikirim.'
+        );
+    }
+
+    public function sendReminderAll()
+    {
+        $invoices = Invoice::with('user')
+
+            ->whereIn('status', [
+                'pending',
+                'unpaid',
+            ])
+
+            ->get();
+
+        foreach ($invoices as $invoice) {
+
+            Mail::to(
+                $invoice->user->email
+            )->queue(
+                new InvoiceReminderMail(
+                    $invoice
+                )
+            );
+
+            $invoice->update([
+                'last_reminder_at' => now()
+            ]);
+        }
+
+        return back()->with(
+            'success',
+            'Reminder massal berhasil dikirim.'
+        );
     }
 }

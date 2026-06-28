@@ -119,7 +119,7 @@
             </div>
 
             <div class="mt-1 text-xl font-black text-slate-900">
-                {{ $totalReviews }}
+                {{ $totalTestimonials }}
             </div>
 
         </div>

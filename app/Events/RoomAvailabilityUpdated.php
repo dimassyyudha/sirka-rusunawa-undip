@@ -23,7 +23,7 @@ class RoomAvailabilityUpdated implements ShouldBroadcast
         $slots = max(0, $capacity - $occupied);
 
         $this->room = [
-            'id' => $room->id,
+            'id' => $room->room_id,
             'kode_kamar' => $room->kode_kamar,
             'gedung' => $room->floor?->building?->code,
             'lantai' => $room->floor?->floor_number,

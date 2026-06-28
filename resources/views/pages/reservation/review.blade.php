@@ -11,10 +11,10 @@
 
             <x-ui.reservation-stepper :step="2" status="pending" />
 
-            <form action="{{ route('Reservation.store', $room->id) }}" method="POST" class="mt-8">
+            <form action="{{ route('Reservation.store', $room->room_id) }}" method="POST" class="mt-8">
 
                 @csrf
-                <input type="hidden" name="room_id" value="{{ $room->id }}">
+                <input type="hidden" name="room_id" value="{{ $room->room_id }}">
                 <input type="hidden" name="profile_photo_path" value="{{ $data['profile_photo_path'] ?? '' }}">
 
                 <input type="hidden" name="ktm_path" value="{{ $data['ktm_path'] ?? '' }}">
@@ -337,7 +337,7 @@
 
                                     </x-button.button-menu>
 
-                                    <x-button.button-menu href="{{ route('Reservation.create', $room->id) }}"
+                                    <x-button.button-menu href="{{ route('Reservation.create', $room->room_id) }}"
                                         variant="outline" size="lg">
 
                                         Kembali

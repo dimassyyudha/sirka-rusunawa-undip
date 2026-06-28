@@ -8,9 +8,9 @@
 @php
     $classes =
         [
-            'putra' => 'border-blue-200 bg-blue-50 text-blue-700',
+            'Laki-Laki' => 'border-blue-200 bg-blue-50 text-blue-700',
 
-            'putri' => 'border-pink-200 bg-pink-50 text-pink-700',
+            'perempuan' => 'border-pink-200 bg-pink-50 text-pink-700',
 
             'brand' => 'border-indigo-200 bg-indigo-50 text-indigo-700',
 

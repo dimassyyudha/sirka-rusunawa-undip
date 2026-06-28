@@ -9,24 +9,21 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // MASTER DATA KAMAR DULU
+
             BuildingSeeder::class,
             FloorSeeder::class,
             RoomSeeder::class,
             RoomPhotoSeeder::class,
 
-            // USER & PROFILE
             UserSeeder::class,
-            // StudentProfileSeeder::class,
 
-            // DATA TRANSAKSI / PENGHUNI
+            OccupancyPeriodSeeder::class,
 
-            ReservationSeeder::class,
-            RoomReviewSeeder::class,
+            OccupantSeeder::class,
+
             RecommendationSeeder::class,
-            // OccupantSeeder::class,
-            // LANDING PAGE CONTENT
-           
+            TestimonialSeeder::class,
+
             FaqSeeder::class,
             AlurSeeder::class,
             FooterSeeder::class,

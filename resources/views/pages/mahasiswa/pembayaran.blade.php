@@ -93,7 +93,7 @@
 
                     </thead>
 
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                         @forelse ($invoices as $invoice)
                             @php

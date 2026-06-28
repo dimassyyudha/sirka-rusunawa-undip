@@ -1,12 +1,12 @@
 <style>
-    .mobile-gender-pria {
+    .mobile-gender-Laki-Laki {
         background: #2563eb !important;
         color: #fff !important;
         border-color: #2563eb !important;
         box-shadow: 0 4px 12px rgba(37, 99, 235, .25);
     }
 
-    .mobile-gender-putri {
+    .mobile-gender-Perempuan {
         background: #ec4899 !important;
         color: #fff !important;
         border-color: #ec4899 !important;

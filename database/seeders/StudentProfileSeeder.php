@@ -2,134 +2,46 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
-
 use App\Models\User;
-use App\Models\Room;
 use App\Models\StudentProfile;
+use Illuminate\Database\Seeder;
 
 class StudentProfileSeeder extends Seeder
 {
     public function run(): void
     {
-        $faker = Faker::create('id_ID');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil semua mahasiswa
-        |--------------------------------------------------------------------------
-        */
-
         $users = User::where('role', 'mahasiswa')->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil semua kamar
-        |--------------------------------------------------------------------------
-        */
-
-        $rooms = Room::with('floor.building')->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | List jurusan UNDIP
-        |--------------------------------------------------------------------------
-        */
-
-        $jurusanList = [
-            'Informatika',
-            'Sistem Informasi',
-            'Teknik Industri',
-            'Teknik Elektro',
-            'Teknik Mesin',
-            'Teknik Sipil',
-            'Arsitektur',
-            'PWK',
-            'Manajemen',
-            'Akuntansi',
-            'Ekonomi Islam',
-            'Ilmu Hukum',
-            'Administrasi Publik',
-            'Administrasi Bisnis',
-            'Ilmu Komunikasi',
-            'Hubungan Internasional',
-            'Keperawatan',
-            'Kesehatan Masyarakat',
-            'Gizi',
-            'Kedokteran',
-        ];
 
         foreach ($users as $index => $user) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | Tentukan gender dari nama / random
-            |--------------------------------------------------------------------------
-            */
-
-            $gender = $faker->randomElement(['putra', 'putri']);
-
-            /*
-            |--------------------------------------------------------------------------
-            | Reservasi Kamar sesuai gender
-            |--------------------------------------------------------------------------
-            */
-
-            $selectedRoom = null;
-
-            if ($gender === 'putra') {
-
-                $availableRooms = $rooms->filter(function ($room) {
-
-                    $buildingCode = strtoupper(
-                        $room->floor?->building?->code ?? ''
-                    );
-
-                    return in_array($buildingCode, ['A', 'F']);
-                });
-            } else {
-
-                $availableRooms = $rooms->filter(function ($room) {
-
-                    $buildingCode = strtoupper(
-                        $room->floor?->building?->code ?? ''
-                    );
-
-                    return in_array($buildingCode, ['B', 'C', 'D', 'E']);
-                });
-            }
-
-            if ($availableRooms->count()) {
-                $selectedRoom = $availableRooms->random();
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Create profile
-            |--------------------------------------------------------------------------
-            */
-
             StudentProfile::updateOrCreate(
+
                 [
-                    'user_id' => $user->id,
+                    'user_id' => $user->user_id,
                 ],
+
                 [
-                    'nim' => '2406012' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
+                    'nim' => '2406012' . str_pad($index + 1, 5, '0', STR_PAD_LEFT),
 
-                    'jurusan' => $faker->randomElement($jurusanList),
+                    'fakultas' => 'FSM',
 
-                    'angkatan' => $faker->numberBetween(2021, 2024),
+                    'jurusan' => 'Informatika',
 
-                    'alamat' => $faker->address,
+                    'angkatan' => 2024,
 
-                    'no_hp_ortu' => '08' . $faker->numerify('##########'),
+                    'alamat' => fake()->address(),
 
-                    'status_mahasiswa' => $faker->randomElement([
-                        'penghuni',
-                        'tidak_penghuni'
-                    ]),
+                    'nama_ortu' => fake()->name(),
 
+                    'no_hp_ortu' => '08' . fake()->numerify('##########'),
+
+                    'jalur_pembiayaan' => fake()->boolean(30)
+                        ? 'Bidikmisi/KIP-K'
+                        : 'Non-Bidikmisi/KIP-K',
+
+                    'status_mahasiswa' => 'tidak_penghuni',
+
+                    // isi jika room_id nullable
                     'room_id' => null,
                 ]
             );

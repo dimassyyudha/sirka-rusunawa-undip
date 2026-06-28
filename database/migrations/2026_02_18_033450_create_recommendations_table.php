@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->ulid('id')->primary();
 
             // Wajib pilih kamar & tidak boleh dobel
-            $table->ulid('room_id')->unique();
+            // $table->ulid('room_id')->unique();
             $table->unsignedInteger('sort_order')->unique(); // wajib unik & > 0
 
             $table->string('badge')->nullable();
@@ -20,8 +20,12 @@ return new class extends Migration {
             $table->timestamps();
 
             // FK: kalau kamar dihapus, rekomendasi ikut terhapus (lebih aman daripada SET NULL)
+           
+            $table->char('room_id', 10);
+
             $table->foreign('room_id')
-                ->references('id')->on('rooms')
+                ->references('room_id')
+                ->on('rooms')
                 ->cascadeOnDelete();
         });
     }

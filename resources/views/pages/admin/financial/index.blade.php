@@ -18,92 +18,142 @@
                 </p>
             </div>
 
-            <a href="{{ route('admin.financial.export', request()->query()) }}"
-                class="inline-flex justify-center items-center px-5 py-3 rounded-2xl bg-blue-600 text-white text-sm font-black hover:bg-blue-700 transition">
-                Export CSV
-            </a>
+
+            <x-button.button-menu type="button" variant="primary" size="lg"
+                href="{{ route('admin.financial.export', request()->query()) }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+
+                Export Laporan
+            </x-button.button-menu>
         </div>
 
-        <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-5">
-            <form method="GET" action="{{ route('admin.financial.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
 
+
+        <div class="mb-8 bg-white rounded-[10px] border border-slate-200 shadow-sm p-5">
+
+            <form id="filterForm" method="GET" action="{{ route('admin.financial.index') }}"
+                class="grid gap-4 lg:grid-cols-5">
+
+                {{-- PERIODE --}}
                 <div>
-                    <label class="text-xs font-black text-slate-500 uppercase">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                         Periode Registrasi
                     </label>
 
                     <select name="occupancy_period_id"
-                        class="mt-2 w-full rounded-2xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
 
-                        <option value="">Semua Periode</option>
+                        <option value="">
+                            Semua Periode
+                        </option>
 
                         @foreach ($periods as $period)
-                            <option value="{{ $period->id }}" @selected(request('occupancy_period_id') == $period->id)>
-                                {{ $period->semester_type === 'ganjil' ? 'Ganjil' : 'Genap' }}
+                            <option value="{{ $period->occupancy_period_id }}" @selected(request('occupancy_period_id') == $period->occupancy_period_id)>
+
+                                {{ $period->semester_type === 'ganjil' ? 'Semester Ganjil' : 'Semester Genap' }}
+                                -
                                 {{ $period->academic_year_start }}/{{ $period->academic_year_end }}
+
                             </option>
                         @endforeach
 
                     </select>
+
                 </div>
 
+                {{-- TANGGAL MULAI --}}
                 <div>
-                    <label class="text-xs font-black text-slate-500 uppercase">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                         Tanggal Mulai
                     </label>
 
                     <input type="date" name="start_date" value="{{ request('start_date') }}"
                         @if (request('occupancy_period_id')) disabled @endif
-                        class="mt-2 w-full rounded-2xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400">
+                        class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100 disabled:bg-slate-100">
+
                 </div>
 
+                {{-- TANGGAL AKHIR --}}
                 <div>
-                    <label class="text-xs font-black text-slate-500 uppercase">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                         Tanggal Akhir
                     </label>
 
                     <input type="date" name="end_date" value="{{ request('end_date') }}"
                         @if (request('occupancy_period_id')) disabled @endif
-                        class="mt-2 w-full rounded-2xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400">
+                        class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100 disabled:bg-slate-100">
+
                 </div>
 
+                {{-- GEDUNG --}}
                 <div>
-                    <label class="text-xs font-black text-slate-500 uppercase">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                         Gedung
                     </label>
 
-                    <select name="gedung"
-                        class="mt-2 w-full rounded-2xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select name="gedung" class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
 
-                        <option value="">Semua Gedung</option>
+                        <option value="">
+                            Semua Gedung
+                        </option>
 
                         @foreach ($buildings as $building)
                             <option value="{{ $building->code }}" @selected(request('gedung') == $building->code)>
+
                                 {{ $building->name }}
+
                             </option>
                         @endforeach
 
                     </select>
+
                 </div>
 
-                <div class="flex items-end gap-2">
-                    <button type="submit"
-                        class="h-11 px-5 rounded-2xl bg-blue-600 text-white text-sm font-black hover:bg-blue-700 transition">
-                        Filter
-                    </button>
+                {{-- ACTION --}}
+                <div>
 
-                    <a href="{{ route('admin.financial.index') }}"
-                        class="h-11 px-5 rounded-2xl bg-slate-100 text-slate-700 text-sm font-black hover:bg-slate-200 transition flex items-center">
-                        Reset
-                    </a>
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-transparent">
+                        Action
+                    </label>
+
+                    <div class="flex gap-2">
+
+                        <button type="submit"
+                            class="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white hover:bg-violet-700">
+
+                            Filter
+
+                        </button>
+
+                        <a href="{{ route('admin.financial.index') }}"
+                            class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">
+
+                            Reset
+
+                        </a>
+
+                    </div>
+
                 </div>
 
             </form>
+
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <p class="text-sm font-semibold text-slate-500">
                     Total Pendapatan
                 </p>
@@ -113,7 +163,7 @@
                 </h3>
             </div>
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <p class="text-sm font-semibold text-slate-500">
                     Total Transaksi
                 </p>
@@ -123,7 +173,7 @@
                 </h3>
             </div>
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <p class="text-sm font-semibold text-slate-500">
                     Periode
                 </p>
@@ -149,49 +199,125 @@
             </div>
 
         </div>
+        <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
-        <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
 
-            <div class="px-6 py-5 border-b border-slate-100">
-                <h3 class="text-lg font-black text-slate-900">
-                    Pendapatan per Gedung
-                </h3>
+                <div>
+                    <h3 class="text-lg font-black text-slate-900">
+                        Pendapatan per Gedung
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        Distribusi pendapatan berdasarkan gedung Rusunawa.
+                    </p>
+                </div>
+
+                <div class="text-right">
+                    <p class="text-xs uppercase tracking-wider text-slate-400">
+                        Total Pendapatan
+                    </p>
+
+                    <p class="text-lg font-black text-emerald-600">
+                        Rp {{ number_format($totalPendapatan ?? 0, 0, ',', '.') }}
+                    </p>
+                </div>
+
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-50 text-slate-500">
-                        <tr>
-                            <th class="px-6 py-4 text-left font-black">Gedung</th>
-                            <th class="px-6 py-4 text-right font-black">Total Pendapatan</th>
-                        </tr>
-                    </thead>
+            <div class="p-6">
 
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse ($incomeByBuilding as $row)
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="px-6 py-4 font-black text-slate-900">
-                                    {{ $row->nama_gedung ?? '-' }}
-                                </td>
+                @forelse ($incomeByBuilding as $index => $row)
+                    @php
+                        $income = (int) ($row->income ?? 0);
 
-                                <td class="px-6 py-4 text-right font-black text-slate-700">
-                                    Rp {{ number_format($row->income ?? 0, 0, ',', '.') }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="2" class="px-6 py-8 text-center text-slate-500">
-                                    Belum ada data pendapatan.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        $percentage = ($totalPendapatan ?? 0) > 0 ? ($income / $totalPendapatan) * 100 : 0;
+
+                        $colors = [
+                            'bg-blue-500',
+                            'bg-emerald-500',
+                            'bg-violet-500',
+                            'bg-orange-500',
+                            'bg-rose-500',
+                            'bg-cyan-500',
+                        ];
+
+                        $barColor = $colors[$index % count($colors)];
+                    @endphp
+
+                    <div class="{{ !$loop->last ? 'mb-6' : '' }}">
+
+                        <div class="flex items-center justify-between mb-2">
+
+                            <div class="flex items-center gap-3">
+
+                                <div
+                                    class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-sm font-black text-slate-700">
+
+                                    {{ $index + 1 }}
+
+                                </div>
+
+                                <div>
+
+                                    <p class="font-black text-slate-900">
+                                        {{ $row->nama_gedung }}
+                                    </p>
+
+                                    <p class="text-xs text-slate-500">
+                                        Kontribusi {{ number_format($percentage, 1) }}%
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <div class="text-right">
+
+                                <p class="font-black text-slate-900">
+                                    Rp {{ number_format($income, 0, ',', '.') }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="h-3 rounded-full bg-slate-100 overflow-hidden">
+
+                            <div class="h-full rounded-full {{ $barColor }}" style="width: {{ $percentage }}%">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @empty
+
+                    <div class="py-10 text-center">
+
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 17v-6m3 6V7m3 10v-4m3 8H6a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2z" />
+
+                            </svg>
+
+                        </div>
+
+                        <p class="mt-4 font-semibold text-slate-500">
+                            Belum ada data pendapatan.
+                        </p>
+
+                    </div>
+                @endforelse
+
             </div>
 
         </div>
-
-        <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
             <div class="px-6 py-5 border-b border-slate-100">
                 <h3 class="text-lg font-black text-slate-900">
@@ -214,7 +340,7 @@
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
                         @forelse ($invoices as $invoice)
                             @php
                                 $Reservation = $invoice->Reservation;

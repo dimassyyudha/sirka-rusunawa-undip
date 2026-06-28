@@ -3,80 +3,364 @@
 @section('title', 'Pengaturan FAQ')
 
 @section('content')
+
 <div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Pengaturan FAQ</h3>
-                <p class="text-subtitle text-muted">Preview FAQ yang tampil di landing page dan halaman FAQ.</p>
+
+    <div class="page-title mb-4">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+
+                <h3 class="fw-bold mb-1">
+                    Pengaturan FAQ
+                </h3>
+
+                <p class="text-muted mb-0">
+                    Kelola daftar pertanyaan yang akan ditampilkan pada Landing Page dan halaman FAQ.
+                </p>
+
             </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+                <a href="{{ route('admin.settings.faq.edit') }}"
+                   class="btn btn-primary rounded-pill px-4">
+
+                    <i class="bi bi-pencil-square me-2"></i>
+
+                    Edit FAQ
+
+                </a>
+
+            </div>
+
         </div>
+
     </div>
 
-    <section class="section">
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">FAQ Saat Ini</h5>
-                    <small class="text-muted">FAQ aktif dapat tampil di halaman FAQ. FAQ yang ditandai landing page juga tampil di beranda.</small>
-                </div>
-                <a href="{{ route('admin.settings.faq.edit') }}" class="btn btn-primary btn-sm">Edit</a>
-            </div>
+    @if(session('success'))
 
-            <div class="card-body">
-                <div class="mb-3">
-                    <div class="fw-semibold">Judul</div>
-                    <div>{{ $data['title'] ?? '-' }}</div>
-                </div>
-                <div class="mb-4">
-                    <div class="fw-semibold">Subjudul</div>
-                    <div>{{ $data['subtitle'] ?? '-' }}</div>
-                </div>
+        <div class="alert alert-success alert-dismissible fade show">
 
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle table-striped">
-                        <thead>
-                            <tr>
-                                <th style="width:90px;">Urutan</th>
-                                <th>Pertanyaan</th>
-                                <th style="width:120px;">Status</th>
-                                <th style="width:150px;">Landing Page</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($items as $it)
-                                <tr>
-                                    <td class="fw-semibold">{{ $it['sort_order'] ?? 0 }}</td>
-                                    <td class="text-break">{{ $it['question'] ?? '-' }}</td>
-                                    <td>
-                                        {!! !empty($it['is_active'])
-                                            ? '<span class="badge bg-success">Aktif</span>'
-                                            : '<span class="badge bg-secondary">Nonaktif</span>' !!}
-                                    </td>
-                                    <td>
-                                        {!! !empty($it['is_featured'])
-                                            ? '<span class="badge bg-primary">Ditampilkan</span>'
-                                            : '<span class="badge bg-light text-dark">Tidak</span>' !!}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-muted">Belum ada FAQ.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+            <i class="bi bi-check-circle-fill me-2"></i>
 
-            </div>
+            {{ session('success') }}
+
+            <button
+                class="btn-close"
+                data-bs-dismiss="alert">
+            </button>
+
         </div>
-    </section>
+
+    @endif
+
+
+    @php
+
+        $total = count($items);
+
+        $aktif = collect($items)->where('is_active', true)->count();
+
+        $landing = collect($items)->where('is_featured', true)->count();
+
+    @endphp
+
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+
+                        Total FAQ
+
+                    </small>
+
+                    <h2 class="fw-bold text-primary mt-2">
+
+                        {{ $total }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+
+                        FAQ Aktif
+
+                    </small>
+
+                    <h2 class="fw-bold text-success mt-2">
+
+                        {{ $aktif }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+
+                        Landing Page
+
+                    </small>
+
+                    <h2 class="fw-bold text-warning mt-2">
+
+                        {{ $landing }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-header bg-primary text-white rounded-top-4 py-3">
+
+            <h5 class="mb-1 text-white">
+
+                FAQ Saat Ini
+
+            </h5>
+
+            <small>
+
+                FAQ yang aktif akan tampil pada halaman FAQ.
+                FAQ yang ditandai Landing Page juga tampil pada Beranda.
+
+            </small>
+
+        </div>
+
+
+        <div class="card-body">
+
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+
+                    <div class="border rounded-4 p-3 h-100 bg-light">
+
+                        <small class="text-muted">
+
+                            Judul
+
+                        </small>
+
+                        <h5 class="fw-bold mt-2 mb-0">
+
+                            {{ $data['title'] ?? '-' }}
+
+                        </h5>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="border rounded-4 p-3 h-100 bg-light">
+
+                        <small class="text-muted">
+
+                            Subjudul
+
+                        </small>
+
+                        <div class="mt-2">
+
+                            {{ $data['subtitle'] ?? '-' }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-primary">
+
+                    <tr>
+
+                        <th width="70" class="text-center">
+
+                            #
+
+                        </th>
+
+                        <th>
+
+                            Pertanyaan
+
+                        </th>
+
+                        <th width="120" class="text-center">
+
+                            Status
+
+                        </th>
+
+                        <th width="150" class="text-center">
+
+                            Landing Page
+
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    @forelse($items as $index => $it)
+
+                        <tr>
+
+                            <td class="text-center fw-bold">
+
+                                {{ $index + 1 }}
+
+                            </td>
+
+                            <td>
+
+                                <div class="fw-semibold">
+
+                                    {{ $it['question'] }}
+
+                                </div>
+
+                                <small class="text-muted">
+
+                                    {{ Str::limit($it['answer'],90) }}
+
+                                </small>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                @if(!empty($it['is_active']))
+
+                                    <span class="badge bg-success px-3 py-2">
+
+                                        Aktif
+
+                                    </span>
+
+                                @else
+
+                                    <span class="badge bg-secondary px-3 py-2">
+
+                                        Nonaktif
+
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                            <td class="text-center">
+
+                                @if(!empty($it['is_featured']))
+
+                                    <span class="badge bg-primary px-3 py-2">
+
+                                        Ya
+
+                                    </span>
+
+                                @else
+
+                                    <span class="badge bg-light text-dark border px-3 py-2">
+
+                                        Tidak
+
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                        </tr>
+
+                    @empty
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="text-center py-5">
+
+                                <i class="bi bi-question-circle display-4 text-secondary"></i>
+
+                                <div class="mt-3 text-muted">
+
+                                    Belum ada data FAQ.
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
 @endsection

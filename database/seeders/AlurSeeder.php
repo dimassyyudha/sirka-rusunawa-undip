@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\SiteSetting;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class AlurSeeder extends Seeder
 {
@@ -53,14 +53,15 @@ class AlurSeeder extends Seeder
             ],
         ];
 
-        DB::table('site_settings')->updateOrInsert(
-            ['key' => 'alur'],
+        SiteSetting::updateOrCreate(
+
             [
-                'value' => json_encode($payload, JSON_UNESCAPED_UNICODE),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'key' => 'alur',
+            ],
+
+            [
+                'value' => $payload,
             ]
         );
-
     }
 }

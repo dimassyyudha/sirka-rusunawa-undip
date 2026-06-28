@@ -2,9 +2,24 @@
 
 @section('title', 'Pindah Kamar')
 @section('page_title', 'Pindah Kamar')
-
+@php
+    $capacity = $room->floor->room_capacity ?? 0;
+    $occupied = $room->occupied ?? 0;
+    $available = $capacity - $occupied;
+@endphp
 @section('content')
+    <div class="rounded-3xl border border-amber-200 bg-amber-50 p-5">
+        <h3 class="font-bold text-amber-800">
+            Informasi Pengajuan
+        </h3>
 
+        <ul class="mt-2 text-sm text-amber-700 space-y-1">
+            <li>• Pengajuan pindah kamar harus diverifikasi admin.</li>
+            <li>• Kamar tidak langsung berpindah setelah pengajuan.</li>
+            <li>• Mahasiswa tetap menempati kamar lama sampai disetujui.</li>
+            <li>• Dokumen pendukung wajib diunggah.</li>
+        </ul>
+    </div>
 
     <div class="max-w-7xl mx-auto space-y-6">
 
@@ -92,14 +107,33 @@
                                 </p>
 
                                 <p class="mt-2 text-lg font-black text-slate-900">
-                                    {{ $room->occupied ?? 0 }}/{{ $room->floor->room_capacity ?? 0 }}
+                                    @if ($available > 0)
+                                        <span
+                                            class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+                                            {{ $available }} Slot
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+                                            Penuh
+                                        </span>
+                                    @endif
+
+                                <div class="rounded-2xl bg-slate-50 p-4">
+                                    <p class="text-xs text-slate-500">
+                                        Slot Tersedia
+                                    </p>
+
+                                    <p class="mt-2 text-lg font-black text-emerald-600">
+                                        {{ $available }} Slot
+                                    </p>
+                                </div>
                                 </p>
                             </div>
 
                         </div>
 
-                        <form action="{{ route('mahasiswa.registrasi-ulang.pindah-kamar.store', $room->id) }}"
-                            method="POST" class="mt-6 space-y-4" data-confirm-form
+                        <form action="{{ route('mahasiswa.registrasi-ulang.pindah-kamar.store', $room->room_id) }}"
+                            method="POST" enctype="multipart/form-data" class="mt-6 space-y-4" data-confirm-form
                             data-confirm-title="Ajukan pindah kamar?"
                             data-confirm-text="Pengajuan pindah kamar akan dikirim ke admin untuk diverifikasi."
                             data-confirm-button-text="Ya, ajukan">
@@ -108,18 +142,80 @@
 
                             <div>
                                 <label class="block mb-2 text-sm font-bold text-slate-700">
+                                    Jenis Hunian
+                                </label>
+
+                                <select name="occupancy_type" required
+                                    class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
+                                    <option value="">
+                                        Pilih Jenis Hunian
+                                    </option>
+
+                                    <option value="shared">
+                                        Shared Room
+                                    </option>
+
+                                    <option value="private">
+                                        Private Room
+                                    </option>
+
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 text-sm font-bold text-slate-700">
+                                    Dokumen Pendukung
+                                </label>
+
+                                <input type="file" name="requirement_document" accept=".pdf,.jpg,.jpeg,.png" required
+                                    class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 text-sm font-bold text-slate-700">
                                     Catatan / Alasan Pindah
                                 </label>
 
                                 <textarea name="notes" rows="3"
                                     class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:border-orange-500 focus:ring-orange-500"
-                                    placeholder="Tuliskan alasan pindah kamar jika diperlukan...">{{ old('notes') }}</textarea>
+                                    placeholder="Tuliskan alasan pindah kamar...">{{ old('notes') }}</textarea>
                             </div>
 
-                            <button type="submit"
-                                class="w-full px-5 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black transition">
-                                Ajukan Pindah Kamar
-                            </button>
+                            @if ($available > 0)
+                                <button type="submit"
+                                    class="w-full px-5 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black">
+
+                                    Saya Ingin Pindah ke Kamar Ini
+
+                                </button>
+                            @else
+                                <button type="button" disabled
+                                    class="w-full px-5 py-3 rounded-2xl bg-slate-200 text-slate-500 cursor-not-allowed">
+
+                                    Kamar Penuh
+
+                                </button>
+                            @endif
+
+                        </form>
+
+                        @csrf
+
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-slate-700">
+                                Catatan / Alasan Pindah
+                            </label>
+
+                            <textarea name="notes" rows="3"
+                                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:border-orange-500 focus:ring-orange-500"
+                                placeholder="Tuliskan alasan pindah kamar jika diperlukan...">{{ old('notes') }}</textarea>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full px-5 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black transition">
+                            Ajukan Pindah Kamar
+                        </button>
 
                         </form>
 
@@ -155,11 +251,11 @@
 
         </div>
 
-        
-            <div>
-                <x-ui.pagination :paginator="$rooms" />
-            </div>
-        
+
+        <div>
+            <x-ui.pagination :paginator="$rooms" />
+        </div>
+
 
     </div>
 

@@ -7,7 +7,13 @@ use App\Models\Invoice;
 use App\Models\OccupancyPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class FinancialController extends Controller
 {
@@ -42,7 +48,7 @@ class FinancialController extends Controller
             ->with([
                 'user',
                 'Reservation.room.floor.building',
-                'reservation.room.floor.building',
+                // 'reservation.room.floor.building',
                 'room.floor.building',
                 'paymentTransactions',
             ])
@@ -52,7 +58,10 @@ class FinancialController extends Controller
             ->when($selectedPeriod, function ($q) use ($selectedPeriod) {
                 $q->where(function ($query) use ($selectedPeriod) {
                     $query->whereHas('reservation', function ($reservationQuery) use ($selectedPeriod) {
-                        $reservationQuery->where('occupancy_period_id', $selectedPeriod->id);
+                        $reservationQuery->where(
+                            'occupancy_period_id',
+                            $selectedPeriod->occupancy_period_id
+                        );
                     })
                         ->orWhereBetween('created_at', [
                             $selectedPeriod->registration_start_date->copy()->startOfDay(),
@@ -83,7 +92,7 @@ class FinancialController extends Controller
 
         $totalTransaksi = (clone $invoiceQuery)->count();
 
-        $paidInvoiceIds = (clone $invoiceQuery)->pluck('id');
+        $paidInvoiceIds = (clone $invoiceQuery)->pluck('invoice_id');
 
         $incomeByBuilding = Building::query()
             ->where('is_active', true)
@@ -91,16 +100,16 @@ class FinancialController extends Controller
             ->get()
             ->map(function ($building) use ($paidInvoiceIds) {
                 $income = Invoice::query()
-                    ->whereIn('id', $paidInvoiceIds)
+                    ->whereIn('invoice_id', $paidInvoiceIds)
                     ->where(function ($query) use ($building) {
                         $query->whereHas('Reservation.room.floor.building', function ($q) use ($building) {
-                            $q->where('buildings.id', $building->id);
+                            $q->where('buildings.building_id', $building->building_id);
                         })
                             ->orWhereHas('reservation.room.floor.building', function ($q) use ($building) {
-                                $q->where('buildings.id', $building->id);
+                                $q->where('buildings.building_id', $building->building_id);
                             })
                             ->orWhereHas('room.floor.building', function ($q) use ($building) {
-                                $q->where('buildings.id', $building->id);
+                                $q->where('buildings.building_id', $building->building_id);
                             });
                     })
                     ->sum('amount');
@@ -124,7 +133,7 @@ class FinancialController extends Controller
         ]);
     }
 
-    public function export(Request $request): StreamedResponse
+    public function export(Request $request)
     {
         $selectedPeriod = null;
 
@@ -156,7 +165,10 @@ class FinancialController extends Controller
             ->when($selectedPeriod, function ($q) use ($selectedPeriod) {
                 $q->where(function ($query) use ($selectedPeriod) {
                     $query->whereHas('reservation', function ($reservationQuery) use ($selectedPeriod) {
-                        $reservationQuery->where('occupancy_period_id', $selectedPeriod->id);
+                        $reservationQuery->where(
+                            'occupancy_period_id',
+                            $selectedPeriod->occupancy_period_id
+                        );
                     })
                         ->orWhereBetween('created_at', [
                             $selectedPeriod->registration_start_date->copy()->startOfDay(),
@@ -180,51 +192,60 @@ class FinancialController extends Controller
             ->latest()
             ->get();
 
-        $fileName = 'laporan-keuangan-' . now()->format('YmdHis') . '.csv';
+        $rows = collect();
 
-        return response()->streamDownload(function () use ($invoices) {
-            $handle = fopen('php://output', 'w');
+        foreach ($invoices as $invoice) {
 
-            fputcsv($handle, [
-                'Tanggal WIB',
-                'Nomor Invoice',
-                'Order ID',
-                'Nama',
-                'Gedung',
-                'Kamar',
-                'Status Invoice',
-                'Total Pembayaran',
+            $Reservation = $invoice->Reservation;
+            // $reservation = $invoice->reservation;
+
+            $room = $Reservation?->room
+                ?? $reservation?->room
+                ?? $invoice->room;
+
+            $transaction = $invoice->paymentTransactions
+                ? $invoice->paymentTransactions->sortByDesc('created_at')->first()
+                : null;
+
+            $rows->push([
+                $invoice->created_at
+                    ? $invoice->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB'
+                    : '-',
+                $invoice->invoice_number,
+                $transaction?->order_id ?? '-',
+                $Reservation?->guest_name ?? $invoice->user?->name ?? '-',
+                $room?->floor?->building?->name ?? '-',
+                $room?->kode_kamar ?? '-',
+                $invoice->status,
+                $invoice->amount,
             ]);
+        }
 
-            foreach ($invoices as $invoice) {
-                $Reservation = $invoice->Reservation;
-                $reservation = $invoice->reservation;
+        return Excel::download(
+            new class($rows) implements FromCollection, WithHeadings, ShouldAutoSize {
 
-                $room = $Reservation?->room
-                    ?? $reservation?->room
-                    ?? $invoice->room;
+                public function __construct(private Collection $rows) {}
 
-                $transaction = $invoice->paymentTransactions
-                    ? $invoice->paymentTransactions->sortByDesc('created_at')->first()
-                    : null;
+                public function collection()
+                {
+                    return $this->rows;
+                }
 
-                fputcsv($handle, [
-                    $invoice->created_at
-                        ? $invoice->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB'
-                        : '-',
-                    $invoice->invoice_number,
-                    $transaction?->order_id ?? '-',
-                    $Reservation?->guest_name ?? $invoice->user?->name ?? '-',
-                    $room?->floor?->building?->name ?? '-',
-                    $room?->kode_kamar ?? '-',
-                    $invoice->status,
-                    $invoice->amount,
-                ]);
-            }
-
-            fclose($handle);
-        }, $fileName, [
-            'Content-Type' => 'text/csv',
-        ]);
+                public function headings(): array
+                {
+                    return [
+                        'Tanggal WIB',
+                        'Nomor Invoice',
+                        'Order ID',
+                        'Nama',
+                        'Gedung',
+                        'Kamar',
+                        'Status Invoice',
+                        'Total Pembayaran',
+                    ];
+                }
+            },
+            'Laporan Keuangan-' . now()->format('dmyHis') . '.xlsx'
+        );
     }
 }

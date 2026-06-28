@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('reservation_documents', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
-            $table->foreignUlid('reservation_id')
-                ->constrained('reservations')
+            $table->char('reservation_id', 10);
+
+            $table->foreign('reservation_id')
+                ->references('reservation_id')
+                ->on('reservations')
                 ->cascadeOnDelete();
 
             $table->string('document_name');

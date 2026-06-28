@@ -5,8 +5,15 @@
     'gedungsSidebar' => [],
     'floorInfo' => [],
 ])
+@php
 
-<div class="space-y-6">
+    $lakiGedung = collect($gedungsSidebar)->where('gender_type', 'laki-laki')->pluck('code')->implode(', ');
+
+    $perempuanGedung = collect($gedungsSidebar)->where('gender_type', 'perempuan')->pluck('code')->implode(', ');
+
+@endphp
+
+<div class="space-y-4">
 
     {{-- TIPE PENGHUNI --}}
     <div>
@@ -27,30 +34,50 @@
 
             @if ($gender)
                 <a href="{{ route('cari-kamar.index', array_filter(request()->except('page', 'gender', 'gedung', 'lantai'), fn($v) => $v !== null && $v !== '')) }}"
-                    class="text-xs font-bold text-blue-600 hover:underline">
+                    class="text-xs font-bold text-red-600 hover:underline">
                     Reset
                 </a>
             @endif
 
         </div>
 
-        <div class="grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+        <div class="space-y-2">
 
-            <a href="{{ route('cari-kamar.index', array_filter(array_merge(request()->except('page', 'gender', 'gedung', 'lantai'), ['gender' => $gender === 'pria' ? null : 'pria']), fn($v) => $v !== null && $v !== '')) }}"
-                class="rounded-xl py-3 text-center text-sm font-black transition-all duration-200
-                {{ $gender === 'pria' ? 'bg-blue-600 text-white shadow' : 'text-slate-700 hover:bg-white' }}">
+            <label class="flex items-center gap-2 cursor-pointer">
 
-                Putra
+                <input type="radio" name="gender_filter" value="laki-laki"
+                    {{ $gender === 'laki-laki' ? 'checked' : '' }}
+                    onchange="window.location.href='{{ route(
+                        'cari-kamar.index',
+                        array_filter(
+                            array_merge(request()->except('page', 'gender', 'gedung', 'lantai'), ['gender' => 'laki-laki']),
+                            fn($v) => $v !== null && $v !== '',
+                        ),
+                    ) }}'">
 
-            </a>
+                <span class="text-sm font-medium">
+                    Laki-Laki
+                </span>
 
-            <a href="{{ route('cari-kamar.index', array_filter(array_merge(request()->except('page', 'gender', 'gedung', 'lantai'), ['gender' => $gender === 'wanita' ? null : 'wanita']), fn($v) => $v !== null && $v !== '')) }}"
-                class="rounded-xl py-3 text-center text-sm font-black transition-all duration-200
-                {{ $gender === 'wanita' ? 'bg-pink-500 text-white shadow' : 'text-slate-700 hover:bg-white' }}">
+            </label>
 
-                Putri
+            <label class="flex items-center gap-2 cursor-pointer">
 
-            </a>
+                <input type="radio" name="gender_filter" value="perempuan"
+                    {{ $gender === 'perempuan' ? 'checked' : '' }}
+                    onchange="window.location.href='{{ route(
+                        'cari-kamar.index',
+                        array_filter(
+                            array_merge(request()->except('page', 'gender', 'gedung', 'lantai'), ['gender' => 'perempuan']),
+                            fn($v) => $v !== null && $v !== '',
+                        ),
+                    ) }}'">
+
+                <span class="text-sm font-medium">
+                    Perempuan
+                </span>
+
+            </label>
 
         </div>
 
@@ -68,13 +95,25 @@
                 </h3>
 
                 <p class="text-xs text-slate-500">
-                    Pilih lokasi gedung
+                    Pilih Gedung Kamar
                 </p>
+                <p class="text-xs text-slate-500">
 
+                    @if ($gender === 'laki-laki')
+                        Gedung laki-laki: {{ $lakiGedung }}
+                    @elseif($gender === 'perempuan')
+                        Gedung perempuan: {{ $perempuanGedung }}
+                    @else
+                        Laki-laki: {{ $lakiGedung }}
+                        <br>
+                        Perempuan: {{ $perempuanGedung }}
+                    @endif
+
+                </p>
             </div>
 
             @if ($gedungFilter)
-                <a href="{{ route('cari-kamar.index', array_filter(request()->except('page', 'gedung', 'lantai'), fn($v) => $v !== null && $v !== '')) }}"
+                <a href="{{ route('cari-kamar.index', array_filter(request()->except('page', 'gedung'), fn($v) => $v !== null && $v !== '')) }}"
                     class="text-xs font-bold text-red-600 hover:underline">
                     Reset
                 </a>
@@ -82,40 +121,42 @@
 
         </div>
 
-        <div class="flex flex-wrap gap-2">
+        <form method="GET">
 
-            @foreach ($gedungsSidebar as $gedung)
-                @php
-                    $kode = $gedung['code'];
-                    $genderGedung = strtolower($gedung['gender_type']);
-                @endphp
-
-                @if (
-                    !$gender ||
-                        ($gender === 'pria' && $genderGedung === 'putra') ||
-                        ($gender === 'wanita' && $genderGedung === 'putri'))
-                    <a href="{{ route(
-                        'cari-kamar.index',
-                        array_filter(
-                            array_merge(request()->except('page', 'gedung', 'lantai'), ['gedung' => $kode]),
-                            fn($v) => $v !== null && $v !== '',
-                        ),
-                    ) }}"
-                        class="px-4 py-2 rounded-full border text-sm font-bold
-        {{ $gedungFilter === $kode
-            ? 'bg-orange-500 text-white border-orange-500'
-            : 'bg-white border-slate-200 text-slate-700 hover:border-orange-300 hover:text-orange-600' }}">
-
-                        Gedung {{ $kode }}
-
-                    </a>
-                @endif
+            @foreach (request()->except('gedung', 'page') as $key => $value)
+                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
             @endforeach
 
-        </div>
+            <select name="gedung" onchange="this.form.submit()"
+                class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+
+                <option value="">
+                    Semua Gedung
+                </option>
+
+                @foreach ($gedungsSidebar as $gedung)
+                    @php
+                        $kode = $gedung['code'];
+                        $genderGedung = strtolower(trim($gedung['gender_type']));
+                    @endphp
+
+                    @if (
+                        !$gender ||
+                            ($gender === 'laki-laki' && $genderGedung === 'laki-laki') ||
+                            ($gender === 'perempuan' && $genderGedung === 'perempuan'))
+                        <option value="{{ $kode }}" {{ $gedungFilter == $kode ? 'selected' : '' }}>
+
+                            Gedung {{ $kode }}
+
+                        </option>
+                    @endif
+                @endforeach
+
+            </select>
+
+        </form>
 
     </div>
-
     {{-- LANTAI --}}
     @if ($gedungFilter && isset($floorInfo[$gedungFilter]))
 
@@ -144,78 +185,33 @@
 
             </div>
 
-            <div class="flex flex-wrap gap-2">
+            <div>
 
-                @foreach ($floorInfo[$gedungFilter] as $floorNumber => $totalRooms)
-                    <a href="{{ route('cari-kamar.index', array_filter(array_merge(request()->except('page', 'lantai'), ['lantai' => $floorNumber]), fn($v) => $v !== null && $v !== '')) }}"
-                        class="px-4 py-2 rounded-full border text-sm font-bold transition-all duration-200
-                        {{ (string) $lantaiFilter === (string) $floorNumber
-                            ? 'bg-[#070B55] text-white border-[#070B55] shadow-sm'
-                            : 'bg-white text-slate-700 border-slate-200 hover:border-[#070B55] hover:text-[#070B55]' }}">
+                <form method="GET">
 
-                        Lt {{ $floorNumber }}
+                    @foreach (request()->except('lantai', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
 
-                    </a>
-                @endforeach
+                    <select name="lantai" onchange="this.form.submit()"
+                        class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
 
-            </div>
+                        <option value="">
+                            Semua Lantai
+                        </option>
 
-        </div>
+                        @foreach ($floorInfo[$gedungFilter] as $floorNumber => $totalRooms)
+                            <option value="{{ $floorNumber }}"
+                                {{ (string) $lantaiFilter === (string) $floorNumber ? 'selected' : '' }}>
 
-    @endif
+                                Lantai {{ $floorNumber }}
 
-    {{-- FILTER AKTIF --}}
-    @if ($gender || $gedungFilter || $lantaiFilter)
+                            </option>
+                        @endforeach
 
-        <div class="rounded-2xl border border-orange-200 bg-orange-50 p-4">
+                    </select>
 
-            <div class="mb-3 text-sm font-black text-orange-700">
-                Filter Aktif
-            </div>
-
-            <div class="flex flex-wrap gap-2">
-
-                @if ($gender)
-                    <a href="{{ route('cari-kamar.index', request()->except('gender')) }}"
-                        class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-2 text-xs font-black text-blue-700 hover:bg-blue-200 transition">
-
-                        {{ $gender === 'pria' ? 'Putra' : 'Putri' }}
-
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </a>
-                @endif
-
-                @if ($gedungFilter)
-                    <a href="{{ route('cari-kamar.index', request()->except('gedung')) }}"
-                        class="inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-2 text-xs font-black text-orange-700 hover:bg-orange-200 transition">
-
-                        Gedung {{ $gedungFilter }}
-
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </a>
-                @endif
-
-                @if ($lantaiFilter)
-                    <a href="{{ route('cari-kamar.index', request()->except('lantai')) }}"
-                        class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-xs font-black text-emerald-700 hover:bg-emerald-200 transition">
-
-                        Lantai {{ $lantaiFilter }}
-
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </a>
-                @endif
+                </form>
 
             </div>
 
@@ -223,12 +219,7 @@
 
     @endif
 
-    {{-- RESET --}}
-    <a href="{{ route('cari-kamar.index') }}"
-        class="block w-full rounded-2xl bg-red-600 px-4 py-3 text-center text-sm font-black text-white transition hover:bg-red-700">
 
-        Reset Semua Filter
 
-    </a>
 
 </div>

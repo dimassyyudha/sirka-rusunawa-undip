@@ -20,14 +20,16 @@ class RecommendationsController extends Controller
 
     public function create()
     {
+
         $rooms = Room::with('floor.building')
-            ->get()
-            ->sortBy([
-                fn ($a, $b) => strcmp($a->floor?->building?->name ?? '', $b->floor?->building?->name ?? ''),
-                fn ($a, $b) => ($a->floor?->floor_number ?? 0) <=> ($b->floor?->floor_number ?? 0),
-                fn ($a, $b) => strcmp($a->kode_kamar ?? '', $b->kode_kamar ?? ''),
-            ])
-            ->values();
+            ->orderBy('kode_kamar')
+            ->get();
+        // ->sortBy([
+        //     fn($a, $b) => strcmp($a->floor?->building?->name ?? '', $b->floor?->building?->name ?? ''),
+        //     fn($a, $b) => ($a->floor?->floor_number ?? 0) <=> ($b->floor?->floor_number ?? 0),
+        //     fn($a, $b) => strcmp($a->kode_kamar ?? '', $b->kode_kamar ?? ''),
+        // ])
+        // ->values();
 
         $nextOrder = (int) (Recommendation::max('sort_order') ?? 0) + 1;
 
@@ -37,7 +39,7 @@ class RecommendationsController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'room_id' => ['required', 'exists:rooms,id'],
+            'room_id' => ['required', 'exists:rooms,room_id'],
             'sort_order' => ['required', 'integer', 'min:1', 'unique:recommendations,sort_order'],
             'is_active' => ['nullable', 'boolean'],
             'badge' => ['nullable', 'string', 'max:50'],
@@ -56,14 +58,17 @@ class RecommendationsController extends Controller
 
     public function edit(Recommendation $recommendation)
     {
+        // $rooms = Room::with('floor.building')
+        //     ->get()
+        //     ->sortBy([
+        //         fn ($a, $b) => strcmp($a->floor?->building?->name ?? '', $b->floor?->building?->name ?? ''),
+        //         fn ($a, $b) => ($a->floor?->floor_number ?? 0) <=> ($b->floor?->floor_number ?? 0),
+        //         fn ($a, $b) => strcmp($a->kode_kamar ?? '', $b->kode_kamar ?? ''),
+        //     ])
+        //     ->values();
         $rooms = Room::with('floor.building')
-            ->get()
-            ->sortBy([
-                fn ($a, $b) => strcmp($a->floor?->building?->name ?? '', $b->floor?->building?->name ?? ''),
-                fn ($a, $b) => ($a->floor?->floor_number ?? 0) <=> ($b->floor?->floor_number ?? 0),
-                fn ($a, $b) => strcmp($a->kode_kamar ?? '', $b->kode_kamar ?? ''),
-            ])
-            ->values();
+            ->orderBy('kode_kamar')
+            ->get();
 
         $item = $recommendation->load('room.floor.building');
 
@@ -73,7 +78,7 @@ class RecommendationsController extends Controller
     public function update(Request $request, Recommendation $recommendation)
     {
         $data = $request->validate([
-            'room_id' => ['required', 'exists:rooms,id'],
+            'room_id' => ['required', 'exists:rooms,room_id'],
             'sort_order' => [
                 'required',
                 'integer',

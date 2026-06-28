@@ -57,7 +57,7 @@ class FloorSeeder extends Seeder
             foreach ($floors as $floorNumber => $floorData) {
                 Floor::updateOrCreate(
                     [
-                        'building_id' => $building->id,
+                        'building_id' => $building->building_id,
                         'floor_number' => $floorNumber,
                     ],
                     [

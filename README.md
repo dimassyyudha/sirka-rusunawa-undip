@@ -14,24 +14,21 @@ Sistem ini dirancang untuk menggantikan proses pendaftaran manual yang sebelumny
 
 ### Clone Repository
 
-```bash
+bash
 git clone https://github.com/username/sirka-rusunawa-undip.git
 cd sirka-rusunawa-undip
-```
 
 ### Install Dependency
 
-```bash
+bash
 composer install
 npm install
-```
 
 ### Konfigurasi Environment
 
-```bash
+bash
 cp .env.example .env
 php artisan key:generate
-```
 
 ### Konfigurasi Database
 
@@ -39,19 +36,16 @@ Edit file `.env`
 
 ### Migrasi dan Seeder
 
-```bash
+bash
 php artisan migrate --seed
-```
 
 ### Menjalankan Aplikasi
 
-```bash
+bash
 php artisan serve
 npm run dev
-```
 
 Aplikasi dapat diakses melalui:
 
-```text
+text
 http://127.0.0.1:8000
-```

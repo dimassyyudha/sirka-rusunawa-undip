@@ -2,23 +2,37 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Reservation extends Model
 {
-    use HasFactory, HasUlids;
+    use HasFactory;
 
+    /**
+     * Table
+     */
+    protected $table = 'reservations';
+
+    /**
+     * Primary Key
+     */
+    protected $primaryKey = 'reservation_id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
+
+    /**
+     * Mass Assignment
+     */
     protected $fillable = [
+        'reservation_id',
         'reservation_code',
-
         'room_id',
         'user_id',
-
         'occupancy_period_id',
-        'reservation_type',
-        'previous_room_id',
 
         'contact_name',
         'contact_phone',
@@ -35,91 +49,173 @@ class Reservation extends Model
 
         'start_date',
         'end_date',
-
         'duration_month',
         'payment_term',
-
         'occupancy_type',
         'slot_used',
-
         'price_per_month',
         'total_price',
 
         'status',
-
         'special_request',
-
-        'requested_at',
-        'approved_at',
-        'checked_out_at',
-
-        'document_path',
-        'kip_document_path',
+        'reservation_type',
+        'previous_room_id',
     ];
 
+    /**
+     * Cast
+     */
     protected $casts = [
-        'duration_month' => 'integer',
         'start_date' => 'date',
         'end_date' => 'date',
-        'requested_at' => 'datetime',
-        'approved_at' => 'datetime',
-        'checked_out_at' => 'datetime',
     ];
 
+    /**
+     * Boot
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($reservation) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reservation ID
+            |--------------------------------------------------------------------------
+            */
+
+            if (!$reservation->reservation_id) {
+
+                $last = self::orderByDesc('reservation_id')->first();
+
+                $number = $last
+                    ? ((int) substr($last->reservation_id, 3)) + 1
+                    : 1;
+
+                $reservation->reservation_id =
+                    'RES' . str_pad($number, 6, '0', STR_PAD_LEFT);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reservation Code
+            |--------------------------------------------------------------------------
+            */
+
+            if (!$reservation->reservation_code) {
+
+                do {
+
+                    $code = strtoupper(substr(md5(uniqid()), 0, 8));
+                } while (self::where('reservation_code', $code)->exists());
+
+                $reservation->reservation_code = $code;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Default Value
+            |--------------------------------------------------------------------------
+            */
+
+            if (empty($reservation->special_request)) {
+                $reservation->special_request = '0';
+            }
+
+            if (empty($reservation->previous_room_id)) {
+                $reservation->previous_room_id = '0';
+            }
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * User
+     */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class,
+            'user_id',
+            'user_id'
+        );
     }
 
+    /**
+     * Room
+     */
     public function room()
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(
+            Room::class,
+            'room_id',
+            'room_id'
+        );
     }
 
-    public function previousRoom()
-    {
-        return $this->belongsTo(Room::class, 'previous_room_id');
-    }
-
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
-    }
-
-    public function scopeApproved($query)
-    {
-        return $query->where('status', 'approved');
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'active');
-    }
-
-    public function scopeType($query, string $type)
-    {
-        return $query->where('reservation_type', $type);
-    }
-
+    /**
+     * Occupancy Period
+     */
     public function occupancyPeriod()
     {
-        return $this->belongsTo(OccupancyPeriod::class);
+        return $this->belongsTo(
+            OccupancyPeriod::class,
+            'occupancy_period_id',
+            'occupancy_period_id'
+        );
     }
 
-    public function documents()
-    {
-        return $this->hasMany(ReservationDocument::class);
-    }
-
+    /**
+     * Invoice
+     */
     public function invoices()
     {
-        return $this->hasMany(Invoice::class);
+        return $this->hasMany(
+            Invoice::class,
+            'reservation_id',
+            'reservation_id'
+        );
     }
-    public function paymentTransactions()
+
+    /**
+     * Occupant
+     */
+    public function occupants()
     {
         return $this->hasMany(
+            Occupant::class,
+            'reservation_id',
+            'reservation_id'
+        );
+    }
+
+    public function paymentTransactions()
+    {
+        return $this->hasManyThrough(
             PaymentTransaction::class,
-            'invoice_id'
+            Invoice::class,
+            'reservation_id', // FK di invoices
+            'invoice_id',     // FK di payment_transactions
+            'reservation_id', // PK reservation
+            'invoice_id'      // PK invoice
+        );
+    }
+
+    /**
+     * Kamar sebelumnya
+     */
+    public function previousRoom()
+    {
+        return $this->belongsTo(
+            Room::class,
+            'previous_room_id',
+            'room_id'
         );
     }
 }

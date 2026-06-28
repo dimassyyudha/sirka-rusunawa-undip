@@ -4,7 +4,7 @@
 @section('page_title', 'Detail Gedung')
 
 @section('content')
-    <div class="max-w-4xl space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -15,6 +15,8 @@
                 <p class="text-sm text-slate-500 mt-1">
                     Informasi lengkap gedung Rusunawa
                 </p>
+
+
             </div>
 
             <div class="flex flex-wrap gap-3">
@@ -24,15 +26,13 @@
 
                 </x-button.button-menu>
 
-                <x-button.button-menu href="{{ route('admin.buildings.index') }}" variant="default">
-
+                <x-button.button-menu href="{{ route('admin.buildings.index') }}" variant="outline" size="md">
                     Kembali
-
                 </x-button.button-menu>
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-[10px] border border-slate-200 bg-white shadow-sm">
 
             <div class="border-b border-slate-100 bg-slate-50 px-8 py-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -45,22 +45,6 @@
                         <p class="text-sm text-slate-500 mt-1">
                             Detail informasi data gedung
                         </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2">
-                        @if ($building->gender_type === 'putra')
-                            <x-ui.badge type="putra" label="Putra" />
-                        @elseif ($building->gender_type === 'putri')
-                            <x-ui.badge type="putri" label="Putri" />
-                        @else
-                            <x-ui.badge type="warning" label="Campur" />
-                        @endif
-
-                        @if ($building->is_active)
-                            <x-ui.badge type="success" label="Aktif" />
-                        @else
-                            <x-ui.badge type="danger" label="Nonaktif" />
-                        @endif
                     </div>
 
                 </div>
@@ -91,12 +75,10 @@
                         <p class="text-sm font-black text-slate-500 uppercase tracking-wide">Tipe</p>
                     </div>
                     <div class="flex-1">
-                        @if ($building->gender_type === 'putra')
-                            <x-ui.badge type="putra" label="Putra" />
-                        @elseif ($building->gender_type === 'putri')
-                            <x-ui.badge type="putri" label="Putri" />
+                        @if ($building->gender_type === 'laki-laki')
+                            <x-ui.badge type="Laki-Laki" label="Laki-Laki" />
                         @else
-                            <x-ui.badge type="warning" label="Campur" />
+                            <x-ui.badge type="perempuan" label="Perempuan" />
                         @endif
                     </div>
                 </div>
@@ -137,20 +119,18 @@
 
         </div>
 
-        <div class="flex justify-end">
-            <form action="{{ route('admin.buildings.destroy', $building) }}" method="POST" class="form-delete">
+        <form action="{{ route('admin.buildings.destroy', $building) }}" method="POST" class="form-delete">
 
-                @csrf
-                @method('DELETE')
+            @csrf
+            @method('DELETE')
 
-                <x-button.button-menu type="submit" variant="danger">
+            <x-button.button-menu type="submit" variant="danger" size="md">
 
-                    Hapus Gedung
+                Hapus Gedung
 
-                </x-button.button-menu>
+            </x-button.button-menu>
 
-            </form>
-        </div>
+        </form>
 
     </div>
 @endsection

@@ -126,7 +126,7 @@
 
                         <div class="flex flex-wrap gap-3">
 
-                            <a href="{{ route('mahasiswa.reservasi.show', $reservation->id) }}"
+                            <a href="{{ route('mahasiswa.reservasi.show', $reservation->reservation_id) }}"
                                 class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                 Detail
                             </a>

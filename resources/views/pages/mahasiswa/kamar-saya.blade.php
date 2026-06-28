@@ -111,7 +111,7 @@
                             </p>
                         </div>
                         @if ($occupant?->room)
-                            <div class="bg-white rounded-[28px] border border-slate-200 p-6 shadow-sm">
+                            <div class="bg-white rounded-[10px] border border-slate-200 p-6 shadow-sm">
 
                                 <h3 class="text-xl font-black text-slate-900">
                                     Teman Sekamar
@@ -199,7 +199,12 @@
                             </p>
                         </div>
                     @endif
+                    <a href="{{ route('mahasiswa.testimoni.create') }}"
+                        class="inline-flex items-center rounded-xl bg-blue-600 px-4 py-2 text-white">
 
+                        Beri Testimoni
+
+                    </a>
                 </div>
 
             </div>

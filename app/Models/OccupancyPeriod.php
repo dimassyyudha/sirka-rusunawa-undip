@@ -2,14 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OccupancyPeriod extends Model
 {
-    use HasUlids;
+    use HasFactory;
+
+    protected $table = 'occupancy_periods';
+
+    protected $primaryKey = 'occupancy_period_id';
+    
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'occupancy_period_id',
         'name',
         'semester_type',
         'academic_year_start',
@@ -25,39 +35,55 @@ class OccupancyPeriod extends Model
 
     protected $casts = [
         'registration_start_date' => 'date',
-        'registration_end_date' => 'date',
-        'lease_start_date' => 'date',
-        'lease_end_date' => 'date',
-        'payment_due_date' => 'date',
+        'registration_end_date'   => 'date',
+        'lease_start_date'        => 'date',
+        'lease_end_date'          => 'date',
+        'payment_due_date'        => 'date',
     ];
-    public function reservations()
+
+    /**
+     * Boot
+     */
+    protected static function boot()
     {
-        return $this->hasMany(Reservation::class, 'occupancy_period_id');
+        parent::boot();
+
+        static::creating(function ($period) {
+
+            if (!$period->occupancy_period_id) {
+
+                $last = self::orderByDesc('occupancy_period_id')->first();
+
+                $number = $last
+                    ? ((int) substr($last->occupancy_period_id, 3)) + 1
+                    : 1;
+
+                $period->occupancy_period_id =
+                    'OCP' . str_pad($number, 6, '0', STR_PAD_LEFT);
+            }
+
+            if (empty($period->notes)) {
+                $period->notes = '0';
+            }
+        });
     }
 
-    public function getComputedStatusAttribute(): string
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
+
+    public function reservations()
     {
-        if ($this->status === 'open') {
-            return 'open';
-        }
-
-        if ($this->status === 'closed') {
-            return 'closed';
-        }
-
-        $today = now()->startOfDay();
-
-        $start = $this->registration_start_date->copy()->startOfDay();
-        $end = $this->registration_end_date->copy()->endOfDay();
-
-        if ($today->between($start, $end)) {
-            return 'open';
-        }
-
-        if ($today->lt($start)) {
-            return 'upcoming';
-        }
-
-        return 'closed';
+        return $this->hasMany(
+            Reservation::class,
+            'occupancy_period_id',
+            'occupancy_period_id'
+        );
+    }
+    public function getRouteKeyName()
+    {
+        return 'occupancy_period_id';
     }
 }

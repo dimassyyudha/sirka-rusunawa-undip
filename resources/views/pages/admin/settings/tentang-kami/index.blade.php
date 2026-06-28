@@ -128,6 +128,7 @@
                         <p class="mt-3 text-sm leading-relaxed text-slate-600">
                             {{ $block['body'] ?? '-' }}
                         </p>
+                        
 
                         <div class="mt-5 space-y-3">
                             @forelse(($block['items'] ?? []) as $item)

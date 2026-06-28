@@ -1,7 +1,7 @@
 {{-- resources/views/pages/Reservation/show.blade.php --}}
 @extends('landing.landing')
 
-@section('title', 'Detail Reservation #' . $Reservation->id)
+@section('title', 'Detail Reservation #' . $reservation->reservation_id)
 
 @section('content')
     @php
@@ -139,7 +139,7 @@
                             <div>
                                 <div class="text-xs text-slate-400">ID Reservation:</div>
                                 <div class="font-mono font-bold text-slate-900">
-                                    {{ $Reservation->id }}
+                                    {{ $reservation->reservation_id }}
                                 </div>
 
                                 <div class="mt-2 text-xs text-slate-400">

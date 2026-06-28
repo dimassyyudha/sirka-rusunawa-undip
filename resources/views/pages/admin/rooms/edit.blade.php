@@ -8,7 +8,7 @@
         $photos = $room->photos ?? collect();
     @endphp
 
-    <div class="space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -32,7 +32,7 @@
         @endif
 
         <form action="{{ route('admin.rooms.update', $room) }}" method="POST" enctype="multipart/form-data"
-            class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6 space-y-6">
+            class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6 space-y-5">
 
             @csrf
             @method('PUT')
@@ -161,15 +161,20 @@
 
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-                <x-button.button-menu href="{{ route('admin.rooms.index') }}" variant="outline" size="md">
-                    Batal
-                </x-button.button-menu>
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-4">
 
                 <x-button.button-menu type="submit" variant="primary" data-confirm data-confirm-title="Simpan perubahan?"
                     data-confirm-text="Pastikan data sudah sesuai." data-confirm-button-text="Ya, simpan">
                     Simpan Perubahan
                 </x-button.button-menu>
+
+                <x-button.button-menu href="{{ route('admin.rooms.index') }}" variant="outline" size="md"
+                    class="w-full sm:w-auto">
+
+                    Batal
+
+                </x-button.button-menu>
+
             </div>
 
         </form>

@@ -4,7 +4,7 @@
             <p>2026 &copy; Sistem Reservasi Kamar Rusunawa Undip</p>
         </div>
         <div class="float-end">
-            <p>Dimas Yudha Saputra</p>
+            <p>Dimas Yudha SaLaki-Laki</p>
         </div>
     </div>
 </footer>

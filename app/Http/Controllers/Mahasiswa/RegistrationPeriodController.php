@@ -65,7 +65,7 @@ class RegistrationPeriodController extends Controller
         }
 
         return Reservation::where('user_id', auth()->id())
-            ->where('occupancy_period_id', $period->id)
+            ->where('occupancy_period_id', $period->occupancy_period_id)
             ->whereIn('status', [
                 'pending',
                 'approved',
@@ -86,7 +86,16 @@ class RegistrationPeriodController extends Controller
                 'previousRoom.floor.building',
             ])
                 ->where('user_id', auth()->id())
-                ->where('occupancy_period_id', $period->id)
+                ->where('occupancy_period_id', $period->occupancy_period_id)
+                ->whereIn('reservation_type', [
+                    'extension',
+                    'transfer',
+                    'checkout',
+                ])
+                ->whereIn('status', [
+                    'pending',
+                    'approved',
+                ])
                 ->latest()
                 ->first();
         }
@@ -126,11 +135,23 @@ class RegistrationPeriodController extends Controller
 
     public function extendStore(Request $request)
     {
+        // $request->validate([
+        //     'duration_month' => 'nullable|in:6',
+        //     'notes' => 'nullable|string|max:1000',
+        // ]);
         $request->validate([
-            'duration_month' => 'nullable|in:6',
-            'notes' => 'nullable|string|max:1000',
-        ]);
+            'duration_month' => ['required'],
+            'notes' => ['nullable', 'string'],
+            'requirement_document' => [
+                'required',
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
 
+            ],
+        ]);
+        $documentPath = $request
+            ->file('requirement_document')
+            ->store('registrasi-ulang/documents', 'public');
         $period = $this->activePeriod();
         $profile = $this->activeProfile();
 
@@ -152,10 +173,10 @@ class RegistrationPeriodController extends Controller
             'reservation_code' => strtoupper(substr(md5(uniqid()), 0, 6)),
             // 'reservation_code' => $this->generateReservationCode(),
 
-            'occupancy_period_id' => $period->id,
+            'occupancy_period_id' => $period->occupancy_period_id,
             'reservation_type' => 'extension',
 
-            'user_id' => $user->id,
+            'user_id' => $user->user_id,
             'room_id' => $profile->room_id,
             'previous_room_id' => $profile->room_id,
 
@@ -190,6 +211,7 @@ class RegistrationPeriodController extends Controller
             'end_date' => $period->lease_end_date,
 
             'special_request' => $request->notes,
+            'requirement_document' => $documentPath,
         ]);
 
         return redirect()
@@ -219,12 +241,10 @@ class RegistrationPeriodController extends Controller
 
         $rooms = Room::query()
             ->select('rooms.*')
-            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
-            ->join('buildings', 'floors.building_id', '=', 'buildings.id')
+            ->join('floors', 'rooms.floor_id', '=', 'floors.floor_id')
+            ->join('buildings', 'floors.building_id', '=', 'buildings.building_id')
             ->with(['floor.building'])
-            ->where('rooms.id', '!=', $profile->room_id)
-            ->where('rooms.status', 'tersedia')
-            ->whereColumn('rooms.occupied', '<', 'floors.room_capacity')
+            ->where('rooms.room_id', '!=', $profile->room_id)
             ->where(function ($query) use ($userGender) {
                 $query->where('buildings.gender_type', 'mixed')
                     ->orWhere('buildings.gender_type', $userGender)
@@ -248,7 +268,14 @@ class RegistrationPeriodController extends Controller
         $request->validate([
             'occupancy_type' => 'required|in:private,shared',
             'notes' => 'nullable|string|max:1000',
+            'requirement_document' => [
+                'required',
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+
+            ],
         ]);
+
 
         $period = $this->activePeriod();
         $profile = $this->activeProfile();
@@ -261,7 +288,7 @@ class RegistrationPeriodController extends Controller
             return back()->with('error', 'Kamu sudah mengajukan pilihan registrasi ulang.');
         }
 
-        if ($profile->room_id === $room->id) {
+        if ($profile->room_id === $room->room_id) {
             return back()->with('error', 'Kamu sudah menempati kamar tersebut.');
         }
 
@@ -280,12 +307,15 @@ class RegistrationPeriodController extends Controller
         if ($buildingGender && $buildingGender !== 'mixed' && $buildingGender !== $userGender) {
             return back()->with('error', 'Kamar tidak sesuai ketentuan gedung.');
         }
+        $documentPath = $request
+            ->file('requirement_document')
+            ->store('registrasi-ulang/documents', 'public');
 
         Reservation::create([
-            'occupancy_period_id' => $period->id,
+            'occupancy_period_id' => $period->occupancy_period_id,
             'reservation_type' => 'transfer',
             'user_id' => auth()->id(),
-            'room_id' => $room->id,
+            'room_id' => $room->room_id,
             'previous_room_id' => $profile->room_id,
             'duration_month' => 6,
             'status' => 'pending',
@@ -294,6 +324,7 @@ class RegistrationPeriodController extends Controller
             'requested_at' => now(),
             'notes' => $request->notes ?: 'Pengajuan pindah kamar.',
             'occupancy_type' => $request->occupancy_type,
+            'requirement_document' => $documentPath,
             'slot_used' => $request->occupancy_type === 'private'
                 ? ($room->floor->room_capacity ?? 2)
                 : 1,
@@ -377,10 +408,10 @@ class RegistrationPeriodController extends Controller
         Reservation::create([
             'reservation_code' => strtoupper(substr(md5(uniqid()), 0, 6)),
 
-            'occupancy_period_id' => $period->id,
+            'occupancy_period_id' => $period->occupancy_period_id,
             'reservation_type' => 'checkout',
 
-            'user_id' => $user->id,
+            'user_id' => $user->user_id,
             'room_id' => $profile->room_id,
             'previous_room_id' => $profile->room_id,
 
@@ -419,7 +450,7 @@ class RegistrationPeriodController extends Controller
             // 'document_path' => $filePath,
         ]);
         // Reservation::create([
-        //     'occupancy_period_id' => $period->id,
+        //     'occupancy_period_id' => $period->occupancy_period_id,
         //     'reservation_type' => 'checkout',
         //     'user_id' => auth()->id(),
         //     'room_id' => $profile->room_id,

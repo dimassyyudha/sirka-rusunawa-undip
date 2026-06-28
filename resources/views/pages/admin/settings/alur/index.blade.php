@@ -1,95 +1,200 @@
 @extends('layouts.app')
 
 @section('title', 'Pengaturan Alur Reservasi')
+@section('page_title', 'Pengaturan Alur Reservasi')
 
 @section('content')
-<div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Pengaturan Alur Reservasi</h3>
-                <p class="text-subtitle text-muted">Preview section alur reservasi yang tampil di landing page.</p>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Alur Reservasi</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
+
+<div class="space-y-6">
+
+
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+    <div>
+
+        <h1 class="text-3xl font-black text-slate-900">
+            Pengaturan Alur Reservasi
+        </h1>
+
+        <p class="mt-2 text-slate-500">
+            Kelola informasi dan langkah-langkah alur reservasi yang tampil pada halaman beranda.
+        </p>
+
     </div>
 
-    <section class="section">
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+    <a href="{{ route('admin.settings.alur.edit') }}"
+        class="inline-flex items-center justify-center rounded-2xl bg-orange-500 px-5 py-3 font-black text-white hover:bg-orange-600 transition">
 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">Preview Alur Reservasi</h5>
-                    <small class="text-muted">Badge, judul, deskripsi, dan daftar langkah yang aktif.</small>
-                </div>
-                <a href="{{ route('admin.settings.alur.edit') }}" class="btn btn-primary btn-sm">
-                    Edit
-                </a>
-            </div>
+        Edit Alur
 
-            <div class="card-body">
-                <div class="mb-3">
-                    <div class="text-uppercase text-muted small">Badge</div>
-                    <div class="fw-semibold">{{ $data['badge'] ?? '-' }}</div>
-                </div>
+    </a>
 
-                <div class="mb-3">
-                    <div class="text-uppercase text-muted small">Judul</div>
-                    <div class="fw-semibold">{{ $data['title'] ?? '-' }}</div>
-                </div>
-
-                <div class="mb-4">
-                    <div class="text-uppercase text-muted small">Deskripsi</div>
-                    <div>{{ $data['description'] ?? '-' }}</div>
-                </div>
-
-                <h6 class="mb-2">Daftar Langkah</h6>
-
-                @if(empty($items))
-                    <div class="text-muted">Belum ada langkah alur.</div>
-                @else
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle table-striped">
-                            <thead>
-                                <tr>
-                                    <th style="width:90px;">Urutan</th>
-                                    <th style="width:120px;">Status</th>
-                                    <th style="width:220px;">Judul</th>
-                                    <th>Deskripsi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($items as $step)
-                                    <tr>
-                                        <td class="fw-semibold">{{ $step['sort_order'] ?? 0 }}</td>
-                                        <td>
-                                            {!! !empty($step['is_active'])
-                                                ? '<span class="badge bg-success">Aktif</span>'
-                                                : '<span class="badge bg-secondary">Nonaktif</span>' !!}
-                                        </td>
-                                        <td class="fw-semibold">{{ $step['title'] ?? '-' }}</td>
-                                        <td class="text-break">{{ $step['desc'] ?? '-' }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </section>
 </div>
+
+@if(session('success'))
+
+    <div class="rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-700">
+
+        {{ session('success') }}
+
+    </div>
+
+@endif
+
+<div class="rounded-[10px] border border-slate-200 bg-white p-6 shadow-sm">
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+        <div>
+
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Badge
+            </p>
+
+            <p class="mt-2 text-lg font-black text-slate-900">
+                {{ $data['badge'] ?? '-' }}
+            </p>
+
+        </div>
+
+        <div class="md:col-span-2">
+
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Judul
+            </p>
+
+            <p class="mt-2 text-lg font-black text-slate-900">
+                {{ $data['title'] ?? '-' }}
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="mt-6">
+
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">
+            Deskripsi
+        </p>
+
+        <p class="mt-2 text-slate-700 leading-relaxed">
+            {{ $data['description'] ?? '-' }}
+        </p>
+
+    </div>
+
+</div>
+
+<div class="rounded-[10px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+
+    <div class="border-b border-slate-200 px-6 py-4">
+
+        <h2 class="text-lg font-black text-slate-900">
+            Daftar Langkah Reservasi
+        </h2>
+
+    </div>
+
+    <div class="overflow-x-auto">
+
+        <table class="w-full text-sm">
+
+            <thead class="bg-slate-50 border-b border-slate-200">
+
+                <tr>
+
+                    <th class="px-6 py-4 text-center font-black text-slate-700">
+                        Urutan
+                    </th>
+
+                    <th class="px-6 py-4 text-center font-black text-slate-700">
+                        Status
+                    </th>
+
+                    <th class="px-6 py-4 text-left font-black text-slate-700">
+                        Judul Langkah
+                    </th>
+
+                    <th class="px-6 py-4 text-left font-black text-slate-700">
+                        Deskripsi
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody class="divide-y divide-slate-100">
+
+                @forelse($items as $step)
+
+                    <tr class="hover:bg-slate-50">
+
+                        <td class="px-6 py-4 text-center font-black text-slate-900">
+
+                            {{ $step['sort_order'] ?? 0 }}
+
+                        </td>
+
+                        <td class="px-6 py-4 text-center">
+
+                            @if(!empty($step['is_active']))
+
+                                <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-black text-green-700">
+
+                                    Aktif
+
+                                </span>
+
+                            @else
+
+                                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
+
+                                    Nonaktif
+
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                        <td class="px-6 py-4 font-semibold text-slate-900">
+
+                            {{ $step['title'] ?? '-' }}
+
+                        </td>
+
+                        <td class="px-6 py-4 text-slate-600">
+
+                            {{ $step['desc'] ?? '-' }}
+
+                        </td>
+
+                    </tr>
+
+                @empty
+
+                    <tr>
+
+                        <td colspan="4"
+                            class="px-6 py-12 text-center text-slate-500">
+
+                            Belum ada langkah alur reservasi.
+
+                        </td>
+
+                    </tr>
+
+                @endforelse
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</div>
+
 @endsection

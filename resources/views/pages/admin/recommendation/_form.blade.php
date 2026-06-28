@@ -1,123 +1,117 @@
 @php
     $isEdit = isset($item);
-
-    // fallback aman
     $nextOrder = $nextOrder ?? 1;
 @endphp
 
-@push('css')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-    <style>
-        .select2-container { width:100%!important; }
-        .select2-container .select2-selection--single{
-            height: 38px;
-            border: 1px solid #ced4da;
-            border-radius: .375rem;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__rendered{
-            line-height: 36px;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow{
-            height: 36px;
-        }
-    </style>
-@endpush
+<div class="grid md:grid-cols-2 gap-5">
 
-<div class="row g-3">
+    <div class="md:col-span-2">
 
-    {{-- SEARCHABLE SELECT ROOM --}}
-    <div class="col-md-8">
-        <label class="form-label fw-bold">Pilih Kamar</label>
+        <label class="mb-2.5 block text-sm font-medium text-slate-700">
+            Kamar
+        </label>
 
-        <select name="room_id" class="form-select js-room-select">
-            <option value="">(Pilih kamar dari database)</option>
+        <select id="room_id" name="room_id" required class="w-full rounded-2xl border border-slate-300 px-4 py-3">
 
-            @foreach ($rooms as $r)
+            <option value="">
+                -- Pilih Kamar --
+            </option>
+
+            @foreach ($rooms as $room)
                 @php
-                    $capacity = (int)($r->capacity ?? 2);
-                    $occupied = (int)($r->occupied ?? 0);
-                    $slot     = max(0, $capacity - $occupied);
-                    $gedung   = str_replace('Gedung ', '', (string)$r->gedung);
+                    $capacity = (int) ($room->capacity ?? 2);
+                    $occupied = (int) ($room->occupied ?? 0);
+                    $slot = max(0, $capacity - $occupied);
+
+                    $gedung = str_replace('Gedung ', '', (string) $room->gedung);
                 @endphp
 
-                <option value="{{ $r->id }}"
-                    @selected(old('room_id', $item->room_id ?? null) == $r->id)>
-                    {{ $r->kode_kamar }}
-                    — Gedung {{ $gedung }}
-                    — Lantai {{ $r->lantai }}
-                    — Rp {{ number_format((int)$r->harga, 0, ',', '.') }}
-                    — Slot {{ $slot }}
-                    — Status {{ $r->status }}
+                <option value="{{ $room->room_id }}" @selected(old('room_id', $item->room_id ?? null) == $room->room_id)>
+
+                    {{ $room->kode_kamar }}
+                    -
+                    Gedung {{ $gedung }}
+                    -
+                    Lantai {{ $room->lantai }}
+                    -
+                    Slot {{ $slot }}
+
                 </option>
             @endforeach
+
         </select>
 
-        <div class="form-text">
-            Tips: ketik <b>A101</b> / <b>Gedung A</b> / <b>Lantai 2</b> biar cepat.
-        </div>
+        @error('room_id')
+            <p class="mt-1 text-sm text-red-600">
+                {{ $message }}
+            </p>
+        @enderror
+
     </div>
 
-    {{-- SORT ORDER --}}
-    <div class="col-md-2">
-        <label class="form-label fw-bold">Nomor Urut</label>
-        <input
-            type="number"
-            name="sort_order"
-            class="form-control @error('sort_order') is-invalid @enderror"
+    <div>
+
+        <label class="mb-2.5 block text-sm font-medium text-slate-700">
+            Nomor Urut
+        </label>
+
+        <input type="number" name="sort_order" min="1" required
             value="{{ old('sort_order', $item->sort_order ?? $nextOrder) }}"
-            min="1"
-            step="1"
-            required
-        >
+            class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
         @error('sort_order')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <p class="mt-1 text-sm text-red-600">
+                {{ $message }}
+            </p>
         @enderror
-        <div class="form-text">Wajib unik & minimal 1.</div>
+
     </div>
 
-    {{-- ACTIVE --}}
-    <div class="col-md-2">
-        <label class="form-label fw-bold">Status</label>
-        <div class="form-check mt-2">
-            <input
-                class="form-check-input"
-                type="checkbox"
-                name="is_active"
-                value="1"
-                @checked(old('is_active', $item->is_active ?? true))
-            >
-            <label class="form-check-label">Aktifkan</label>
-        </div>
-    </div>
+    <div>
 
-    {{-- BADGE --}}
-    <div class="col-md-4">
-        <label class="form-label fw-bold">Badge (opsional)</label>
-        <input
-            type="text"
-            name="badge"
-            class="form-control @error('badge') is-invalid @enderror"
-            value="{{ old('badge', $item->badge ?? 'Rekomendasi') }}"
-            placeholder="Rekomendasi"
-        >
+        <label class="mb-2.5 block text-sm font-medium text-slate-700">
+            Badge
+        </label>
+
+        <input type="text" name="badge" value="{{ old('badge', $item->badge ?? 'Rekomendasi') }}"
+            class="w-full rounded-2xl border border-slate-300 px-4 py-3" placeholder="Rekomendasi">
+
         @error('badge')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <p class="mt-1 text-sm text-red-600">
+                {{ $message }}
+            </p>
         @enderror
+
+    </div>
+
+    <div class="md:col-span-2">
+
+        <label class="flex items-center gap-3">
+
+            <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $item->is_active ?? true))
+                class="h-5 w-5 rounded border-slate-300">
+
+            <span class="font-semibold text-slate-700">
+                Tampilkan rekomendasi ini di halaman beranda
+            </span>
+
+        </label>
+
     </div>
 
 </div>
 
-@push('scripts-bottom')
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
+@push('scripts')
     <script>
-        $(function () {
-            $('.js-room-select').select2({
-                placeholder: "Ketik A101 / Gedung A / Lantai 2 ...",
-                allowClear: true,
-                width: '100%'
+        document.addEventListener('DOMContentLoaded', () => {
+
+            new TomSelect('#room_id', {
+                create: false,
+                allowEmptyOption: true,
+                placeholder: 'Cari kode kamar, gedung, atau lantai...',
+                maxOptions: null,
             });
+
         });
     </script>
 @endpush

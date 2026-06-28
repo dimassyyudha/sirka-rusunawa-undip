@@ -4,7 +4,7 @@
 @section('page_title', 'Tambah Lantai')
 
 @section('content')
-    <div class="max-w-3xl space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -17,14 +17,12 @@
             </div>
 
             <x-button.button-menu href="{{ route('admin.floors.index') }}" variant="outline" size="md">
-
                 Kembali
-
             </x-button.button-menu>
         </div>
 
         <form action="{{ route('admin.floors.store') }}" method="POST"
-            class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6 space-y-5">
+            class="bg-white rounded-[20px] border border-slate-200 shadow-sm p-8 lg:p-10 space-y-6">
 
             @csrf
 
@@ -38,7 +36,8 @@
                     <option value="">Pilih gedung</option>
 
                     @foreach ($buildings as $building)
-                        <option value="{{ $building->id }}" {{ old('building_id') == $building->id ? 'selected' : '' }}>
+                        <option value="{{ $building->building_id }}"
+                            {{ old('building_id') == $building->building_id ? 'selected' : '' }}>
                             {{ $building->name }}
                         </option>
                     @endforeach
@@ -107,7 +106,9 @@
 
             <div class="flex flex-col sm:flex-row items-center gap-3 pt-4">
 
-                <x-button.button-menu type="submit" variant="primary" size="md" class="w-full sm:w-auto">
+                <x-button.button-menu type="submit" variant="primary" size="md" class="w-full sm:w-auto" data-confirm
+                    data-confirm-title="Apakah data sudah sesuai?" data-confirm-text="Pastikan data sudah sesuai."
+                    data-confirm-button-text="Ya, simpan">
 
                     Simpan Data
 

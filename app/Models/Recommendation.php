@@ -8,24 +8,17 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 class Recommendation extends Model
 {
     use HasUlids;
-
-    public $incrementing = false;
-    protected $keyType = 'string';
+    // protected $primaryKey = 'recommendation_id';
 
     protected $fillable = [
         'room_id',
-        'sort_order',
         'badge',
+        'sort_order',
         'is_active',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-        'sort_order' => 'integer',
     ];
 
     public function room()
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(Room::class, 'room_id', 'room_id');
     }
 }

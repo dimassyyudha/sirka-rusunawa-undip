@@ -24,9 +24,9 @@
 
             Ulasan
 
-            @if ($totalReviews > 0)
+            @if ($totalTestimonials > 0)
                 <span class="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-600">
-                    {{ $totalReviews }}
+                    {{ $totalTestimonials }}
                 </span>
             @endif
 
@@ -170,12 +170,12 @@
                 </div>
 
                 <div class="text-xs text-slate-500">
-                    {{ $totalReviews }} ulasan
+                    {{ $totalTestimonials }} ulasan
                 </div>
             </div>
         </div>
 
-        @forelse ($visibleReviews as $review)
+        @forelse ($visibleTestimonials as $review)
             <div class="border border-slate-200 rounded-3xl p-5 bg-white">
 
                 <div class="flex justify-between items-start">

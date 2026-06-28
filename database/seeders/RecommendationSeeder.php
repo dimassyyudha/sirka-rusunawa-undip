@@ -25,13 +25,13 @@ class RecommendationSeeder extends Seeder
 
                 return ($capacity - $occupied) > 0;
             })
-            ->sortBy(fn ($room) => $room->floor->monthly_price ?? 0)
+            ->sortBy(fn($room) => $room->floor->monthly_price ?? 0)
             ->take(15)
             ->values();
 
         foreach ($rooms as $index => $room) {
             Recommendation::create([
-                'room_id' => $room->id,
+                'room_id' => $room->room_id,
                 'badge' => 'Rekomendasi',
                 'sort_order' => $index + 1,
                 'is_active' => true,

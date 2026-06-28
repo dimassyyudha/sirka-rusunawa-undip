@@ -10,10 +10,29 @@
 
         $firstMoveInDate = $occupant?->start_date;
 
-        $leaseEndDate =
-            $latestReservation?->occupancyPeriod?->lease_end_date ??
-            ($latestReservation?->end_date ?? $occupant?->end_date);
+        $leaseEndDate = $occupant?->end_date;
     @endphp
+
+
+    {{-- @php
+
+        $latestReservation = $occupant?->reservation;
+
+        $firstMoveInDate = $occupant?->start_date;
+
+        $leaseEndDate = null;
+
+        if ($firstMoveInDate) {
+            $start = \Carbon\Carbon::parse($firstMoveInDate);
+
+            if ($start->month <= 6) {
+                $leaseEndDate = $start->copy()->month(6)->endOfMonth();
+            } else {
+                $leaseEndDate = $start->copy()->month(12)->endOfMonth();
+            }
+        }
+
+    @endphp --}}
 
     <div class="space-y-4">
 
@@ -113,7 +132,8 @@
                         </p>
 
                         <h3 class="mt-2 text-3xl font-black text-slate-900">
-                            Rp {{ number_format($activeInvoice?->amount ?? 0, 0, ',', '.') }}
+                            {{-- Rp {{ number_format($activeInvoice?->amount ?? 0, 0, ',', '.') }} --}}
+                            Rp {{ number_format($activeInvoiceTotal ?? 0, 0, ',', '.') }}
                         </h3>
 
                     </div>
@@ -136,29 +156,51 @@
 
                 <div class="mt-5 border-t border-slate-100 pt-4">
 
-                    @if ($activeInvoice)
+                    @if ($activeInvoices->count())
                         <p class="text-sm font-medium text-orange-600">
-                            Menunggu pembayaran
+                            {{ $activeInvoices->count() }}
+                            tagihan menunggu pembayaran
                         </p>
                     @else
                         <p class="text-sm font-medium text-emerald-600">
                             Tidak ada tagihan aktif.
                         </p>
                     @endif
-                    @if ($activeInvoice)
-                        <form action="{{ route('mahasiswa.invoices.pay', $activeInvoice) }}" method="POST" class="mt-3">
+                    @if ($activeInvoices->count())
 
-                            @csrf
+                        <div class="mt-3 space-y-2">
 
-                            <button type="submit"
-                                class="inline-flex items-center text-sm font-bold text-blue-600 hover:text-emerald-700">
+                            @foreach ($activeInvoices as $invoice)
+                                <form action="{{ route('mahasiswa.invoices.pay', $invoice) }}" method="POST">
 
-                                Bayar Tagihan
+                                    @csrf
 
-                            </button>
+                                    <button type="submit"
+                                        class="inline-flex items-center text-sm font-bold text-blue-600 hover:text-emerald-700">
 
-                        </form>
+                                        Bayar {{ $invoice->invoice_number }}
+                                        (Rp {{ number_format($invoice->amount, 0, ',', '.') }})
+                                    </button>
+
+                                </form>
+                            @endforeach
+
+                        </div>
+
                     @endif
+                    {{-- <form action="{{ route('mahasiswa.invoices.pay', $activeInvoice) }}" method="POST" class="mt-3">
+
+                        @csrf
+
+                        <button type="submit"
+                            class="inline-flex items-center text-sm font-bold text-blue-600 hover:text-emerald-700">
+
+                            Bayar Tagihan
+
+                        </button>
+
+                    </form>
+                    @endif --}}
                 </div>
 
             </div>

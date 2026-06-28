@@ -1,6 +1,6 @@
 <footer class="bg-[#070b55] text-white">
     <div class="mx-auto max-w-[1500px] px-4 py-12">
-        <div class="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4 xl:gap-12">
+        <div class="grid grid-cols-1  gap-10  sm:grid-cols-2  xl:grid-cols-4  xl:gap-12 ">
 
             {{-- BRAND --}}
             <div class="text-center md:text-left">
@@ -42,49 +42,92 @@
 
                     {{-- DROPDOWN TENTANG --}}
                     <li>
-                        <details class="group mx-auto w-max md:mx-0">
-                            <summary
-                                class="flex cursor-pointer list-none items-center gap-2 hover:text-orange-500 transition">
-                                <span>Tentang Kami</span>
 
-                                <svg class="h-4 w-4 transition group-open:rotate-180" fill="none"
-                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <details class="group">
+
+                            <summary
+                                class="flex items-center justify-center md:justify-start gap-1 cursor-pointer list-none font-semibold transition hover:text-orange-500">
+
+                                <span>
+                                    Tentang Kami
+                                </span>
+
+                                <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-300 group-open:rotate-180"
+                                    fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7" />
+
                                 </svg>
+
                             </summary>
 
-                            <ul class="mt-3 space-y-2 rounded-2xl  px-4 py-3 text-sm text-white/80">
+                            <ul class="mt-3 space-y-2 text-center md:text-left text-sm text-white/80">
+
                                 <li>
-                                    <a href="{{ route('about.index') }}" class="hover:text-orange-500 transition">
+
+                                    <a href="{{ route('about.index') }}" class="block hover:text-orange-500 transition">
+
                                         Tentang Kami
+
                                     </a>
+
                                 </li>
 
                                 <li>
-                                    <a href="{{ route('about.visi-misi') }}" class="hover:text-orange-500 transition">
+                                    <a href="{{ route('page.syarat-ketentuan') }}" target="_blank"
+                                        class="hover:text-orange-500 transition">
+                                        Syarat & Ketentuan
+                                    </a>
+                                </li>
+
+                                {{-- <li>
+
+                                    <a href="{{ route('about.visi-misi') }}"
+                                        class="block hover:text-orange-500 transition">
+
                                         Visi & Misi
+
                                     </a>
+
                                 </li>
 
                                 <li>
-                                    <a href="{{ route('about.gedung') }}" class="hover:text-orange-500 transition">
-                                        Paparan Tiap Gedung
-                                    </a>
-                                </li>
 
-                                <li>
-                                    <a href="{{ route('about.fasilitas') }}" class="hover:text-orange-500 transition">
+                                    <a href="{{ route('about.gedung') }}"
+                                        class="block hover:text-orange-500 transition">
+
+                                        Paparan Gedung
+
+                                    </a>
+
+                                </li> --}}
+
+                                {{-- <li>
+
+                                    <a href="{{ route('about.fasilitas') }}"
+                                        class="block hover:text-orange-500 transition">
+
                                         Fasilitas Umum
-                                    </a>
-                                </li>
 
-                                <li>
-                                    <a href="{{ route('about.aturan') }}" class="hover:text-orange-500 transition">
-                                        Aturan / Tata Tertib
                                     </a>
-                                </li>
+
+                                </li> --}}
+
+                                {{-- <li>
+
+                                    <a href="{{ route('about.aturan') }}"
+                                        class="block hover:text-orange-500 transition">
+
+                                        Aturan / Tata Tertib
+
+                                    </a>
+
+                                </li> --}}
+
                             </ul>
+
                         </details>
+
                     </li>
                     <li>
                         <a href="{{ route('page.testimoni') }}" class="hover:text-orange-500 transition">
@@ -98,12 +141,7 @@
                         </a>
                     </li>
 
-                    <li>
-                        <a href="{{ route('page.syarat-ketentuan') }}" target="_blank"
-                            class="hover:text-orange-500 transition">
-                            Syarat & Ketentuan
-                        </a>
-                    </li>
+
                 </ul>
             </div>
 

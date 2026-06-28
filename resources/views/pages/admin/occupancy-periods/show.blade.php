@@ -15,7 +15,7 @@
                 </h1>
 
                 <p class="mt-2 text-slate-500">
-                <p class="mt-2 text-slate-500">
+                    {{-- <p class="mt-2 text-slate-500">
                     {{ $occupancyPeriod->semester_type === 'ganjil' ? 'Semester Ganjil' : 'Semester Genap' }}
                     {{ $occupancyPeriod->academic_year_start }}/{{ $occupancyPeriod->academic_year_end }}
                     •
@@ -24,33 +24,103 @@
                     -
                     {{ $occupancyPeriod->lease_end_date?->format('d M Y') }}
                 </p>
-                </p>
+                </p> --}}
             </div>
 
-            <a href="{{ route('admin.occupancy-periods.index') }}"
-                class="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black transition">
-                Kembali
-            </a>
 
         </div>
 
-        <form method="GET" action="{{ route('admin.occupancy-periods.show', $occupancyPeriod) }}"
-            class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form id="filterForm" method="GET" action="{{ route('admin.occupancy-periods.show', $occupancyPeriod) }}"
+            class="rounded-[10px] border border-slate-200 bg-white p-5 shadow-sm">
 
-            <div class="grid lg:grid-cols-[1fr_auto] gap-4 lg:items-end">
+            <div class="grid gap-4 lg:grid-cols-12">
 
-                <div>
-                    <label class="block mb-2 text-sm font-bold text-slate-700">
+                {{-- PENCARIAN --}}
+                <div class="lg:col-span-4">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Pencarian
+                    </label>
+
+                    <input id="searchInput" type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari nama mahasiswa atau NIM..."
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+
+                </div>
+
+                {{-- JENIS PENGAJUAN --}}
+                <div class="lg:col-span-2">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Jenis Pengajuan
+                    </label>
+
+                    <select name="reservation_type"
+                        class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+
+                        <option value="" @selected(request('reservation_type') == '')>
+                            Semua
+                        </option>
+
+                        <option value="extension" @selected(request('reservation_type') == 'extension')>
+                            Perpanjang
+                        </option>
+
+                        <option value="transfer" @selected(request('reservation_type') == 'transfer')>
+                            Pindah Kamar
+                        </option>
+
+                        <option value="checkout" @selected(request('reservation_type') == 'checkout')>
+                            Akhiri Hunian
+                        </option>
+
+                    </select>
+
+                </div>
+
+                {{-- STATUS --}}
+                <div class="lg:col-span-2">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Status
+                    </label>
+
+                    <select name="status" class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+
+                        <option value="" @selected(request('status') == '')>
+                            Semua
+                        </option>
+
+                        <option value="pending" @selected(request('status') == 'pending')>
+                            Menunggu
+                        </option>
+
+                        <option value="approved" @selected(request('status') == 'approved')>
+                            Disetujui
+                        </option>
+
+                        <option value="rejected" @selected(request('status') == 'rejected')>
+                            Ditolak
+                        </option>
+
+                    </select>
+
+                </div>
+
+                {{-- PERIODE --}}
+                <div class="lg:col-span-2">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                         Periode Registrasi
                     </label>
 
                     <select name="period_id"
-                        class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500">
+                        class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
 
                         @foreach ($periods as $period)
                             <option value="{{ $period->id }}" @selected($period->id === $occupancyPeriod->id)>
 
-                                {{ $period->semester_type === 'ganjil' ? 'Semester Ganjil' : 'Semester Genap' }}
+                                {{ $period->semester_type === 'ganjil' ? 'Ganjil' : 'Genap' }}
                                 -
                                 {{ $period->academic_year_start }}/{{ $period->academic_year_end }}
 
@@ -58,19 +128,33 @@
                         @endforeach
 
                     </select>
+
                 </div>
 
-                <div class="flex gap-2">
+                {{-- ACTION --}}
+                <div class="lg:col-span-2">
 
-                    <button type="submit"
-                        class="rounded-2xl bg-orange-500 px-5 py-3 text-sm font-black text-white hover:bg-orange-600 transition">
-                        Tampilkan
-                    </button>
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-transparent">
+                        Action
+                    </label>
 
-                    <a href="{{ route('admin.occupancy-periods.show', $occupancyPeriod) }}"
-                        class="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black text-slate-700 hover:bg-slate-200 transition">
-                        Reset
-                    </a>
+                    <div class="flex gap-2">
+
+                        <button type="submit"
+                            class="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white hover:bg-violet-700">
+
+                            Filter
+
+                        </button>
+
+                        <a href="{{ route('admin.occupancy-periods.show', $occupancyPeriod) }}"
+                            class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">
+
+                            Reset
+
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -78,39 +162,7 @@
 
         </form>
 
-        <div class="grid md:grid-cols-6 gap-4">
 
-            <div class="rounded-3xl bg-white border border-slate-200 p-5">
-                <p class="text-sm text-slate-500">Perpanjang</p>
-                <h2 class="mt-2 text-3xl font-black text-slate-900">{{ $summary['extension'] }}</h2>
-            </div>
-
-            <div class="rounded-3xl bg-white border border-slate-200 p-5">
-                <p class="text-sm text-slate-500">Pindah</p>
-                <h2 class="mt-2 text-3xl font-black text-slate-900">{{ $summary['transfer'] }}</h2>
-            </div>
-
-            <div class="rounded-3xl bg-white border border-slate-200 p-5">
-                <p class="text-sm text-slate-500">Akhiri</p>
-                <h2 class="mt-2 text-3xl font-black text-slate-900">{{ $summary['checkout'] }}</h2>
-            </div>
-
-            <div class="rounded-3xl bg-white border border-slate-200 p-5">
-                <p class="text-sm text-slate-500">Pending</p>
-                <h2 class="mt-2 text-3xl font-black text-orange-500">{{ $summary['pending'] }}</h2>
-            </div>
-
-            <div class="rounded-3xl bg-white border border-slate-200 p-5">
-                <p class="text-sm text-slate-500">Approved</p>
-                <h2 class="mt-2 text-3xl font-black text-emerald-500">{{ $summary['approved'] }}</h2>
-            </div>
-
-            <div class="rounded-3xl bg-white border border-slate-200 p-5">
-                <p class="text-sm text-slate-500">Rejected</p>
-                <h2 class="mt-2 text-3xl font-black text-red-500">{{ $summary['rejected'] }}</h2>
-            </div>
-
-        </div>
 
         {{-- FORM BULK ACTION TERPISAH, JANGAN MEMBUNGKUS TABLE --}}
         <form id="bulkActionForm" action="{{ route('admin.occupancy-periods.reservations.bulk-action') }}" method="POST"
@@ -118,7 +170,7 @@
             @csrf
         </form>
 
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="relative overflow-x-auto bg-white shadow-sm rounded-[10px] border border-slate-200">
 
             <div class="px-6 py-5 border-b border-slate-100">
 
@@ -148,39 +200,13 @@
                         </select>
 
                         <button type="submit" form="bulkActionForm"
-                            class="px-5 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-sm transition">
+                            class="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white hover:bg-violet-700">
                             Terapkan
                         </button>
 
                     </div>
 
-                    <div class="flex flex-col lg:flex-row gap-3">
 
-                        <select id="statusFilter"
-                            class="rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500">
-
-                            <option value="">
-                                Semua Status
-                            </option>
-
-                            <option value="pending">
-                                Pending
-                            </option>
-
-                            <option value="approved">
-                                Approved
-                            </option>
-
-                            <option value="rejected">
-                                Rejected
-                            </option>
-
-                        </select>
-
-                        <input type="text" id="tableSearch" placeholder="Cari mahasiswa..."
-                            class="w-full lg:w-[280px] rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500">
-
-                    </div>
 
                 </div>
 
@@ -239,7 +265,7 @@
 
                                 <td class="px-6 py-5">
 
-                                    <input type="checkbox" name="ids[]" value="{{ $reservation->id }}"
+                                    <input type="checkbox" name="ids[]" value="{{ $reservation->reservation_id }}"
                                         form="bulkActionForm"
                                         class="row-checkbox rounded border-slate-300 text-orange-500 focus:ring-orange-500">
 
@@ -313,8 +339,8 @@
                                     <div class="flex justify-end gap-2 flex-wrap">
 
                                         @if ($reservation->status === 'pending')
-                                            <form id="approve-{{ $reservation->id }}"
-                                                action="{{ route('admin.occupancy-periods.reservations.approve', $reservation->id) }}"
+                                            <form id="approve-{{ $reservation->reservation_id }}"
+                                                action="{{ route('admin.occupancy-periods.reservations.approve', $reservation->reservation_id) }}"
                                                 method="POST" data-confirm-form data-confirm-title="Setujui pengajuan?"
                                                 data-confirm-text="Pengajuan registrasi ulang akan disetujui."
                                                 data-confirm-button-text="Ya, setujui">
@@ -322,13 +348,13 @@
                                                 @method('PATCH')
                                             </form>
 
-                                            <button type="submit" form="approve-{{ $reservation->id }}"
+                                            <button type="submit" form="approve-{{ $reservation->reservation_id }}"
                                                 class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black transition">
                                                 Setujui
                                             </button>
 
-                                            <form id="reject-{{ $reservation->id }}"
-                                                action="{{ route('admin.occupancy-periods.reservations.reject', $reservation->id) }}"
+                                            <form id="reject-{{ $reservation->reservation_id }}"
+                                                action="{{ route('admin.occupancy-periods.reservations.reject', $reservation->reservation_id) }}"
                                                 method="POST" data-confirm-form data-confirm-title="Tolak pengajuan?"
                                                 data-confirm-text="Pengajuan registrasi ulang akan ditolak."
                                                 data-confirm-button-text="Ya, tolak">
@@ -336,14 +362,14 @@
                                                 @method('PATCH')
                                             </form>
 
-                                            <button type="submit" form="reject-{{ $reservation->id }}"
+                                            <button type="submit" form="reject-{{ $reservation->reservation_id }}"
                                                 class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-black transition">
                                                 Tolak
                                             </button>
                                         @endif
 
-                                        <form id="delete-{{ $reservation->id }}"
-                                            action="{{ route('admin.occupancy-periods.reservations.delete', $reservation->id) }}"
+                                        <form id="delete-{{ $reservation->reservation_id }}"
+                                            action="{{ route('admin.occupancy-periods.reservations.delete', $reservation->reservation_id) }}"
                                             method="POST" data-confirm-form data-confirm-title="Hapus data?"
                                             data-confirm-text="Data registrasi ulang akan dihapus permanen."
                                             data-confirm-button-text="Ya, hapus">
@@ -351,7 +377,7 @@
                                             @method('DELETE')
                                         </form>
 
-                                        <button type="submit" form="delete-{{ $reservation->id }}"
+                                        <button type="submit" form="delete-{{ $reservation->reservation_id }}"
                                             class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-black transition">
                                             Hapus
                                         </button>
@@ -377,137 +403,12 @@
 
             </div>
 
-            <div class="border-t border-slate-200 bg-white px-6 py-4">
-                <x-ui.pagination :paginator="$reservations" />
-            </div>
+
 
         </div>
-
+        <div class="border-t border-slate-200  px-6 py-4">
+            <x-ui.pagination :paginator="$reservations" />
+        </div>
     </div>
-
-    @push('scripts')
-        <script>
-            const checkAll = document.getElementById('checkAll');
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-
-            if (checkAll) {
-                checkAll.addEventListener('change', function() {
-                    rowCheckboxes.forEach(cb => {
-                        cb.checked = this.checked;
-                    });
-                });
-            }
-
-            const searchInput = document.getElementById('tableSearch');
-            const statusFilter = document.getElementById('statusFilter');
-
-            function filterTable() {
-                const keyword = searchInput.value.toLowerCase();
-                const status = statusFilter.value.toLowerCase();
-
-                document.querySelectorAll('.table-row-item').forEach(row => {
-                    const text = row.innerText.toLowerCase();
-                    const rowStatus = row.dataset.status;
-
-                    row.style.display =
-                        text.includes(keyword) && (!status || rowStatus === status) ?
-                        '' :
-                        'none';
-                });
-            }
-
-            if (searchInput) searchInput.addEventListener('keyup', filterTable);
-            if (statusFilter) statusFilter.addEventListener('change', filterTable);
-
-            const bulkForm = document.querySelector('[data-bulk-form]');
-
-            if (bulkForm) {
-                bulkForm.addEventListener('submit', function(e) {
-                    if (bulkForm.dataset.confirmed === '1') return;
-
-                    e.preventDefault();
-
-                    const action = document.getElementById('bulkActionSelect').value;
-                    const checked = document.querySelectorAll('.row-checkbox:checked').length;
-
-                    if (!action) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Pilih aksi dulu',
-                            text: 'Silakan pilih setujui, tolak, atau hapus.',
-                            confirmButtonColor: '#f97316',
-                        });
-                        return;
-                    }
-
-                    if (checked === 0) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Pilih data dulu',
-                            text: 'Centang minimal satu data registrasi ulang.',
-                            confirmButtonColor: '#f97316',
-                        });
-                        return;
-                    }
-
-                    let config = {
-                        title: 'Lanjutkan?',
-                        text: 'Data terpilih akan diproses.',
-                        icon: 'warning',
-                        confirmButtonText: 'Ya, lanjutkan',
-                        confirmButtonColor: '#f97316',
-                    };
-
-                    if (action === 'approve') {
-                        config = {
-                            title: 'Setujui data terpilih?',
-                            text: `${checked} pengajuan akan disetujui.`,
-                            icon: 'success',
-                            confirmButtonText: 'Ya, setujui',
-                            confirmButtonColor: '#10b981',
-                        };
-                    }
-
-                    if (action === 'reject') {
-                        config = {
-                            title: 'Tolak data terpilih?',
-                            text: `${checked} pengajuan akan ditolak.`,
-                            icon: 'warning',
-                            confirmButtonText: 'Ya, tolak',
-                            confirmButtonColor: '#ef4444',
-                        };
-                    }
-
-                    if (action === 'delete') {
-                        config = {
-                            title: 'Hapus data terpilih?',
-                            text: `${checked} data akan dihapus permanen.`,
-                            icon: 'warning',
-                            confirmButtonText: 'Ya, hapus',
-                            confirmButtonColor: '#ef4444',
-                        };
-                    }
-
-                    Swal.fire({
-                        ...config,
-                        showCancelButton: true,
-                        cancelButtonText: 'Batal',
-                        cancelButtonColor: '#64748b',
-                        reverseButtons: true,
-                        customClass: {
-                            popup: 'rounded-3xl',
-                            confirmButton: 'rounded-xl',
-                            cancelButton: 'rounded-xl',
-                        }
-                    }).then((result) => {
-                        if (!result.isConfirmed) return;
-
-                        bulkForm.dataset.confirmed = '1';
-                        bulkForm.submit();
-                    });
-                });
-            }
-        </script>
-    @endpush
 
 @endsection

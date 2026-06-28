@@ -3,19 +3,14 @@
 @section('title', 'Pembayaran Reservation')
 
 @section('content')
-    @php
-        $expiredAt = $transaction?->expired_at
-            ? \Carbon\Carbon::parse($transaction->expired_at)->timestamp * 1000
-            : null;
 
-        $paymentStatus = $transaction?->transaction_status ?? 'pending';
+    @php
+        $expiredAt = $transaction->expired_at ? $transaction->expired_at->timestamp * 1000 : null;
     @endphp
 
     <section class="min-h-screen bg-slate-50 py-10">
         <div class="mx-auto max-w-4xl px-4 space-y-6">
 
-            {{-- <x-ui.Reservation-stepper step="2" :status="$Reservation->status" class="bg-white shadow-sm" /> --}}
-            {{-- <x-ui.reservation-stepper step="1" :status="$reservation->status" /> --}}
 
             <x-ui.Reservation-stepper step="2" :status="$Reservation->status" class="bg-white shadow-sm" />
 
@@ -117,7 +112,7 @@
                     <div class="flex justify-between gap-4">
                         <span class="text-sm text-slate-500">Status Pembayaran</span>
                         <span class="text-right text-sm font-black uppercase text-orange-600">
-                            {{ $paymentStatus }}
+                            {{ $transaction->transaction_status ?? 'pending' }}
                         </span>
                     </div>
 
@@ -138,16 +133,22 @@
             </div>
         </div>
     </section>
-
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ $midtransClientKey }}"></script>
-
     <script>
-        const expiredAt = Number(@json($expiredAt));
+        // const expiredAt = Number(@json($expiredAt));
+
+        const expiredAt = @json($expiredAt);
         const hoursEl = document.getElementById('countdown-hours');
         const minutesEl = document.getElementById('countdown-minutes');
         const secondsEl = document.getElementById('countdown-seconds');
         const messageEl = document.getElementById('countdown-message');
         const payButton = document.getElementById('pay-button');
+
+        console.log({
+            expiredAtRaw: @json($expiredAt),
+            expiredAt,
+            now: Date.now()
+        });
 
         function setExpiredState() {
             hoursEl.textContent = '00';
@@ -159,6 +160,9 @@
         }
 
         function updateCountdown() {
+            console.log('expiredAt =', expiredAt);
+            console.log('now =', Date.now());
+            console.log('distance =', expiredAt - Date.now());
             if (!expiredAt) {
                 setExpiredState();
                 clearInterval(timer);
@@ -172,55 +176,61 @@
                 setExpiredState();
                 clearInterval(timer);
                 setTimeout(function() {
-                    window.location.reload();
-                }, 1000);
+                        window.location.reload();
+                    },
+                    1000);
                 return;
             }
-
             const hours = Math.floor(distance / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const minutes = Math.floor((distance % (1000 *
+                60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
             hoursEl.textContent = String(hours).padStart(2, '0');
             minutesEl.textContent = String(minutes).padStart(2, '0');
             secondsEl.textContent = String(seconds).padStart(2, '0');
         }
-
         const timer = setInterval(updateCountdown, 1000);
         updateCountdown();
-
         payButton.addEventListener('click', function() {
             if (payButton.disabled) return;
-
             payButton.disabled = true;
             payButton.textContent = 'Memproses Pembayaran...';
-
             snap.pay('{{ $snapToken }}', {
                 onSuccess: function(result) {
                     window.location.href =
                         "{{ route('Reservation.payment.success.order') }}?order_id={{ $transaction->order_id }}";
                 },
-
-
                 onPending: function(result) {
                     payButton.disabled = false;
                     payButton.textContent = 'Lanjutkan Pembayaran';
                     console.log('Pembayaran masih pending:', result);
                 },
-
                 onError: function(result) {
                     payButton.disabled = false;
                     payButton.textContent = 'Coba Bayar Lagi';
                     alert('Pembayaran gagal. Silakan coba lagi.');
-                    console.log('Payment error:', result);
+                    console.error('Payment error:', result);
                 },
-
-                onClose: function() {
-                    payButton.disabled = false;
-                    payButton.textContent = 'Lanjutkan Pembayaran';
-                    console.log('Popup pembayaran ditutup.');
-                }
             });
         });
+        const orderId = "{{ $transaction->order_id }}";
+
+        setInterval(async () => {
+
+            const res = await fetch(
+                `/payment/check-status/${orderId}`
+            );
+
+            const data = await res.json();
+
+            if (data.status === 'settlement') {
+
+                window.location.href =
+                    "{{ route('Reservation.success.page') }}" +
+                    "?order_id=" + orderId;
+            }
+
+        }, 2000);
     </script>
+
 @endsection

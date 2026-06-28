@@ -1,244 +1,333 @@
 @extends('layouts.app')
 
 @section('title', 'Edit Alur Reservasi')
+@section('page_title', 'Edit Alur Reservasi')
 
 @section('content')
-<div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Edit Alur Reservasi</h3>
-                <p class="text-subtitle text-muted">Kelola badge, judul, deskripsi, dan langkah reservasi.</p>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.settings.alur.index') }}">Alur Reservasi</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-    </div>
 
-    <section class="section">
+    <div class="mx-auto max-w-6xl space-y-6">
+
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+            <div>
+
+                <h1 class="text-3xl font-black text-slate-900">
+                    Edit Alur Reservasi
+                </h1>
+
+                <p class="mt-2 text-slate-500">
+                    Kelola badge, judul, deskripsi, dan langkah-langkah alur reservasi.
+                </p>
+
+            </div>
+
+            <a href="{{ route('admin.settings.alur.index') }}"
+                class="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">
+
+                Kembali
+
+            </a>
+
+        </div>
+
         @if ($errors->any())
-            <div class="alert alert-danger">
-                <div class="fw-bold mb-1">Terjadi kesalahan:</div>
-                <ul class="mb-0 ps-3">
+
+            <div class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+
+                <ul class="list-disc pl-5 space-y-1">
+
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
+
                 </ul>
+
             </div>
+
         @endif
 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Form Alur Reservasi</h5>
-                <a href="{{ route('admin.settings.alur.index') }}" class="btn btn-outline-secondary btn-sm">
-                    Kembali
-                </a>
+        <form method="POST" action="{{ route('admin.settings.alur.update') }}"
+            class="rounded-[10px] border border-slate-200 bg-white p-6 shadow-sm">
+
+            @csrf
+            @method('PUT')
+
+            <div class="space-y-5">
+
+                <div>
+
+                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                        Badge
+                    </label>
+
+                    <input type="text" name="badge" value="{{ old('badge', $data['badge'] ?? '') }}"
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
+                </div>
+
+                <div>
+
+                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                        Judul
+                    </label>
+
+                    <input type="text" name="title" required value="{{ old('title', $data['title'] ?? '') }}"
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
+                </div>
+
+                <div>
+
+                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                        Deskripsi
+                    </label>
+
+                    <textarea name="description" rows="4" class="w-full rounded-2xl border border-slate-300 px-4 py-3">{{ old('description', $data['description'] ?? '') }}</textarea>
+
+                </div>
+
             </div>
 
-            <div class="card-body">
-                <form method="POST" action="{{ route('admin.settings.alur.update') }}">
-                    @csrf
-                    @method('PUT')
+            <div class="mt-8 border-t border-slate-200 pt-6">
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Badge</label>
-                        <input type="text"
-                               name="badge"
-                               class="form-control"
-                               value="{{ old('badge', $data['badge'] ?? '') }}"
-                               placeholder="Contoh: Cara Reservasi">
+                <div class="flex items-center justify-between">
+
+                    <div>
+
+                        <h3 class="font-black text-slate-900">
+                            Daftar Langkah
+                        </h3>
+
+                        <p class="text-sm text-slate-500">
+                            Urutan akan dirapikan otomatis saat disimpan.
+                        </p>
+
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Judul</label>
-                        <input type="text"
-                               name="title"
-                               class="form-control"
-                               value="{{ old('title', $data['title'] ?? '') }}"
-                               required
-                               placeholder="Contoh: Alur Reservasi Kamar Rusunawa">
-                    </div>
+                    <button type="button" id="btnAddStep"
+                        class="rounded-2xl bg-orange-500 px-4 py-3 text-sm font-black text-white hover:bg-orange-600">
 
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Deskripsi</label>
-                        <textarea name="description"
-                                  class="form-control"
-                                  rows="3"
-                                  placeholder="Tulis deskripsi singkat section alur reservasi...">{{ old('description', $data['description'] ?? '') }}</textarea>
-                    </div>
+                        Tambah Langkah
 
-                    <hr class="my-4">
+                    </button>
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Daftar Langkah</h6>
-                            <small class="text-muted">Urutan akan dirapikan otomatis saat disimpan.</small>
+                </div>
+
+                <div id="stepContainer" class="mt-5 space-y-4">
+
+                    @forelse($items as $i => $step)
+                        <div class="step-item rounded-[10px] border border-slate-200 bg-slate-50 p-5">
+
+                            <div class="grid md:grid-cols-12 gap-4">
+
+                                <div class="md:col-span-5">
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        Judul Langkah
+                                    </label>
+
+                                    <input type="text" name="step_title[]"
+                                        value="{{ old("step_title.$i", $step['title'] ?? '') }}"
+                                        class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
+                                </div>
+
+                                <div class="md:col-span-2">
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        Urutan
+                                    </label>
+
+                                    <input type="number" min="1" name="sort_order[]"
+                                        value="{{ old("sort_order.$i", $step['sort_order'] ?? 1) }}"
+                                        class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
+                                </div>
+
+                                <div class="md:col-span-2 flex items-end">
+
+                                    <label class="flex items-center gap-2">
+
+                                        <input type="checkbox" class="active-switch" name="is_active[{{ $i }}]"
+                                            {{ !empty($step['is_active']) ? 'checked' : '' }}>
+
+                                        <span class="font-medium">
+                                            Aktif
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                                <div class="md:col-span-3 flex items-end">
+
+                                    <label class="flex items-center gap-2">
+
+                                        <input type="checkbox" name="delete[{{ $i }}]">
+
+                                        <span class="font-medium text-red-600">
+                                            Hapus
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="mt-4">
+
+                                <label class="block mb-2 text-sm font-medium text-slate-700">
+                                    Deskripsi Langkah
+                                </label>
+
+                                <textarea name="step_desc[]" rows="4" class="w-full rounded-2xl border border-slate-300 px-4 py-3">{{ old("step_desc.$i", $step['desc'] ?? '') }}</textarea>
+
+                            </div>
+
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" id="btnAddStep">
-                            <i class="bi bi-plus-circle me-1"></i> Tambah Langkah
-                        </button>
-                    </div>
 
-                    <div id="stepContainer" class="mt-3 d-flex flex-column gap-3">
-                        @forelse($items as $i => $step)
-                            <div class="border rounded-3 p-3 step-item">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Judul Langkah</label>
-                                        <input type="text"
-                                               name="step_title[]"
-                                               class="form-control"
-                                               value="{{ old("step_title.$i", $step['title'] ?? '') }}"
-                                               required
-                                               placeholder="Contoh: Pilih Kamar">
-                                    </div>
+                    @empty
 
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-semibold">Urutan</label>
-                                        <input type="number"
-                                               name="sort_order[]"
-                                               class="form-control"
-                                               value="{{ old("sort_order.$i", $step['sort_order'] ?? 1) }}"
-                                               min="1">
-                                    </div>
+                        <div class="rounded-[10px] border border-slate-200 bg-slate-50 p-5 text-center text-slate-500">
 
-                                    <div class="col-md-3 d-flex flex-column justify-content-end gap-2">
-                                        <div class="form-check form-switch mb-1">
-                                            <input class="form-check-input active-switch"
-                                                   type="checkbox"
-                                                   name="is_active[{{ $i }}]"
-                                                   {{ !empty($step['is_active']) ? 'checked' : '' }}>
-                                            <label class="form-check-label">Aktif</label>
-                                        </div>
+                            Belum ada langkah alur.
 
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input"
-                                                   type="checkbox"
-                                                   name="delete[{{ $i }}]">
-                                            <label class="form-check-label text-danger fw-semibold">Hapus</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Deskripsi Langkah</label>
-                                        <textarea name="step_desc[]"
-                                                  class="form-control"
-                                                  rows="4"
-                                                  required
-                                                  placeholder="Tulis penjelasan detail langkah...">{{ old("step_desc.$i", $step['desc'] ?? '') }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="alert alert-light border mb-0">
-                                Belum ada langkah alur. Klik <b>Tambah Langkah</b>.
-                            </div>
-                        @endforelse
-                    </div>
-
-                    <template id="stepTemplate">
-                        <div class="border rounded-3 p-3 step-item">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Judul Langkah</label>
-                                    <input type="text"
-                                           name="step_title[]"
-                                           class="form-control"
-                                           placeholder="Contoh: Pilih Kamar"
-                                           required>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <label class="form-label fw-semibold">Urutan</label>
-                                    <input type="number"
-                                           name="sort_order[]"
-                                           class="form-control sort-input"
-                                           min="1"
-                                           value="1">
-                                </div>
-
-                                <div class="col-md-3 d-flex flex-column justify-content-end gap-2">
-                                    <div class="form-check form-switch mb-1">
-                                        <input class="form-check-input active-switch" type="checkbox" checked>
-                                        <label class="form-check-label">Aktif</label>
-                                    </div>
-
-                                    <button type="button" class="btn btn-outline-danger btn-sm btnRemoveStep">
-                                        <i class="bi bi-trash me-1"></i> Buang
-                                    </button>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">Deskripsi Langkah</label>
-                                    <textarea name="step_desc[]"
-                                              class="form-control"
-                                              rows="4"
-                                              placeholder="Tulis penjelasan detail langkah..."
-                                              required></textarea>
-                                </div>
-                            </div>
                         </div>
-                    </template>
+                    @endforelse
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{{ route('admin.settings.alur.index') }}" class="btn btn-outline-secondary">
-                            Batal
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
+                </div>
+
             </div>
+
+            <div class="mt-8 flex gap-3">
+
+                <x-button.button-menu type="submit" variant="primary" data-confirm data-confirm-title="Simpan perubahan?"
+                    data-confirm-text="Pastikan data sudah sesuai." data-confirm-button-text="Ya, simpan">
+                    Simpan Perubahan
+                </x-button.button-menu>
+
+                <x-button.button-menu href="{{ route('admin.settings.alur.index') }}" variant="outline" size="md"
+                    class="w-full sm:w-auto">
+
+                    Batal
+
+                </x-button.button-menu>
+
+
+            </div>
+
+        </form>
+
+
+    </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+
+                const btnAdd = document.getElementById('btnAddStep');
+                const container = document.getElementById('stepContainer');
+
+                btnAdd.addEventListener('click', () => {
+
+                    const total = document.querySelectorAll('.step-item').length + 1;
+
+                    const html = `
+        <div class="step-item rounded-[10px] border border-slate-200 bg-slate-50 p-5">
+
+            <div class="grid md:grid-cols-12 gap-4">
+
+                <div class="md:col-span-5">
+
+                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                        Judul Langkah
+                    </label>
+
+                    <input
+                        type="text"
+                        name="step_title[]"
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
+                </div>
+
+                <div class="md:col-span-2">
+
+                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                        Urutan
+                    </label>
+
+                    <input
+                        type="number"
+                        min="1"
+                        value="${total}"
+                        name="sort_order[]"
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+
+                </div>
+
+                <div class="md:col-span-2 flex items-end">
+
+                    <label class="flex items-center gap-2">
+
+                        <input type="checkbox" checked>
+
+                        <span class="font-medium">
+                            Aktif
+                        </span>
+
+                    </label>
+
+                </div>
+
+                <div class="md:col-span-3 flex items-end">
+
+                    <button
+                        type="button"
+                        class="remove-step rounded-xl bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-600 hover:text-white">
+
+                        Hapus
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="mt-4">
+
+                <label class="block mb-2 text-sm font-medium text-slate-700">
+                    Deskripsi Langkah
+                </label>
+
+                <textarea
+                    name="step_desc[]"
+                    rows="4"
+                    class="w-full rounded-2xl border border-slate-300 px-4 py-3"></textarea>
+
+
         </div>
-    </section>
-</div>
 
-<script>
-(function () {
-    const btnAdd = document.getElementById('btnAddStep');
-    const container = document.getElementById('stepContainer');
-    const tpl = document.getElementById('stepTemplate');
+    </div>`;
 
-    function nextSort() {
-        const nums = Array.from(document.querySelectorAll('input[name="sort_order[]"]'))
-            .map(i => parseInt(i.value || '0', 10))
-            .filter(n => !isNaN(n) && n > 0);
+                    container.insertAdjacentHTML('beforeend', html);
 
-        return (nums.length ? Math.max(...nums) : 0) + 1;
-    }
+                });
 
-    function refreshIndexes() {
-        document.querySelectorAll('#stepContainer .step-item').forEach((item, idx) => {
-            const activeSwitch = item.querySelector('.active-switch');
-            if (activeSwitch) activeSwitch.name = `is_active[${idx}]`;
-        });
-    }
+                document.addEventListener('click', function(e) {
 
-    btnAdd?.addEventListener('click', () => {
-        const node = tpl.content.cloneNode(true);
+                    if (e.target.classList.contains('remove-step')) {
 
-        const sortInput = node.querySelector('.sort-input');
-        if (sortInput) sortInput.value = nextSort();
+                        e.target.closest('.step-item').remove();
 
-        const removeBtn = node.querySelector('.btnRemoveStep');
-        removeBtn?.addEventListener('click', () => {
-            removeBtn.closest('.step-item').remove();
-            refreshIndexes();
-        });
+                    }
 
-        container.appendChild(node);
-        refreshIndexes();
-    });
+                });
 
-    refreshIndexes();
-})();
-</script>
+
+            });
+        </script>
+    @endpush
+
 @endsection

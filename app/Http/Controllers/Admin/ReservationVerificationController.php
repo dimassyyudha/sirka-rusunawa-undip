@@ -11,6 +11,7 @@ use App\Models\Room;
 use App\Services\WhatsappService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 class ReservationVerificationController extends Controller
 {
@@ -22,8 +23,9 @@ class ReservationVerificationController extends Controller
 
         return $code;
     }
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->integer('per_page', 10);
         $status = request('status');
 
         $query = Reservation::with([
@@ -41,6 +43,7 @@ class ReservationVerificationController extends Controller
         if (!$status) {
 
             $query->whereIn('status', [
+                'pending',
                 'paid',
                 'active',
                 'rejected',
@@ -52,6 +55,55 @@ class ReservationVerificationController extends Controller
     | FILTER
     |--------------------------------------------------------------------------
     */
+        if ($status = request('status')) {
+
+            $query->where(
+                'status',
+                $status
+            );
+        }
+        if ($jalur = request('jalur')) {
+
+            $query->whereHas(
+                'user.studentProfile',
+                function ($q) use ($jalur) {
+
+                    if ($jalur === 'kipk') {
+
+                        $q->where(
+                            'jalur_pembiayaan',
+                            'Bidikmisi/KIP-K'
+                        );
+                    } else {
+
+                        $q->where(
+                            'jalur_pembiayaan',
+                            '!=',
+                            'Bidikmisi/KIP-K'
+                        );
+                    }
+                }
+            );
+        }
+        if ($search = request('search')) {
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('guest_name', 'like', "%{$search}%")
+                    ->orWhere('guest_nim', 'like', "%{$search}%")
+
+                    ->orWhereHas('user', function ($user) use ($search) {
+
+                        $user->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+
+                    ->orWhereHas('user.studentProfile', function ($profile) use ($search) {
+
+                        $profile->where('nim', 'like', "%{$search}%");
+                    });
+            });
+        }
 
         if ($status === 'paid') {
             $query->where('status', 'paid');
@@ -67,7 +119,7 @@ class ReservationVerificationController extends Controller
 
         $Reservations = $query
             ->latest()
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view(
@@ -166,7 +218,7 @@ class ReservationVerificationController extends Controller
                 ],
                 [
                     'room_id' => $Reservation->room_id,
-                    'reservation_id' => $Reservation->id,
+                    'reservation_id' => $Reservation->reservation_id,
                     'start_date' => $Reservation->start_date,
                     'end_date' => $Reservation->end_date,
                     'status' => 'active',
@@ -253,11 +305,11 @@ class ReservationVerificationController extends Controller
         });
 
         SendReservationApprovedMailJob::dispatch(
-            $Reservation->id
+            $Reservation->getKey()
         );
 
         SendReservationApprovedWhatsappJob::dispatch(
-            $Reservation->id
+            $Reservation->getKey()
         );
         return redirect()
             ->route('admin.verifikasi.index')

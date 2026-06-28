@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\SiteSetting;
 
 class FaqSeeder extends Seeder
 {
@@ -49,7 +49,7 @@ class FaqSeeder extends Seeder
                 'answer'     => $item['answer'],
                 'sort_order' => $index + 1,
                 'is_active'  => true,
-                'is_featured'=> $item['is_featured'],
+                'is_featured' => $item['is_featured'],
             ];
         })->toArray();
 
@@ -59,14 +59,15 @@ class FaqSeeder extends Seeder
             'items' => $items,
         ];
 
-        DB::table('site_settings')->updateOrInsert(
-            ['key' => 'faq'],
+        SiteSetting::updateOrCreate(
+
             [
-                'value' => json_encode($payload, JSON_UNESCAPED_UNICODE),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'key' => 'faq',
+            ],
+
+            [
+                'value' => $payload,
             ]
         );
-
     }
 }

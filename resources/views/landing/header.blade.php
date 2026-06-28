@@ -59,9 +59,15 @@
                         class="
     relative px-3 py-2 transition-all duration-200
 
-    {{ request()->routeIs('cari-kamar.*')
-        ? 'text-orange-500 font-semibold after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-[2px] after:bg-orange-500 after:rounded-full'
-        : 'text-white hover:text-orange-500' }}
+   {{ request()->routeIs(
+       'cari-kamar.*',
+       'Reservation.create',
+       'Reservation.store',
+       'Reservation.payment.page',
+       'Reservation.success.page',
+   )
+       ? 'text-orange-500 font-semibold after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-[2px] after:bg-orange-500 after:rounded-full'
+       : 'text-white hover:text-orange-500' }}
 ">
                         Reservasi Kamar
                     </a>
@@ -70,7 +76,7 @@
                         class="
     relative px-3 py-2 transition-all duration-200
 
-    {{ request()->routeIs('Reservation.*')
+    {{ request()->routeIs('Reservation.check')
         ? 'text-orange-500 font-semibold after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-[2px] after:bg-orange-500 after:rounded-full'
         : 'text-white hover:text-orange-500' }}
 ">
@@ -103,7 +109,7 @@
                                     Tentang Kami
                                 </a>
 
-                                <a href="{{ route('about.visi-misi') }}"
+                                {{-- <a href="{{ route('about.visi-misi') }}"
                                     class="rounded-xl px-4 py-3 hover:text-orange-500 transition">
                                     Visi & Misi
                                 </a>
@@ -111,17 +117,24 @@
                                 <a href="{{ route('about.gedung') }}"
                                     class="rounded-xl px-4 py-3 hover:text-orange-500 transition">
                                     Paparan Gedung
-                                </a>
+                                </a> --}}
 
-                                <a href="{{ route('about.fasilitas') }}"
+                                {{-- <a href="{{ route('about.fasilitas') }}"
                                     class="rounded-xl px-4 py-3 hover:text-orange-500 transition">
                                     Fasilitas Umum
-                                </a>
+                                </a> --}}
 
-                                <a href="{{ route('about.aturan') }}"
+                                {{-- <a href="{{ route('about.aturan') }}"
                                     class="rounded-xl px-4 py-3 hover:text-orange-500 transition">
                                     Aturan / Tata Tertib
+                                </a> --}}
+
+
+                                <a href="{{ route('page.syarat-ketentuan') }}" target="_blank"
+                                    class="rounded-xl px-4 py-3 hover:text-orange-500 transition">
+                                    Syarat & Ketentuan
                                 </a>
+
 
                             </div>
 
@@ -129,7 +142,7 @@
 
                     </div>
 
-                    <a href="{{ route('page.testimoni') }}"
+                    <a href="{{ route('page.testimoni') }}" target="_blank"
                         class="
     relative px-3 py-2 transition-all duration-200
 
@@ -140,7 +153,7 @@
                         Testimoni
                     </a>
 
-                    <a href="{{ route('page.faq') }}"
+                    <a href="{{ route('page.faq') }}" target="_blank"
                         class="
     relative px-3 py-2 transition-all duration-200
 
@@ -172,15 +185,204 @@
 
                     @auth
 
-                        @if (auth()->user()->role === 'mahasiswa')
-                            {{-- DESKTOP PROFILE --}}
+                        @php
+                            $portalRoute =
+                                auth()->user()->role === 'admin'
+                                    ? route('admin.dashboard')
+                                    : route('mahasiswa.dashboard');
+                        @endphp
+
+                        {{-- DESKTOP PROFILE --}}
+                        <div class="hidden xl:block relative">
+
+                            <button id="profileButton" type="button"
+                                class="flex items-center gap-3 px-3 py-1.5 rounded-2xl transition">
+
+                                <div
+                                    class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-orange-500 flex items-center justify-center">
+
+                                    @if (auth()->user()->profile_photo)
+                                        <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                                            alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-white text-sm font-black">
+                                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                                        </span>
+                                    @endif
+
+                                </div>
+
+                                <div class="text-left leading-tight">
+
+                                    <div class="text-sm font-extrabold">
+                                        {{ strtok(auth()->user()->name, ' ') }}
+                                    </div>
+
+                                    <div class="text-[11px] text-white/60 capitalize">
+                                        {{ auth()->user()->role }}
+                                    </div>
+
+                                </div>
+
+                                <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+
+                            </button>
+
+                            <div id="profileDropdown"
+                                class="hidden absolute right-0 mt-3 w-[250px] bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+
+                                <div class="bg-gradient-to-r from-orange-500 to-orange-400 px-4 py-3 text-white">
+
+                                    <div class="text-sm truncate">
+                                        {{ auth()->user()->name }}
+                                    </div>
+
+                                    <div class="text-[11px] text-white/80 mt-0.5 capitalize">
+                                        Portal {{ auth()->user()->role }}
+                                    </div>
+
+                                </div>
+
+                                <div class="p-2">
+
+                                    <a href="{{ $portalRoute }}" target="_blank"
+                                        class="block px-3 py-3 rounded-xl hover:bg-slate-50 text-sm font-bold text-slate-900 transition">
+
+                                        Dashboard
+
+                                    </a>
+
+                                </div>
+
+                                <div class="border-t border-slate-100 p-2">
+
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+
+                                        <button type="submit"
+                                            class="w-full px-3 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition">
+
+                                            Logout
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {{-- MOBILE PROFILE --}}
+                        <div class="xl:hidden relative">
+
+                            <button id="mobileProfileButton" type="button"
+                                class="flex items-center gap-2 rounded-2xl px-2 py-1.5 hover:bg-white/5 transition">
+
+                                <div
+                                    class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-orange-500 flex items-center justify-center">
+
+                                    @if (auth()->user()->profile_photo)
+                                        <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                                            alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-white text-sm font-black">
+                                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                                        </span>
+                                    @endif
+
+                                </div>
+
+                                <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+
+                            </button>
+
+                            <div id="mobileProfileDropdown"
+                                class="hidden absolute right-0 mt-3 w-[220px] rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden z-50">
+
+                                <div class="bg-gradient-to-r from-orange-500 to-orange-400 px-4 py-4 text-white">
+
+                                    <div class="flex items-center gap-3">
+
+                                        <div
+                                            class="w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center shrink-0">
+
+                                            @if (auth()->user()->profile_photo)
+                                                <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                                                    alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
+                                            @else
+                                                <span class="text-white text-sm font-black">
+                                                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                                                </span>
+                                            @endif
+
+                                        </div>
+
+                                        <div class="min-w-0">
+
+                                            <div class="text-sm font-black truncate">
+                                                {{ auth()->user()->name }}
+                                            </div>
+
+                                            <div class="text-[11px] text-white/80 capitalize">
+                                                {{ auth()->user()->role }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="p-2">
+
+                                    <a href="{{ $portalRoute }}"
+                                        class="block rounded-xl px-4 py-3 text-sm font-bold text-slate-800 hover:bg-slate-50 transition">
+
+                                        Dashboard
+
+                                    </a>
+
+                                </div>
+
+                                <div class="border-t border-slate-100 p-2">
+
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+
+                                        <button type="submit"
+                                            class="w-full rounded-xl bg-red-500 px-4 py-3 text-sm font-bold text-white hover:bg-red-600 transition">
+
+                                            Logout
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @endauth
+
+                    {{-- @if (auth()->user()->role === 'mahasiswa')
+                           
                             <div class="hidden xl:block relative">
 
                                 <button id="profileButton" type="button"
                                     class="flex items-center gap-3 px-3 py-1.5 rounded-2xl transition">
 
                                     <div
-                                        class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-white flex items-center justify-center">
+                                        class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-orange-500 flex items-center justify-center">
 
                                         @if (auth()->user()->profile_photo)
                                             <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
@@ -257,7 +459,7 @@
 
                             </div>
 
-                            {{-- MOBILE PROFILE --}}
+                      
                             <div class="xl:hidden relative">
 
                                 <button id="mobileProfileButton" type="button"
@@ -286,7 +488,6 @@
 
                                 </button>
 
-                                {{-- MOBILE PROFILE DROPDOWN --}}
                                 <div id="mobileProfileDropdown"
                                     class="hidden absolute right-0 mt-3 w-[220px] rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden z-50">
 
@@ -352,9 +553,9 @@
                                 </div>
 
                             </div>
-                        @endif
+                        @endif --}}
 
-                    @endauth
+                    {{-- @endauth --}}
 
                 </div>
 

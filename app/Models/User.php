@@ -10,9 +10,10 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUlids;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'password',
@@ -22,15 +23,35 @@ class User extends Authenticatable
         'profile_photo',
     ];
 
-    public $incrementing = false;
+    protected $table = 'users';
+
+    protected $primaryKey = 'user_id';
 
     protected $keyType = 'string';
+
+    public $incrementing = false;
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+
+            if (!$user->user_id) {
+
+                $last = self::orderByDesc('user_id')->first();
+
+                $next = $last
+                    ? ((int) substr($last->user_id, 3)) + 1
+                    : 1;
+
+                $user->user_id = 'USR' . str_pad($next, 7, '0', STR_PAD_LEFT);
+            }
+        });
+    }
     protected function casts(): array
     {
         return [
@@ -39,10 +60,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function occupants()
-    {
-        return $this->hasMany(Occupant::class);
-    }
+
 
     public function activeOccupant()
     {
@@ -52,12 +70,52 @@ class User extends Authenticatable
 
     public function studentProfile()
     {
-        return $this->hasOne(StudentProfile::class);
+        return $this->hasOne(
+            StudentProfile::class,
+            'user_id',
+            'user_id'
+        );
     }
 
-    public function Reservations()
+    public function invoices()
     {
-        return $this->hasMany(Reservation::class);
+        return $this->hasMany(
+            Invoice::class,
+            'user_id',
+            'user_id'
+        );
+    }
+
+    public function paymentTransactions()
+    {
+        return $this->hasMany(
+            PaymentTransaction::class,
+            'user_id',
+            'user_id'
+        );
+    }
+
+    public function occupants()
+    {
+        return $this->hasMany(
+            Occupant::class,
+            'user_id',
+            'user_id'
+        );
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(
+            Reservation::class,
+            'user_id',
+            'user_id'
+        );
+    }
+
+    public function testimonials()
+    {
+        return $this->hasMany(Testimonial::class);
     }
 
     public function isAdmin(): bool

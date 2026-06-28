@@ -13,7 +13,7 @@
     <div class="space-y-6">
 
         {{-- HEADER --}}
-        <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+        <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
 
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
 
@@ -68,7 +68,7 @@
         <div class="grid xl:grid-cols-2 gap-6">
 
             {{-- AKADEMIK --}}
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                 <div class="px-6 py-5 border-b border-slate-100">
                     <h3 class="text-lg font-black text-slate-900">
@@ -80,7 +80,7 @@
 
                     <table class="w-full">
 
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                             <tr>
                                 <td class="px-6 py-4 text-sm text-slate-500 w-[35%]">
@@ -144,7 +144,7 @@
             </div>
 
             {{-- PRIBADI --}}
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                 <div class="px-6 py-5 border-b border-slate-100">
                     <h3 class="text-lg font-black text-slate-900">
@@ -156,7 +156,7 @@
 
                     <table class="w-full">
 
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                             <tr>
                                 <td class="px-6 py-4 text-sm text-slate-500 w-[35%]">
@@ -217,7 +217,7 @@
             </div>
 
             {{-- ORANG TUA --}}
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                 <div class="px-6 py-5 border-b border-slate-100">
                     <h3 class="text-lg font-black text-slate-900">
@@ -229,7 +229,7 @@
 
                     <table class="w-full">
 
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                             <tr>
                                 <td class="px-6 py-4 text-sm text-slate-500 w-[35%]">
@@ -280,7 +280,7 @@
             </div>
 
             {{-- DOKUMEN --}}
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                 <div class="px-6 py-5 border-b border-slate-100">
                     <h3 class="text-lg font-black text-slate-900">
@@ -292,7 +292,7 @@
 
                     <table class="w-full">
 
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                             <tr>
                                 <td class="px-6 py-4 text-sm text-slate-500 w-[35%]">

@@ -4,62 +4,138 @@
 @section('page_title', 'Verifikasi Reservation')
 
 @section('content')
-    <div class="flex gap-2">
-        <a href="{{ route('admin.verifikasi.index') }}" class="px-4 py-2 rounded-xl bg-slate-100">
-            Semua
-        </a>
 
-        <a href="{{ route('admin.verifikasi.index', ['status' => 'paid']) }}"
-            class="px-4 py-2 rounded-xl bg-orange-100 text-orange-700">
-            Pending
-        </a>
-
-        <a href="{{ route('admin.verifikasi.index', ['status' => 'active']) }}"
-            class="px-4 py-2 rounded-xl bg-green-100 text-green-700">
-            Disetujui
-        </a>
-
-        <a href="{{ route('admin.verifikasi.index', ['status' => 'rejected']) }}"
-            class="px-4 py-2 rounded-xl bg-red-100 text-red-700">
-            Ditolak
-        </a>
-    </div>
     <div class="space-y-4">
 
         {{-- HEADER --}}
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="rounded-[10px] border border-slate-200 bg-white p-6 shadow-sm">
 
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
                 <div>
 
-                    <h1 class="text-2xl font-black text-slate-900">
-                        Verifikasi Reservation
+                    <h1 class="text-3xl font-black text-slate-900">
+                        Verifikasi Reservasi
                     </h1>
 
-                    <p class="mt-2 text-sm text-slate-500">
-                        Daftar Reservation mahasiswa yang sudah melakukan pembayaran dan menunggu verifikasi admin.
+                    <p class="mt-2 text-slate-500">
+                        Kelola verifikasi pembayaran reservasi mahasiswa Rusunawa.
                     </p>
 
                 </div>
 
-                @php
-                    $counterLabel = match ($status) {
-                        'paid' => 'Menunggu Verifikasi',
-                        'active' => 'Disetujui',
-                        'rejected' => 'Ditolak',
-                        default => 'Total Reservation',
-                    };
-                @endphp
-
                 <div class="inline-flex items-center rounded-2xl bg-orange-50 px-4 py-3 text-sm font-bold text-orange-700">
-                    {{ $Reservations->total() }} {{ $counterLabel }}
+
+                    {{ $Reservations->total() }}
+                    Data Reservasi
+
                 </div>
 
             </div>
 
         </div>
+        <form id="filterForm" method="GET" action="{{ route('admin.verifikasi.index') }}"
+            class="rounded-[10px] border border-slate-200 bg-white p-5 shadow-sm">
 
+            <div class="grid gap-4 lg:grid-cols-5">
+
+                {{-- PENCARIAN --}}
+                <div class="lg:col-span-2">
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Pencarian
+                    </label>
+
+                    <input id="searchInput" type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari nama mahasiswa atau NIM..."
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+
+                </div>
+
+                {{-- STATUS --}}
+                <div>
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Status Verifikasi
+                    </label>
+
+                    <select name="status" class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+
+                        <option value="">
+                            Semua Status
+                        </option>
+
+                        <option value="paid" @selected(request('status') == 'paid')>
+                            Menunggu Verifikasi
+                        </option>
+
+                        <option value="active" @selected(request('status') == 'active')>
+                            Disetujui
+                        </option>
+
+                        <option value="rejected" @selected(request('status') == 'rejected')>
+                            Ditolak
+                        </option>
+
+                    </select>
+
+                </div>
+
+                {{-- JALUR --}}
+                <div>
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Jalur Pembiayaan
+                    </label>
+
+                    <select name="jalur" class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+
+                        <option value="">
+                            Semua Jalur
+                        </option>
+
+                        <option value="kipk" @selected(request('jalur') == 'kipk')>
+                            KIP-K
+                        </option>
+
+                        <option value="mandiri" @selected(request('jalur') == 'mandiri')>
+                            Non KIP-K
+                        </option>
+
+                    </select>
+
+                </div>
+
+                {{-- ACTION --}}
+                <div>
+
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-transparent">
+                        Action
+                    </label>
+
+                    <div class="flex gap-2">
+
+                        <button type="submit"
+                            class="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white hover:bg-violet-700">
+
+                            Filter
+
+                        </button>
+
+                        <a href="{{ route('admin.verifikasi.index') }}"
+                            class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">
+
+                            Reset
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
         {{-- TABLE --}}
         <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
@@ -85,134 +161,7 @@
                     </thead>
 
 
-                    {{-- @forelse ($Reservations as $Reservation)
-                            <tr class="transition hover:bg-slate-50">
 
-
-                                <td class="px-6 py-5">
-
-                                    <div class="flex items-center gap-4">
-
-                                        <div
-                                            class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-black text-blue-700">
-
-                                            {{ strtoupper(substr($Reservation->guest_name, 0, 1)) }}
-
-                                        </div>
-
-                                        <div>
-
-                                            <h3 class="font-black text-slate-900">
-                                                {{ $Reservation->guest_name }}
-                                            </h3>
-
-                                            <p class="mt-1 text-xs text-slate-500">
-                                                {{ $Reservation->guest_nim }}
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                </td>
-
-                                <td class="px-6 py-5">
-
-                                    <div>
-
-                                        <h4 class="font-black text-slate-900">
-                                            {{ $Reservation->room?->kode_kamar ?? '-' }}
-                                        </h4>
-
-                                        <p class="mt-1 text-xs text-slate-500">
-                                            {{ $Reservation->room?->floor?->building?->name ?? 'Gedung -' }}
-                                        </p>
-
-                                    </div>
-
-                                </td>
-                                <td class="px-6 py-5">
-
-                                    <h4 class="font-black text-orange-600">
-                                        Rp {{ number_format($Reservation->total_price, 0, ',', '.') }}
-                                    </h4>
-
-                                </td>
-
-
-                                <td class="px-6 py-5 text-center">
-
-                                    @php
-                                        $badge = match ($Reservation->status) {
-                                            'paid' => [
-                                                'label' => 'Menunggu Verifikasi',
-                                                'class' => 'bg-orange-50 text-orange-700',
-                                            ],
-
-                                            'active' => [
-                                                'label' => 'Disetujui',
-                                                'class' => 'bg-green-50 text-green-700',
-                                            ],
-
-                                            'rejected' => [
-                                                'label' => 'Ditolak',
-                                                'class' => 'bg-red-50 text-red-700',
-                                            ],
-
-                                            default => [
-                                                'label' => ucfirst($Reservation->status),
-                                                'class' => 'bg-slate-50 text-slate-700',
-                                            ],
-                                        };
-                                    @endphp
-
-                                    <span
-                                        class="inline-flex rounded-full px-3 py-1 text-xs font-black {{ $badge['class'] }}">
-                                        {{ $badge['label'] }}
-                                    </span>
-
-                                </td>
-                                <td class="px-6 py-5 text-center">
-
-                                    <a href="{{ route('admin.verifikasi.show', $Reservation) }}"
-                                        class="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-4 py-2 text-xs font-black text-white transition hover:bg-blue-700">
-                                        Lihat Detail
-                                    </a>
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-                            <tr>
-
-                                <td colspan="5" class="px-6 py-16 text-center">
-
-                                    <div
-                                        class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-
-                                        </svg>
-
-                                    </div>
-
-                                    <h3 class="mt-5 text-xl font-black text-slate-900">
-                                        Tidak Ada Reservation
-                                    </h3>
-
-                                    <p class="mt-2 text-sm text-slate-500">
-                                        Belum ada Reservation yang menunggu verifikasi admin.
-                                    </p>
-
-                                </td>
-
-                            </tr>
-                        @endforelse --}}
 
 
                     <tbody class="divide-y divide-slate-100 bg-white">
@@ -365,10 +314,12 @@
 
             </div>
 
-            <div class="border-t border-slate-200 bg-white px-6 py-4">
-                <x-ui.pagination :paginator="$Reservations" />
-            </div>
+
         </div>
+        <div class="border-t border-slate-200 px-6 py-4">
+            <x-ui.pagination :paginator="$Reservations" />
+        </div>
+
 
     </div>
 

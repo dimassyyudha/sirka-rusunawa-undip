@@ -8,25 +8,34 @@ use Illuminate\Http\Request;
 
 class FloorController extends Controller
 {
-    // public function index()
-    // {
-    //     $floors = Floor::with('building')
-    //         ->latest()
-    //         ->get();
-
-    //     return view('pages.admin.floors.index', compact('floors'));
-    // }
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->integer('per_page', 10);
+
+        $buildings = Building::orderBy('name')->get();
 
         $floors = Floor::with('building')
+
+            ->when($request->search, function ($q) use ($request) {
+
+                $q->where('floor_number', 'like', '%' . $request->search . '%');
+            })
+
+            ->when($request->building_id, function ($q) use ($request) {
+
+                $q->where('building_id', $request->building_id);
+            })
+
             ->orderBy('building_id')
             ->orderBy('floor_number')
+
             ->paginate($perPage)
             ->withQueryString();
 
-        return view('pages.admin.floors.index', compact('floors'));
+        return view(
+            'pages.admin.floors.index',
+            compact('floors', 'buildings')
+        );
     }
 
     public function create()
@@ -39,7 +48,7 @@ class FloorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'building_id' => 'required|exists:buildings,id',
+            'building_id' => 'required|exists:buildings,building_id',
             'floor_number' => 'required|integer|min:1',
             'total_rooms' => 'required|integer|min:0',
             'monthly_price' => 'required|integer|min:0',
@@ -56,6 +65,7 @@ class FloorController extends Controller
 
         $exists = Floor::where('building_id', $request->building_id)
             ->where('floor_number', $request->floor_number)
+            ->where('floor_id', '!=', $request->floor_id)
             ->exists();
 
         if ($exists) {
@@ -96,14 +106,15 @@ class FloorController extends Controller
     public function update(Request $request, Floor $floor)
     {
         $request->validate([
-            'building_id' => 'required|exists:buildings,id',
+            'building_id' => 'required|exists:buildings,building_id',
             'floor_number' => 'required|integer|min:1',
             'total_rooms' => 'required|integer|min:0',
             'monthly_price' => 'required|integer|min:0',
             'room_capacity' => 'required|integer|min:1',
         ]);
 
-        $building = Building::findOrFail($request->building_id);
+        // $building = Building::findOrFail($request->building_id);
+        $building = Building::where('building_id', $request->building_id)->firstOrFail();
 
         if ($request->floor_number > $building->total_floors) {
             return back()
@@ -113,7 +124,8 @@ class FloorController extends Controller
 
         $exists = Floor::where('building_id', $request->building_id)
             ->where('floor_number', $request->floor_number)
-            ->where('id', '!=', $floor->id)
+            // ->where('floor_id', '!=', $floor->floor_id)
+            ->where('floor_id', '!=', $floor->getKey())
             ->exists();
 
         if ($exists) {

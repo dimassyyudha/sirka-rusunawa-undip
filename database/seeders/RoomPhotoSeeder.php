@@ -23,7 +23,7 @@ class RoomPhotoSeeder extends Seeder
             'F' => 'f',
         ];
 
-        $exts = ['jpg','jpeg','png','webp'];
+        $exts = ['jpg', 'jpeg', 'png', 'webp'];
 
         foreach (Room::all() as $room) {
             // normalisasi gedung ("Gedung A" / "A" → "A")
@@ -32,7 +32,7 @@ class RoomPhotoSeeder extends Seeder
             if (! $folder) continue;
 
             // bikin 3 foto random per kamar, tapi tetap di folder gedung yg sama
-            $seed = crc32((string)($room->id ?? $room->kode_kamar));
+            $seed = crc32((string)($room->room_id ?? $room->kode_kamar));
             $base = ($seed % 6) + 1; // 1..6
 
             $indexes = [
@@ -58,7 +58,7 @@ class RoomPhotoSeeder extends Seeder
                 if (! $relPath) continue;
 
                 RoomPhoto::create([
-                    'room_id'    => $room->id,
+                    'room_id'    => $room->room_id,
                     'path'       => $relPath,     // contoh: images/a/a3.jpg
                     'is_primary' => $order === 1,
                     'order'      => $order,

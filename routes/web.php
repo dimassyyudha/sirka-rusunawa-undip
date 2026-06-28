@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ReservationVerificationController;
-use App\Http\Controllers\Admin\syaratKetentuanController;
+// use App\Http\Controllers\Admin\syaratKetentuanController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Api\MidtransController;
 use App\Http\Controllers\AuthController;
@@ -23,6 +23,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomPhotoController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TestimonialController;
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -101,6 +102,12 @@ Route::get('/bypass-{id}', function (Request $request, string $id) {
 
     abort(404);
 })->name('dev.bypass');
+Route::get('/cek-reservation', function () {
+    return view('pages.Reservation.check');
+})->name('Reservation.check');
+
+Route::post('/cek-reservation', [ReservationController::class, 'checkReservation'])
+    ->name('Reservation.check.store');
 
 Route::middleware(['checkislogin'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -113,48 +120,57 @@ Route::middleware(['checkislogin'])->group(function () {
         ->name('Reservation.success.page');
 
     Route::middleware(['checkrole:mahasiswa'])->group(function () {
-        // Route::get('/Reservation/review/{room}', [ReservationController::class, 'reviewPage'])->name('reservation.review.page');
-        // Route::post('/Reservation/review/{room}', [ReservationController::class, 'review'])->name('reservation.review');
-        Route::get('/reservation/{room}', [ReservationController::class, 'create'])->name('Reservation.create');
+
+        Route::get('/reservation/{room}/create', [ReservationController::class, 'create'])->name('Reservation.create');
         Route::post('/reservation/{room}', [ReservationController::class, 'store'])->name('Reservation.store');
 
-        // Route::post('/reservation/{room}/save-data', [ReservationController::class, 'saveData'])->name('Reservation.saveData');
 
-        // Route::get(
-        //     '/reservation/{reservation}/document',
-        //     [ReservationController::class, 'documentPage']
-        // )->name('Reservation.document.page');
-
-        // Route::post(
-        //     '/reservation/{reservation}/document',
-        //     [ReservationController::class, 'documentStore']
-        // )->name('Reservation.document.store');
-
-        // Route::get(
-        //     '/reservation/{reservation}/payment',
-        //     [ReservationController::class, 'paymentPage']
-        // )->name('Reservation.payment');
-
-        // Route::post(
-        //     '/reservation/{reservation}/payment',
-        //     [ReservationController::class, 'paymentStore']
-        // )->name('Reservation.payment.store');
 
         Route::get('/reservation/status/{Reservation}', [ReservationController::class, 'show'])->name('Reservation.show');
 
         Route::get('/reservation/{Reservation}/ticket/download', [ReservationController::class, 'downloadTicket'])
             ->name('Reservation.ticket.download');
 
-        Route::get('/cek-reservation', function () {
-            return view('pages.Reservation.check');
-        })->name('Reservation.check');
 
-        Route::post('/cek-reservation', [ReservationController::class, 'checkReservation'])
-            ->name('Reservation.check.store');
+
+
 
         Route::get('/payment', [MidtransController::class, 'show'])
             ->name('Reservation.payment.page');
 
+        Route::get('/payment/check/{orderId}', function ($orderId) {
+
+            $transaction = \App\Models\PaymentTransaction::where(
+                'order_id',
+                $orderId
+            )->first();
+
+            if (!$transaction) {
+                return response()->json([
+                    'status' => 'not_found'
+                ]);
+            }
+
+            return response()->json([
+                'status' => $transaction->transaction_status
+            ]);
+        });
+
+        Route::get(
+            '/payment/check-status/{orderId}',
+            [MidtransController::class, 'checkStatus']
+        );
+
+
+        Route::get(
+            '/payment/{transaction}',
+            [PaymentTransactionController::class, 'show']
+        )->name('payment.show');
+
+        Route::post(
+            '/payment/{transaction}/generate-qris',
+            [PaymentTransactionController::class, 'generateQris']
+        )->name('payment.generate.qris');
 
         // Route::get('/payment/success', [MidtransController::class, 'success'])
         //     ->name('Reservation.payment.success.order');
@@ -162,13 +178,38 @@ Route::middleware(['checkislogin'])->group(function () {
         // Route::get('/Reservation/success', [MidtransController::class, 'successPage'])
         //     ->name('Reservation.success.page');
 
-        Route::get('/cek-invoice', [InvoiceController::class, 'checkForm'])
-            ->name('invoice.check.form');
 
-        Route::post('/cek-invoice', [InvoiceController::class, 'check'])
-            ->name('invoice.check');
     });
+    Route::get('/cek-invoice', [InvoiceController::class, 'checkForm'])
+        ->name('invoice.check.form');
 
+    Route::post('/cek-invoice', [InvoiceController::class, 'check'])
+        ->name('invoice.check');
+    Route::prefix('admin/invoices')
+        ->name('admin.invoices.')
+        ->middleware(['auth'])
+        ->group(function () {
+
+            Route::get('/', [
+                InvoiceController::class,
+                'index'
+            ])->name('index');
+
+            Route::get('/{invoice}', [
+                InvoiceController::class,
+                'show'
+            ])->name('show');
+
+            Route::post('/{invoice}/reminder', [
+                InvoiceController::class,
+                'sendReminder'
+            ])->name('send-reminder');
+
+            Route::post('/send-reminder-all', [
+                InvoiceController::class,
+                'sendReminderAll'
+            ])->name('send-reminder-all');
+        });
     Route::prefix('admin')
         ->name('admin.')
         ->middleware(['admin'])
@@ -191,7 +232,16 @@ Route::middleware(['checkislogin'])->group(function () {
             Route::resource('rooms', RoomController::class);
             Route::resource('room-photos', RoomPhotoController::class);
             Route::resource('penghuni', PenghuniController::class);
-            // Route::resource('reservations', ReservationController::class);
+            Route::get(
+                'testimoni',
+                [TestimonialController::class, 'indexAdmin']
+            )->name('testimoni.index');
+
+            Route::get(
+                '/testimoni/{testimonial}',
+                [TestimonialController::class, 'show']
+            )->name('testimoni.show');
+
             Route::get('/reservasi', [ReservationController::class, 'index'])
                 ->name('reservasi');
 
@@ -219,13 +269,19 @@ Route::middleware(['checkislogin'])->group(function () {
                 'registrasi-ulang',
                 [OccupancyPeriodController::class, 'activeRegistration']
             )->name('registrasi-ulang.index');
+
+            Route::get(
+                'registrasi-ulang/{occupancyPeriod}',
+                [OccupancyPeriodController::class, 'show']
+            )->name('registrasi-ulang.show');
+
             Route::post('/reservations/bulk-action', [OccupancyPeriodController::class, 'bulkAction'])
                 ->name('occupancy-periods.reservations.bulk-action');
             Route::delete('/occupancy-periods/bulk-delete', [OccupancyPeriodController::class, 'bulkDelete'])
                 ->name('occupancy-periods.bulk-delete');
+
             Route::resource('occupancy-periods', OccupancyPeriodController::class);
-            // Route::get('/occupancy-periods', [OccupancyPeriodController::class, 'index'])
-            //     ->name('occupancy-periods.index');
+
             Route::patch('/occupancy-periods/{occupancyPeriod}/open-registration', [OccupancyPeriodController::class, 'openRegistration'])
                 ->name('occupancy-periods.open-registration');
 
@@ -307,24 +363,6 @@ Route::middleware(['checkislogin'])->group(function () {
                 [ReservationController::class, 'show']
             )->name('mahasiswa.reservasi.show');
 
-            // Route::get('/reservasi/perpanjang', [ReservationController::class, 'extendForm'])
-            //     ->name('reservasi.perpanjang');
-
-            // Route::post('/reservasi/perpanjang', [ReservationController::class, 'extendStore'])
-            //     ->name('reservasi.perpanjang.store');
-
-            // Route::get('/reservasi/pindah-kamar', [ReservationController::class, 'transferForm'])
-            //     ->name('reservasi.pindah-kamar');
-
-            // Route::post('/reservasi/pindah-kamar/{room}', [ReservationController::class, 'transferStore'])
-            //     ->name('reservasi.pindah-kamar.store');
-
-            // Route::get('/reservasi/akhiri-kontrak', [ReservationController::class, 'checkoutForm'])
-            //     ->name('reservasi.akhiri-kontrak');
-
-            // Route::post('/reservasi/akhiri-kontrak', [ReservationController::class, 'checkoutStore'])
-            //     ->name('reservasi.akhiri-kontrak.store');
-
             Route::post(
                 '/invoices/{invoice}/pay',
                 [InvoiceController::class, 'pay']
@@ -370,6 +408,21 @@ Route::middleware(['checkislogin'])->group(function () {
 
             Route::post('/registrasi-ulang/akhiri-kontrak', [RegistrationPeriodController::class, 'checkoutStore'])
                 ->name('registrasi-ulang.akhiri-kontrak.store');
+
+            Route::get(
+                '/testimoni',
+                [TestimonialController::class, 'indexMahasiswa']
+            )->name('testimoni.index');
+
+            Route::get(
+                '/testimoni/create',
+                [TestimonialController::class, 'create']
+            )->name('testimoni.create');
+
+            Route::post(
+                '/testimoni',
+                [TestimonialController::class, 'store']
+            )->name('testimoni.store');
         });
     Route::resource('/occupants', OccupantController::class);
 });

@@ -4,15 +4,20 @@
 @section('page_title', 'Edit Gedung')
 
 @section('content')
-    <div class="max-w-3xl space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6">
 
-        <div>
-            <h2 class="text-2xl font-black text-slate-900">Edit Gedung</h2>
-            <p class="text-sm text-slate-500 mt-1">Perbarui data gedung</p>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900">Edit Gedung</h2>
+                <p class="text-sm text-slate-500 mt-1">Edit data gedung </p>
+            </div>
+
+            <x-button.button-menu href="{{ route('admin.buildings.index') }}" variant="outline" size="md">
+                Kembali
+            </x-button.button-menu>
         </div>
-
         <form action="{{ route('admin.buildings.update', $building) }}" method="POST"
-            class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6 space-y-5">
+            class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6 space-y-5">
             @csrf
             @method('PUT')
 
@@ -38,10 +43,12 @@
                 <label class="block text-sm font-bold text-slate-700 mb-2">Tipe Penghuni</label>
                 <select name="gender_type"
                     class="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:ring-2 focus:ring-[#070B55] focus:outline-none">
-                    <option value="putra" {{ old('gender_type', $building->gender_type) == 'putra' ? 'selected' : '' }}>
-                        Putra</option>
-                    <option value="putri" {{ old('gender_type', $building->gender_type) == 'putri' ? 'selected' : '' }}>
-                        Putri</option>
+                    <option value="Laki-Laki"
+                        {{ old('gender_type', $building->gender_type) == 'laki-laki' ? 'selected' : '' }}>
+                        Laki-Laki</option>
+                    <option value="Perempuan"
+                        {{ old('gender_type', $building->gender_type) == 'perempuan' ? 'selected' : '' }}>
+                        Perempuan</option>
 
                 </select>
                 @error('gender_type')
@@ -88,7 +95,7 @@
 
             </div>
 
-            <div class="flex flex-col sm:flex-row items-center gap-3 pt-6">
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-4">
 
                 <x-button.button-menu type="submit" variant="primary" data-confirm data-confirm-title="Simpan perubahan?"
                     data-confirm-text="Pastikan data sudah sesuai." data-confirm-button-text="Ya, simpan">

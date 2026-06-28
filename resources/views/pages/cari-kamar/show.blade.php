@@ -84,9 +84,9 @@
                     $fasilitasList ??
                     array_filter(array_map('trim', preg_split('/,|\r\n|\r|\n/', (string) ($room->fasilitas ?? ''))));
 
-                $visibleReviews = $visibleReviews ?? collect();
+                $visibleTestimonials = $visibleTestimonials ?? collect();
                 $averageRating = $averageRating ?? 0;
-                $totalReviews = $totalReviews ?? 0;
+                $totalTestimonials = $totalTestimonials ?? 0;
             @endphp
 
             

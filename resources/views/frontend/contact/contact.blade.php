@@ -54,7 +54,7 @@
 
                 {{-- FORM --}}
                 <div class="lg:col-span-5">
-                    <div class="rounded-[28px] bg-white px-8 py-9 shadow-2xl md:px-10">
+                    <div class="rounded-[10px] bg-white px-8 py-9 shadow-2xl md:px-10">
                         <h3 class="text-3xl font-extrabold text-[#07587a]">
                             {{ $contact['form_title'] ?? 'Get In Touch' }}
                         </h3>

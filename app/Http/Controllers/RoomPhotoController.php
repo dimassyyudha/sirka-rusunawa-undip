@@ -31,22 +31,22 @@ class RoomPhotoController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'room_id'   => 'required|exists:rooms,id',
+            'room_id'   => 'required|exists:rooms,room_id',
             'photos'    => 'required|array',
             'photos.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
         $room = Room::findOrFail($data['room_id']);
 
-        $lastOrder = (int) RoomPhoto::where('room_id', $room->id)->max('order');
+        $lastOrder = (int) RoomPhoto::where('room_id', $room->room_id)->max('order');
         $order     = $lastOrder;
 
         foreach ($request->file('photos') as $file) {
             $order++;
 
             $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
-            $relativePath = 'uploads/rooms/' . $room->id . '/' . $filename;
-            $destination  = public_path('uploads/rooms/' . $room->id);
+            $relativePath = 'uploads/rooms/' . $room->room_id . '/' . $filename;
+            $destination  = public_path('uploads/rooms/' . $room->room_id);
 
             if (!is_dir($destination)) {
                 mkdir($destination, 0775, true);
@@ -55,7 +55,7 @@ class RoomPhotoController extends Controller
             $file->move($destination, $filename);
 
             RoomPhoto::create([
-                'room_id'    => $room->id,
+                'room_id'    => $room->room_id,
                 'path'       => $relativePath,
                 'is_primary' => $order === 1 && $lastOrder === 0, // kalau belum ada foto, jadikan utama
                 'order'      => $order,

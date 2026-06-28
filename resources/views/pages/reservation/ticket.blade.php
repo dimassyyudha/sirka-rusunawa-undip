@@ -116,7 +116,7 @@
         <div class="section">
             <div class="label">Status</div>
             <div class="value">
-                Menunggu Verifikasi Admin
+                Berhasil
             </div>
         </div>
 

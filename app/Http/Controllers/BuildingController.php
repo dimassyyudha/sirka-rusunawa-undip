@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Building;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class BuildingController extends Controller
 {
@@ -24,7 +25,33 @@ class BuildingController extends Controller
     {
         $perPage = $request->input('per_page', 10);
 
-        $buildings = Building::withCount('rooms')
+        // $buildings = Building::withCount('rooms')
+        //     ->orderBy('code')
+        //     ->paginate($perPage)
+        //     ->withQueryString();
+
+        $buildings = Building::query()
+
+            ->when($request->search, function ($q) use ($request) {
+
+                $q->where(function ($query) use ($request) {
+
+                    $query
+                        ->where('code', 'like', '%' . $request->search . '%')
+                        ->orWhere('name', 'like', '%' . $request->search . '%');
+                });
+            })
+
+            ->when($request->filled('gender_type'), function ($q) use ($request) {
+
+                $q->where('gender_type', $request->gender_type);
+            })
+
+            ->when($request->filled('is_active'), function ($q) use ($request) {
+
+                $q->where('is_active', $request->is_active);
+            })
+
             ->orderBy('code')
             ->paginate($perPage)
             ->withQueryString();
@@ -42,7 +69,7 @@ class BuildingController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:20|unique:buildings,code',
-            'gender_type' => 'required|in:putra,putri',
+            'gender_type' => 'required|in:Laki-Laki,Perempuan',
             'total_floors' => 'required|integer|min:1',
         ]);
 
@@ -75,8 +102,14 @@ class BuildingController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:20|unique:buildings,code,' . $building->id,
-            'gender_type' => 'required|in:putra,putri',
+            'code' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('buildings', 'code')
+                    ->ignore($building->building_id, 'building_id'),
+            ],
+            'gender_type' => 'required|in:Laki-Laki,Perempuan',
             'total_floors' => 'required|integer|min:1',
             'is_active' => 'required|boolean',
         ]);

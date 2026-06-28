@@ -45,7 +45,17 @@ class MidtransController extends Controller
 
         $Reservation = $transaction->Reservation;
         $invoice = $transaction->invoice;
+        if (
+            $transaction->transaction_status === 'settlement'
+        ) {
 
+            return redirect()->route(
+                'Reservation.success.page',
+                [
+                    'order_id' => $transaction->order_id
+                ]
+            );
+        }
         if (!$Reservation || $Reservation->user_id !== auth()->id()) {
             abort(403);
         }
@@ -124,7 +134,7 @@ class MidtransController extends Controller
 
                 'expiry' => [
                     'unit' => 'minute',
-                    'duration' => 15,
+                    'duration' => 30,
                 ],
             ]);
 
@@ -177,14 +187,21 @@ class MidtransController extends Controller
 
             $transactionStatus = $status->transaction_status ?? null;
             $paymentType = $status->payment_type ?? null;
+            if (in_array($transactionStatus, ['capture', 'settlement'])) {
 
-            if (in_array($transactionStatus, ['settlement', 'capture'])) {
+                // $this->markAsPaid(
+                //     $transaction,
+                //     $paymentType,
+                //     $request->all()
+                // );
 
-                $this->markAsPaid(
-                    $transaction,
-                    $paymentType,
-                    (array) $status
-                );
+                // if (in_array($transactionStatus, ['settlement', 'capture'])) {
+
+                //     $this->markAsPaid(
+                //         $transaction,
+                //         $paymentType,
+                //         (array) $status
+                //     );
             } elseif ($transactionStatus === 'pending') {
 
                 $this->markAsPending(
@@ -358,21 +375,17 @@ class MidtransController extends Controller
         array $rawResponse = []
     ): void {
 
+        $transaction->refresh();
+
+        if ($transaction->transaction_status === 'settlement') {
+            return;
+        }
+
         DB::transaction(function () use (
             $transaction,
             $paymentType,
             $rawResponse
         ) {
-            $transaction = PaymentTransaction::where(
-                'id',
-                $transaction->id
-            )
-                ->lockForUpdate()
-                ->first();
-
-            if ($transaction->transaction_status === 'settlement') {
-                return;
-            }
 
             $transaction->Reservation?->update([
                 'status' => 'paid',
@@ -390,6 +403,15 @@ class MidtransController extends Controller
                 'raw_response' => $rawResponse,
             ]);
         });
+
+        SendPaymentMailJob::dispatch(
+            $transaction->id
+        );
+
+        SendPaymentWhatsappJob::dispatch(
+            $transaction->id
+        );
+
 
         try {
 
@@ -541,5 +563,50 @@ class MidtransController extends Controller
         Config::$isProduction = (bool) config('services.midtrans.is_production');
         Config::$isSanitized = true;
         Config::$is3ds = true;
+    }
+
+    public function checkStatus($orderId)
+    {
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = false;
+
+        try {
+
+            $status = \Midtrans\Transaction::status($orderId);
+
+            if (
+                in_array(
+                    $status->transaction_status,
+                    ['settlement', 'capture']
+                )
+            ) {
+
+                $transaction =
+                    PaymentTransaction::where(
+                        'order_id',
+                        $orderId
+                    )->first();
+
+                // $this->markAsPaid(
+                //     $transaction,
+                //     $status->payment_type,
+                //     (array) $status
+                // );
+
+                return response()->json([
+                    'status' => 'settlement'
+                ]);
+            }
+
+            return response()->json([
+                'status' =>
+                $status->transaction_status
+            ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => 'pending'
+            ]);
+        }
     }
 }

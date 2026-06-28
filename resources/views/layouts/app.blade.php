@@ -10,6 +10,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 </head>
 
 <body class="bg-slate-100 text-slate-900">
@@ -85,7 +87,7 @@
                     @else
                         <a href="{{ Route::has($menu['route']) ? route($menu['route']) : '#' }}"
                             class="flex items-center gap-3 px-4 py-3 rounded-2xl transition
-                {{ request()->routeIs($menu['route']) ? 'bg-orange-500 text-white' : 'text-white hover:bg-white/10 hover:text-white' }}">
+{{ request()->routeIs($menu['active'] ?? $menu['route']) ? 'bg-orange-500 text-white' : 'text-white hover:bg-white/10 hover:text-white' }}">
                             {{ $menu['label'] }}
                         </a>
                     @endif
@@ -182,8 +184,8 @@
             <section class="p-4 sm:p-6">
                 @include('components.alert.sweetalert')
                 @include('components.alert.flash-message')
-                @include('components.ui.badge')
-                <br>
+                {{-- @include('components.ui.badge')
+                <br> --}}
                 @yield('content')
             </section>
 
@@ -193,7 +195,10 @@
     <div wire:target="navigate" class="fixed left-0 top-0 z-[9999] h-1 w-full bg-orange-500">
     </div>
     <x-alert.sweetalert />
+    <x-scripts.auto-filter />
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
     @livewireScripts
     @stack('scripts')
     @stack('scripts-bottom')

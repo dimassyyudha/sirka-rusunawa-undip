@@ -9,21 +9,47 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('room_photos', function (Blueprint $table) {
-            $table->ulid('id');
 
-            // rooms.id kamu ULID, jadi pakai foreignUlid
-            $table->foreignUlid('room_id')
-                ->constrained('rooms')
-                ->cascadeOnDelete();
+            /*
+            |--------------------------------------------------------------------------
+            | PRIMARY KEY
+            |--------------------------------------------------------------------------
+            */
 
-            // path relatif file, misal: uploads/rooms/{room_id}/nama-file.jpg
-            $table->string('path');
+            $table->char('photo_id', 10)->primary();
 
-            // opsional: penanda foto utama & urutan tampilan
+            /*
+            |--------------------------------------------------------------------------
+            | FOREIGN KEY
+            |--------------------------------------------------------------------------
+            */
+
+            $table->char('room_id', 10);
+
+            /*
+            |--------------------------------------------------------------------------
+            | PHOTO
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string('photo_path');
+
             $table->boolean('is_primary')->default(false);
-            $table->unsignedInteger('order')->default(0);
+
+            $table->unsignedInteger('sort_order')->default(1);
 
             $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | FOREIGN KEY
+            |--------------------------------------------------------------------------
+            */
+
+            $table->foreign('room_id')
+                ->references('room_id')
+                ->on('rooms')
+                ->cascadeOnDelete();
         });
     }
 

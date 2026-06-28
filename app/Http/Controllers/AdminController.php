@@ -58,14 +58,24 @@ class AdminController extends Controller
         $availableRooms = $totalRooms - $occupiedRooms;
 
         $fullRooms = Room::query()
-            ->whereHas('floor')
+            ->with('floor')
             ->get()
             ->filter(function ($room) {
+
                 $capacity = $room->floor->room_capacity ?? 2;
 
                 $activeOccupants = $room->occupants()
                     ->where('status', 'active')
                     ->count();
+
+                $reservation = Reservation::where('room_id', $room->room_id)
+                    ->whereIn('status', ['approved', 'active'])
+                    ->latest()
+                    ->first();
+
+                if ($reservation?->occupancy_type === 'private') {
+                    return true;
+                }
 
                 return $activeOccupants >= $capacity;
             })
@@ -96,38 +106,110 @@ class AdminController extends Controller
                     ->where('status', 'active')
                     ->count();
 
-                if ($activeOccupants <= 0) {
+                $reservation = Reservation::where('room_id', $room->room_id)
+                    ->whereIn('status', ['approved', 'active'])
+                    ->latest()
+                    ->first();
+
+                $isPrivate =
+                    $reservation &&
+                    $reservation->occupancy_type === 'private';
+
+                if ($isPrivate) {
+
+                    $penuh++;
+                } elseif ($activeOccupants <= 0) {
+
                     $tersedia++;
                 } elseif ($activeOccupants >= $capacity) {
+
                     $penuh++;
                 } else {
+
                     $terisi++;
                 }
             }
 
             return [
                 'nama_gedung' => $building->name,
+
                 'total' => $totalRoom,
-                'tersedia' => $tersedia,
+
+                // hanya kamar yang belum penuh
+                'tersedia' => $totalRoom - $penuh,
+
+                // hanya shared yang masih punya slot
                 'terisi' => $terisi,
+
+                // private aktif + shared penuh
                 'full' => $penuh,
             ];
         });
 
+        $availableRooms = collect($statsByBuilding)->sum('tersedia');
+
+        $occupiedRooms = collect($statsByBuilding)->sum('terisi');
+
+        $fullRooms = collect($statsByBuilding)->sum('full');
+
+
+        //     $incomeByBuilding = Building::query()
+        //         ->leftJoin('floors', 'buildings.id', '=', 'floors.building_id')
+        //         ->leftJoin('rooms', 'floors.id', '=', 'rooms.floor_id')
+        //         ->leftJoin('reservations', function ($join) {
+        //             $join->on('rooms.id', '=', 'reservations.room_id')
+        //                 ->whereIn('reservations.status', [
+        //                     'paid',
+        //                     'approved',
+        //                     'active',
+        //                     'completed'
+        //                 ]);
+        //         })
+        //         ->leftJoin('invoices', function ($join) {
+        //             $join->on('reservations.id', '=', 'invoices.reservation_id')
+        //                 ->whereIn('invoices.status', [
+        //                     'paid',
+        //                     'settlement'
+        //                 ]);
+        //         })
+        //         ->selectRaw("
+        //     buildings.id,
+        //     buildings.name as nama_gedung,
+        //     COALESCE(SUM(invoices.amount),0) as income
+        // ")
+        //         ->where('buildings.is_active', true)
+        //         ->groupBy(
+        //             'buildings.id',
+        //             'buildings.name'
+        //         )
+        //         ->orderBy('buildings.code')
+        //         ->get();
+
         $incomeByBuilding = Building::query()
-            ->leftJoin('floors', 'buildings.id', '=', 'floors.building_id')
-            ->leftJoin('rooms', 'floors.id', '=', 'rooms.floor_id')
-            ->leftJoin('reservations', 'rooms.id', '=', 'reservations.room_id')
-            ->leftJoin('invoices', function ($join) {
-                $join->on('reservations.id', '=', 'invoices.reservation_id')
-                    ->whereIn('invoices.status', ['paid', 'settlement']);
+            ->leftJoin('floors', 'buildings.building_id', '=', 'floors.building_id')
+            ->leftJoin('rooms', 'floors.floor_id', '=', 'rooms.floor_id')
+            ->leftJoin('reservations', function ($join) {
+                $join->on('rooms.room_id', '=', 'reservations.room_id')
+                    ->whereIn('reservations.status', [
+                        'active',
+                        'approved',
+                        'completed',
+                    ]);
             })
-            ->selectRaw('buildings.name as nama_gedung, COALESCE(SUM(invoices.amount),0) as income')
-            ->where('buildings.is_active', true)
-            ->groupBy('buildings.id', 'buildings.name')
+            ->selectRaw("
+        buildings.building_id,
+        buildings.name as nama_gedung,
+        COALESCE(SUM(reservations.total_price),0) as income
+    ")
+            ->groupBy('buildings.building_id', 'buildings.name')
             ->orderBy('buildings.code')
             ->get();
 
+        $availableRooms = collect($statsByBuilding)->sum('tersedia');
+
+        $occupiedRooms = collect($statsByBuilding)->sum('terisi');
+
+        $fullRooms = collect($statsByBuilding)->sum('full');
         $latestReservations = Reservation::with(['user', 'room.floor.building'])
             ->latest()
             ->take(5)

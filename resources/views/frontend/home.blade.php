@@ -16,6 +16,7 @@
 
     @include('frontend.alur')
 
+    @include('frontend.testimonials')
     @include('frontend.faq')
 
     @include('frontend.cta-bottom')

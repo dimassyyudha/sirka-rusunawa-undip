@@ -6,69 +6,95 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('occupants', function (Blueprint $table) {
 
-            $table->ulid('id')->primary();
+            /*
+            |--------------------------------------------------------------------------
+            | PRIMARY KEY
+            |--------------------------------------------------------------------------
+            */
+
+            $table->char('occupant_id', 10)->primary();
 
             /*
-    |--------------------------------------------------------------------------
-    | RELATION
-    |--------------------------------------------------------------------------
-    */
+            |--------------------------------------------------------------------------
+            | FOREIGN KEY
+            |--------------------------------------------------------------------------
+            */
 
-            $table->foreignUlid('user_id')
-                ->constrained('users')
-                ->cascadeOnDelete();
+            $table->char('user_id', 10);
 
-            $table->foreignUlid('room_id')
-                ->nullable()
-                ->constrained('rooms')
-                ->nullOnDelete();
+            $table->char('room_id', 10);
 
-            $table->foreignUlid('reservation_id')
-                ->constrained('reservations')
-                ->cascadeOnDelete();
+            $table->char('reservation_id', 10);
 
             /*
-    |--------------------------------------------------------------------------
-    | OCCUPANCY
-    |--------------------------------------------------------------------------
-    */
+            |--------------------------------------------------------------------------
+            | OCCUPANCY
+            |--------------------------------------------------------------------------
+            */
 
             $table->date('start_date');
 
-            $table->date('end_date');
-
-            /*
-    |--------------------------------------------------------------------------
-    | STATUS
-    |--------------------------------------------------------------------------
-    */
+            $table->date('end_date')->nullable();
 
             $table->enum('status', [
                 'active',
                 'moved',
                 'checked_out',
                 'completed',
-            ])->default('active');
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | TIMESTAMPS
+            |--------------------------------------------------------------------------
+            */
 
             $table->timestamps();
 
             /*
-    |--------------------------------------------------------------------------
-    | INDEX
-    |--------------------------------------------------------------------------
-    */
+            |--------------------------------------------------------------------------
+            | FOREIGN KEY
+            |--------------------------------------------------------------------------
+            */
 
-            $table->index(['user_id']);
-            $table->index(['room_id']);
-            $table->index(['reservation_id']);
-            $table->index(['status']);
+            $table->foreign('user_id')
+                ->references('user_id')
+                ->on('users')
+                ->cascadeOnDelete();
+
+            $table->foreign('room_id')
+                ->references('room_id')
+                ->on('rooms')
+                ->cascadeOnDelete();
+
+            $table->foreign('reservation_id')
+                ->references('reservation_id')
+                ->on('reservations')
+                ->cascadeOnDelete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | INDEX
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index('user_id');
+            $table->index('room_id');
+            $table->index('reservation_id');
+            $table->index('status');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('occupants');

@@ -6,27 +6,76 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('floors', function (Blueprint $table) {
-            $table->ulid('id')->primary();
 
-            $table->foreignUlid('building_id')
-                ->constrained('buildings')
-                ->cascadeOnDelete();
+            /*
+            |--------------------------------------------------------------------------
+            | PRIMARY KEY
+            |--------------------------------------------------------------------------
+            */
 
-            $table->integer('floor_number');
-            $table->integer('total_rooms')->default(0);
-            $table->integer('monthly_price')->default(0);
-            $table->integer('room_capacity')->default(2);
-            // $table->string('payment_period')->default('6 bulan');
+            $table->char('floor_id', 10)->primary();
+
+            /*
+            |--------------------------------------------------------------------------
+            | FOREIGN KEY
+            |--------------------------------------------------------------------------
+            */
+
+            $table->char('building_id', 10);
+
+            /*
+            |--------------------------------------------------------------------------
+            | FLOOR INFORMATION
+            |--------------------------------------------------------------------------
+            */
+
+            $table->unsignedTinyInteger('floor_number');
+
+            $table->unsignedInteger('total_rooms');
+
+            $table->unsignedInteger('monthly_price');
+
+            $table->unsignedTinyInteger('room_capacity');
+
+            /*
+            |--------------------------------------------------------------------------
+            | TIMESTAMPS
+            |--------------------------------------------------------------------------
+            */
 
             $table->timestamps();
 
-            $table->unique(['building_id', 'floor_number']);
+            /*
+            |--------------------------------------------------------------------------
+            | FOREIGN KEY CONSTRAINT
+            |--------------------------------------------------------------------------
+            */
+
+            $table->foreign('building_id')
+                ->references('building_id')
+                ->on('buildings')
+                ->cascadeOnDelete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | INDEX
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index('building_id');
+            $table->index('floor_number');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('floors');

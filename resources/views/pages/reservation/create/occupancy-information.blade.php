@@ -1,5 +1,5 @@
 {{-- SKEMA HUNIAN --}}
-<div class="bg-white rounded-3xl border border-slate-200 shadow-sm">
+<div>
     <div class="px-5 md:px-6 py-5 border-b border-slate-100">
         <h2 class="text-lg font-black text-slate-900">Skema Hunian</h2>
         <p class="mt-1 text-sm text-slate-500">Durasi Reservation tetap 6 bulan / 1 semester.</p>

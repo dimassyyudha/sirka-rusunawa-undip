@@ -84,12 +84,14 @@ class MahasiswaController extends Controller
         return Reservation::with([
             'room.floor.building',
             'room.photos',
-            'invoices.paymentTransactions',
+            'paymentTransactions',
         ])
             ->where('user_id', auth()->id())
             ->latest()
             ->get();
     }
+
+
 
     // private function getReservations()
     // {
@@ -125,9 +127,10 @@ class MahasiswaController extends Controller
             return collect();
         }
 
-        return PaymentTransaction::with([
-            'invoice.Reservation.room.floor.building',
-            'Reservation.room.floor.building',
+        return Reservation::with([
+            'room.floor.building',
+            'room.photos',
+            'paymentTransactions',
         ])
             ->where('user_id', auth()->id())
             ->latest()
@@ -153,37 +156,48 @@ class MahasiswaController extends Controller
                 ->get();
         }
 
-        $pendingReservations = $Reservations->filter(function ($Reservation) {
-            $transaction = $Reservation->paymentTransactions
-                ->where('transaction_status', 'pending')
-                ->sortByDesc('created_at')
-                ->first();
+        $pendingReservations = $Reservations->filter(function ($reservation) {
 
-            return $Reservation instanceof Reservation
-                && $Reservation->status === 'pending'
+            $transaction = $reservation->invoices
+                ->flatMap(function ($invoice) {
+                    return $invoice->paymentTransactions;
+                })
+                ->sortByDesc('created_at')
+                ->firstWhere('transaction_status', 'pending');
+
+            return $reservation->status === 'pending'
                 && $transaction
                 && $transaction->expired_at
-                && now()->lessThan($transaction->expired_at);
+                && now()->lt($transaction->expired_at);
         });
-
         $unpaidInvoices = $invoices->whereIn('status', [
             'pending',
             'unpaid',
         ]);
-        $activeInvoice = Invoice::with('paymentTransactions')
+        // $activeInvoice = Invoice::with('paymentTransactions')
+        //     ->where('user_id', auth()->id())
+        //     ->get()
+        //     ->first(function ($invoice) {
+
+        //         $trx = $invoice->paymentTransactions
+        //             ->sortByDesc('created_at')
+        //             ->first();
+
+        //         return !in_array(
+        //             $trx?->transaction_status,
+        //             ['settlement']
+        //         );
+        //     });
+        $activeInvoices = Invoice::with('paymentTransactions')
             ->where('user_id', auth()->id())
-            ->get()
-            ->first(function ($invoice) {
+            ->whereIn('status', [
+                'pending',
+                'unpaid',
+            ])
+            ->orderBy('due_at')
+            ->get();
 
-                $trx = $invoice->paymentTransactions
-                    ->sortByDesc('created_at')
-                    ->first();
-
-                return !in_array(
-                    $trx?->transaction_status,
-                    ['settlement']
-                );
-            });
+        $activeInvoiceTotal = $activeInvoices->sum('amount');
         return view('pages.mahasiswa.dashboard', [
             'occupant' => $occupant,
             'roommates' => $roommates,
@@ -194,7 +208,8 @@ class MahasiswaController extends Controller
             'unpaidInvoices' => $unpaidInvoices,
             'activeInvoiceTotal' => $unpaidInvoices->sum('amount'),
             'reservationCount' => $Reservations->count(),
-            'activeInvoice' => $activeInvoice,
+            'activeInvoices' => $activeInvoices,
+            'activeInvoiceTotal' => $activeInvoiceTotal,
             'activeReservation' => $Reservations
                 ->whereIn('status', [
                     'pending',

@@ -8,9 +8,9 @@
     'rooms' => null,
 ])
 
-<aside class="self-start md:sticky md:top-24 md:h-[calc(100vh-120px)] md:overflow-y-auto md:pr-2 filter-sidebar-scroll">
+<aside class="self-start md:sticky md:top-1 md:h-[calc(100vh-120px)] md:overflow-y-auto md:pr-2 filter-sidebar-scroll">
 
-    <div class="space-y-5">
+    <div class="space-y-4">
 
         {{-- MOBILE --}}
 
@@ -168,22 +168,7 @@
                 <div
                     class="absolute top-[80px] left-1/2 w-[92%] max-w-md -translate-x-1/2 rounded-[32px] bg-white shadow-2xl max-h-[80vh] overflow-y-auto">
 
-                    <div
-                        class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-4">
 
-                        <h3 class="text-lg font-black">
-                            Filter Kamar
-
-                        </h3>
-
-                        <button id="closeFilterBtn"
-                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
-
-                            <i class="bi bi-x-lg"></i>
-
-                        </button>
-
-                    </div>
 
                     <div class="p-5">
 
@@ -203,20 +188,20 @@
                                     <label
                                         class="gender-option cursor-pointer rounded-2xl border border-slate-200 bg-white p-3 text-center text-sm font-black text-slate-700 transition-all duration-200">
 
-                                        <input type="radio" name="gender" value="pria" class="hidden"
-                                            {{ $gender === 'pria' ? 'checked' : '' }}>
+                                        <input type="radio" name="gender" value="laki-laki" class="hidden"
+                                            {{ $gender === 'laki-laki' ? 'checked' : '' }}>
 
-                                        Putra
+                                        Laki-Laki
 
                                     </label>
 
                                     <label
                                         class="gender-option cursor-pointer rounded-2xl border border-slate-200 bg-white p-3 text-center text-sm font-black text-slate-700 transition-all duration-200">
 
-                                        <input type="radio" name="gender" value="wanita" class="hidden"
-                                            {{ $gender === 'wanita' ? 'checked' : '' }}>
+                                        <input type="radio" name="gender" value="perempuan" class="hidden"
+                                            {{ $gender === 'perempuan' ? 'checked' : '' }}>
 
-                                        Putri
+                                        Perempuan
 
                                     </label>
 
@@ -333,70 +318,86 @@
         <div class="hidden md:block space-y-5">
 
             {{-- FILTER CARD --}}
-            <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div class="overflow-visible rounded-3xl border border-slate-200 bg-white shadow-sm">
 
                 {{-- HEADER --}}
-                <div class="bg-gradient-to-r from-[#070B55] to-[#0f1a9e] px-5 py-5 text-white">
+                <div class="bg-gradient-to-r from-[#070B55] to-[#0f1a9e] px-4 py-3 text-white rounded-t-3xl">
 
-                    <div class="flex items-center gap-3">
-
-                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
-
-                            <svg id='Search_24' width='24' height='24' viewBox='0 0 24 24'
-                                xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
-                                <rect width='24' height='24' stroke='none' fill='#000000' opacity='0' />
-
-
-                                <g transform="matrix(0.78 0 0 0.78 12 12)">
-                                    <path
-                                        style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
-                                        transform=" translate(-13.03, -13.03)"
-                                        d="M 10 0.1875 C 4.578125 0.1875 0.1875 4.578125 0.1875 10 C 0.1875 15.421875 4.578125 19.8125 10 19.8125 C 12.289063 19.8125 14.394531 19.003906 16.0625 17.6875 L 16.9375 18.5625 C 16.570313 19.253906 16.699219 20.136719 17.28125 20.71875 L 21.875 25.34375 C 22.589844 26.058594 23.753906 26.058594 24.46875 25.34375 L 25.34375 24.46875 C 26.058594 23.753906 26.058594 22.589844 25.34375 21.875 L 20.71875 17.28125 C 20.132813 16.695313 19.253906 16.59375 18.5625 16.96875 L 17.6875 16.09375 C 19.011719 14.421875 19.8125 12.300781 19.8125 10 C 19.8125 4.578125 15.421875 0.1875 10 0.1875 Z M 10 2 C 14.417969 2 18 5.582031 18 10 C 18 14.417969 14.417969 18 10 18 C 5.582031 18 2 14.417969 2 10 C 2 5.582031 5.582031 2 10 2 Z M 4.9375 7.46875 C 4.421875 8.304688 4.125 9.289063 4.125 10.34375 C 4.125 13.371094 6.566406 15.8125 9.59375 15.8125 C 10.761719 15.8125 11.859375 15.433594 12.75 14.8125 C 12.511719 14.839844 12.246094 14.84375 12 14.84375 C 8.085938 14.84375 4.9375 11.695313 4.9375 7.78125 C 4.9375 7.675781 4.933594 7.574219 4.9375 7.46875 Z"
-                                        stroke-linecap="round" />
-                                </g>
-                            </svg>
-                        </div>
+                    <div class="flex items-center justify-between">
 
                         <div>
 
-                            <div class="text-lg font-black">
-                                Filter Kamar
+                            <div class="text-sm font-black">
+                                Filter Aktif
                             </div>
 
-                            <div class="text-xs text-white/70">
-                                Temukan kamar yang sesuai
+                            <div class="text-[11px] text-white/70">
+                                {{ collect([$gender, $gedungFilter, $lantaiFilter])->filter()->count() }}
+                                filter dipilih
                             </div>
 
                         </div>
+
+                        <a href="{{ route('cari-kamar.index') }}"
+                            class="rounded-lg bg-red-600 px-2.5 py-1.5 text-[11px] font-bold text-white transition hover:bg-red-700">
+
+                            Reset Filter
+
+                        </a>
 
                     </div>
 
-                    {{-- STATS --}}
-                    <div class="mt-5 grid grid-cols-2 gap-3">
+                    <div class="mt-3 flex flex-wrap gap-1.5">
 
-                        <div class="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+                        @if ($gender)
+                            <a href="{{ route('cari-kamar.index', request()->except('gender')) }}"
+                                class="inline-flex items-center gap-1 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-red-700">
 
-                            <div class="text-2xl font-black">
-                                {{ $rooms && method_exists($rooms, 'total') ? $rooms->total() : 0 }}
-                            </div>
+                                {{ $gender === 'laki-laki' ? 'Laki-Laki' : 'Perempuan' }}
 
-                            <div class="text-xs text-white/70">
-                                Kamar
-                            </div>
+                                <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
 
-                        </div>
+                            </a>
+                        @endif
 
-                        <div class="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+                        @if ($gedungFilter)
+                            <a href="{{ route('cari-kamar.index', request()->except('gedung')) }}"
+                                class="inline-flex items-center gap-1 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-red-700">
 
-                            <div class="text-2xl font-black">
-                                {{ count($gedungsSidebar) }}
-                            </div>
+                                Gedung {{ $gedungFilter }}
 
-                            <div class="text-xs text-white/70">
-                                Gedung
-                            </div>
+                                <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
 
-                        </div>
+                            </a>
+                        @endif
+
+                        @if ($lantaiFilter)
+                            <a href="{{ route('cari-kamar.index', request()->except('lantai')) }}"
+                                class="inline-flex items-center gap-1 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-red-700">
+
+                                Lantai {{ $lantaiFilter }}
+
+                                <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+
+                            </a>
+                        @endif
+
+                        @if (!$gender && !$gedungFilter && !$lantaiFilter)
+                            <span class="rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/70">
+
+                                Belum ada filter
+
+                            </span>
+                        @endif
 
                     </div>
 
@@ -427,7 +428,7 @@
 
                 </div>
 
-                <div class="p-4">
+                <div class="p-3">
 
                     <x-room.sort :sort="$sort" />
 

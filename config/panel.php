@@ -30,6 +30,12 @@ return [
             ],
 
             [
+                'label' => 'Testimoni',
+                'route' => 'mahasiswa.testimoni.index',
+                'active' => 'mahasiswa.testimoni.*',
+            ],
+
+            [
                 'label' => 'Reservasi',
                 'route' => 'mahasiswa.reservasi',
                 'active' => [
@@ -104,7 +110,9 @@ return [
                 'label' => 'Periode Registrasi',
                 'route' => 'admin.occupancy-periods.index',
                 'active' => [
-                    'admin.occupancy-periods.*',
+                    'admin.occupancy-periods.index',
+                    'admin.occupancy-periods.create',
+                    'admin.occupancy-periods.edit',
                 ],
             ],
 
@@ -113,8 +121,17 @@ return [
                 'route' => 'admin.registrasi-ulang.index',
                 'active' => [
                     'admin.registrasi-ulang.*',
+                    'admin.occupancy-periods.show',
                 ],
             ],
+
+            // [
+            //     'label' => 'Pengajuan Registrasi Ulang',
+            //     'route' => '',
+            //     'active' => [
+            //         'admin.registrasi-ulang.*',
+            //     ],
+            // ],
 
             [
                 'section' => 'Manajemen Rusunawa',
@@ -145,6 +162,12 @@ return [
             ],
 
             [
+                'label' => 'Testimoni',
+                'route' => 'admin.testimoni.index',
+                'active' => 'admin.testimoni.*',
+            ],
+
+            [
                 'section' => 'Keuangan',
             ],
 
@@ -154,11 +177,11 @@ return [
                 'active' => 'admin.invoices.*',
             ],
 
-            [
-                'label' => 'Pembayaran',
-                'route' => 'admin.payments.index',
-                'active' => 'admin.payments.*',
-            ],
+            // [
+            //     'label' => 'Pembayaran',
+            //     'route' => 'admin.payments.index',
+            //     'active' => 'admin.payments.*',
+            // ],
             [
                 'label' => 'Transactions',
                 'route' => 'admin.transactions.index',
@@ -205,11 +228,6 @@ return [
                 'active' => 'admin.settings.alur.*',
             ],
 
-            [
-                'label' => 'Reservasi Kamar',
-                'route' => 'admin.settings.cari-kamar.index',
-                'active' => 'admin.settings.cari-kamar.*',
-            ],
 
             [
                 'label' => 'FAQ',

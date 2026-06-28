@@ -37,70 +37,73 @@
     'class' => 'rounded-3xl border border-transparent bg-transparent p-6',
 ]) }}>
 
-    <h2 class="text-lg font-black text-black text-center">
-        PROGRESS TRANSAKSI
-    </h2>
 
-    <ol class="mt-6 grid grid-cols-1 gap-6 text-sm font-bold md:grid-cols-4 md:gap-0">
 
-        @foreach ($steps as $number => $item)
-            @php
+        <h2 class="text-lg font-black text-black text-center">
+            PROGRESS TRANSAKSI
+        </h2>
 
-                $circleClass =
-                    $isExpired && $number === 2
-                        ? 'bg-red-500 border-red-500 text-white'
-                        : ($number <= $step
-                            ? 'bg-orange-500 border-orange-500 text-white'
-                            : 'bg-white border-slate-200 text-slate-400');
+        <ol class="mt-8 flex items-start justify-between">
 
-                $textClass =
-                    $isExpired && $number === 2
-                        ? 'text-red-600'
-                        : ($number <= $step
-                            ? 'text-orange-600'
-                            : 'text-slate-500');
+            @foreach ($steps as $number => $item)
+                @php
 
-                $lineClass =
-                    $isExpired && $number < 2
-                        ? 'md:after:bg-red-500'
-                        : ($number < $step
-                            ? 'md:after:bg-orange-500'
-                            : 'md:after:bg-slate-200');
+                    $circleClass =
+                        $isExpired && $number === 2
+                            ? 'bg-red-500 border-red-500 text-white'
+                            : ($number <= $step
+                                ? 'bg-orange-500 border-orange-500 text-white'
+                                : 'bg-white border-slate-300 text-slate-400');
 
-            @endphp
+                    $textClass =
+                        $isExpired && $number === 2
+                            ? 'text-red-600'
+                            : ($number <= $step
+                                ? 'text-orange-600'
+                                : 'text-slate-500');
 
-            <li
-                class="relative flex text-center md:block
-                {{ $number < count($steps)
-                    ? "md:after:content-[''] md:after:absolute md:after:top-5 md:after:left-1/2 md:after:w-full md:after:h-0.5 {$lineClass}"
-                    : '' }}">
+                    $lineClass =
+                        $isExpired && $number < 2 ? 'bg-red-500' : ($number < $step ? 'bg-orange-500' : 'bg-slate-200');
 
-                <div class="relative z-10 flex items-center gap-3 md:block">
+                @endphp
 
-                    <span
-                        class="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full border-2 {{ $circleClass }}">
+                <li class="relative flex-1">
 
-                        {{ $number }}
+                    @if (!$loop->last)
+                        <div class="absolute top-5 left-1/2 w-full h-0.5 {{ $lineClass }}">
+                        </div>
+                    @endif
 
-                    </span>
+                    <div class="relative z-10 flex flex-col items-center text-center">
 
-                    <div>
+                        <span
+                            class="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 text-sm md:text-base font-black {{ $circleClass }}">
 
-                        <p class="{{ $textClass }}">
-                            {{ $item['title'] }}
-                        </p>
+                            {{ $number }}
 
-                        <p class="mt-1 text-xs font-normal text-slate-500">
-                            {{ $item['desc'] }}
-                        </p>
+                        </span>
+
+                        <div class="mt-3">
+
+                            <p class="text-xs md:text-sm font-black {{ $textClass }}">
+
+                                {{ $item['title'] }}
+
+                            </p>
+
+                            <p class="hidden md:block mt-1 text-xs font-normal text-slate-500">
+
+                                {{ $item['desc'] }}
+
+                            </p>
+
+                        </div>
 
                     </div>
 
-                </div>
+                </li>
+            @endforeach
 
-            </li>
-        @endforeach
+        </ol>
 
-    </ol>
-
-</div>
+    </div>

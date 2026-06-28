@@ -69,7 +69,7 @@
                         @if ($img)
                             <div class="{{ $i % 2 === 0 ? 'lg:col-span-5' : 'lg:col-span-5 lg:order-2' }}">
 
-                                <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-slate-100">
+                                <div class="overflow-hidden rounded-[10px] border border-slate-200 bg-slate-100">
 
                                     <img src="{{ $img }}" class="h-[320px] w-full object-cover md:h-[420px]"
                                         alt="{{ $block['title'] ?? 'Tentang Kami' }}">
@@ -99,6 +99,34 @@
                                 <p class="mt-5 text-sm leading-relaxed text-slate-600 md:text-base">
                                     {{ $block['body'] }}
                                 </p>
+                            @endif
+                            @if (strtolower(trim($block['type'] ?? '')) === 'aturan')
+                                <div class="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+
+                                    <p class="text-sm leading-relaxed text-slate-700">
+
+                                        Informasi pada bagian ini merupakan ringkasan aturan umum penghuni
+                                        Rusunawa Universitas Diponegoro. Untuk membaca tata tertib,
+                                        kewajiban penghuni, larangan, sanksi, serta ketentuan hunian
+                                        secara lengkap, silakan kunjungi halaman Syarat & Ketentuan.
+
+                                    </p>
+
+                                    <a href="{{ route('page.syarat-ketentuan') }}"
+                                        class="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#070B55] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#0f1a9e]">
+
+                                        Baca Syarat & Ketentuan Lengkap
+
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+
+                                        </svg>
+
+                                    </a>
+
+                                </div>
                             @endif
 
                             @if (!empty($items))

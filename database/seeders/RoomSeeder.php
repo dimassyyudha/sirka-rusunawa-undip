@@ -55,7 +55,7 @@ class RoomSeeder extends Seeder
                         'kode_kamar' => $kodeKamar,
                     ],
                     [
-                        'floor_id' => $floor->id,
+                        'floor_id' => $floor->floor_id,
 
                         // AWAL SEMUA KOSONG
                         'occupied' => 0,

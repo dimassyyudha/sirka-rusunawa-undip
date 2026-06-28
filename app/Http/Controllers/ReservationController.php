@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ExpirePendingReservationJob;
-use App\Models\Reservation;
 use App\Models\Invoice;
 use App\Models\PaymentTransaction;
+use App\Models\Reservation;
 use App\Models\Room;
+use App\Models\SiteSetting;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -37,15 +38,17 @@ class ReservationController extends Controller
 
         return $duration;
     }
-    public function index()
+    public function index(Request $request)
     {
+
+        $perPage = $request->integer('per_page', 10);
         $reservations = Reservation::with([
             'room.floor.building',
             'previousRoom.floor.building',
         ])
             ->where('user_id', auth()->id())
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
 
         return view('pages.mahasiswa.reservasi.index', compact('reservations'));
     }
@@ -117,7 +120,7 @@ class ReservationController extends Controller
                 ->route('cari-kamar.show', $room)
                 ->with(
                     'error',
-                    $buildingGender === 'putra'
+                    $buildingGender === 'laki-laki'
                         ? 'Kamar ini hanya tersedia untuk mahasiswa laki-laki.'
                         : 'Kamar ini hanya tersedia untuk mahasiswa perempuan.'
                 );
@@ -134,7 +137,7 @@ class ReservationController extends Controller
                 ->with('error', 'Kamar sudah penuh.');
         }
 
-        $activeReservationSlot = Reservation::where('room_id', $room->id)
+        $activeReservationSlot = Reservation::where('room_id', $room->room_id)
             ->whereIn('status', ['pending', 'paid', 'approved', 'active'])
             ->sum('slot_used');
 
@@ -170,13 +173,28 @@ class ReservationController extends Controller
 
         $startDate = now()->startOfDay();
 
-        $endDate = $startDate->copy()->addMonths($durationMonth);
+        // $endDate = $startDate->copy()->addMonths($durationMonth);
+
+        $endDate = $startDate
+            ->copy()
+            ->addMonths($durationMonth)
+            ->endOfMonth();
 
         $totalPrice = $monthlyPrice * $durationMonth;
 
 
         $oldReservationData = session('reservation_review_data', []);
-        return view('pages.Reservation.create', compact(
+
+        $syaratKetentuan = SiteSetting::getValue(
+            'syarat-ketentuan',
+            [
+                'title' => 'Syarat & Ketentuan',
+                'sections' => [],
+            ]
+        );
+        // dd($syaratKetentuan);
+
+        return view('pages.reservation.create.index', compact(
             'room',
             'capacity',
             'occupied',
@@ -191,60 +209,12 @@ class ReservationController extends Controller
             'startDate',
             'endDate',
             'totalPrice',
+            'syaratKetentuan'
         ));
     }
 
 
 
-    // public function review(Request $request, Room $room)
-    // {
-    //     $request->validate([
-    //         'profile_photo_file' => 'required|file|mimes:jpg,jpeg,png|max:2048',
-    //         'ktm_file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
-    //         'stnk_file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-    //     ]);
-
-    //     $data = $request->except([
-    //         'profile_photo_file',
-    //         'ktm_file',
-    //         'stnk_file',
-    //     ]);
-
-    //     $data['profile_photo_path'] = $request
-    //         ->file('profile_photo_file')
-    //         ->store('temp/profile', 'public');
-
-    //     $data['ktm_path'] = $request
-    //         ->file('ktm_file')
-    //         ->store('temp/ktm', 'public');
-
-    //     if ($request->hasFile('stnk_file')) {
-    //         $data['stnk_path'] = $request
-    //             ->file('stnk_file')
-    //             ->store('temp/stnk', 'public');
-    //     }
-
-    //     session([
-    //         'reservation_review_data' => $data
-    //     ]);
-
-    //     return redirect()->route(
-    //         'reservation.review.page',
-    //         $room->id
-    //     );
-    // }
-
-    // public function reviewPage(Room $room)
-    // {
-    //     $data = session('reservation_review_data');
-
-    //     if (!$data) {
-    //         return redirect()
-    //             ->route('Reservation.create', $room->id);
-    //     }
-
-    //     return view('pages.Reservation.review', compact('data', 'room'));
-    // }
 
     public function store(Request $request, Room $room)
     {
@@ -264,7 +234,7 @@ class ReservationController extends Controller
 
             return back()->with(
                 'error',
-                $buildingGender === 'putra'
+                $buildingGender === 'laki-laki'
                     ? 'Kamar ini hanya tersedia untuk mahasiswa laki-laki.'
                     : 'Kamar ini hanya tersedia untuk mahasiswa perempuan.'
             );
@@ -281,11 +251,11 @@ class ReservationController extends Controller
             'parent_phone' => 'required|string|max:32',
             'duration_month' => 'required|in:6',
             'occupancy_type' => 'required|in:private,shared',
-            'profile_photo_file' => 'required|file|mimes:jpg,jpeg,png|max:2048',
-            'ktm_file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'profile_photo_file' => 'required|file|mimes:jpg,jpeg,png',
+            'ktm_file' => 'required|file|mimes:jpg,jpeg,png,pdf',
             'has_motor' => 'required|in:0,1',
             'vehicle_plate_number' => 'nullable|required_if:has_motor,1|string|max:20',
-            'stnk_file' => 'required_if:has_motor,1|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'stnk_file' => 'required_if:has_motor,1|file|mimes:jpg,jpeg,png,pdf',
             'special_request' => 'nullable|string',
             'birth_place' => 'required|string|max:100',
             'birth_date' => 'required|date',
@@ -295,7 +265,8 @@ class ReservationController extends Controller
             'parent_address' => 'required|string',
             'jalur_pembiayaan' => ['required', 'in:Bidikmisi/KIP-K,Non-Bidikmisi/KIP-K'],
             'payment_term' => 'required|in:3,6',
-            'kip_document' => 'required_if:jalur_pembiayaan,Bidikmisi/KIP-K|mimes:pdf,jpg,jpeg,png|max:2048',
+            'kip_document' => 'required_if:jalur_pembiayaan,Bidikmisi/KIP-K|mimes:pdf,jpg,jpeg,png',
+
         ]);
 
         $user = Auth::user();
@@ -348,7 +319,7 @@ class ReservationController extends Controller
                 );
         }
         $existingNim = StudentProfile::where('nim', $request->guest_nim)
-            ->where('user_id', '!=', $user->id)
+            ->where('user_id', '!=', $user->user_id)
             ->exists();
 
         if ($existingNim) {
@@ -360,7 +331,7 @@ class ReservationController extends Controller
                 ]);
         }
         StudentProfile::updateOrCreate(
-            ['user_id' => $user->id],
+            ['user_id' => $user->user_id],
             [
                 'nim' => $request->guest_nim,
                 'fakultas' => $request->guest_faculty,
@@ -379,11 +350,20 @@ class ReservationController extends Controller
                 'has_vehicle' => $request->has_motor == '1',
                 'vehicle_plate_number' => $request->has_motor == '1' ? $request->vehicle_plate_number : null,
                 'stnk_path' => $request->has_motor == '1' ? $stnkPath : null,
+
+                'vehicle_plate_number' => $request->has_motor == '1'
+                    ? $request->vehicle_plate_number
+                    : '0',
+
+                'stnk_path' => $request->has_motor == '1'
+                    ? $stnkPath
+                    : '0',
+
                 'status_mahasiswa' => 'tidak_penghuni',
                 'jalur_pembiayaan' => $request->jalur_pembiayaan,
                 'jalur_pembiayaan' => $request->jalur_pembiayaan,
 
-                'kip_document_path' => $kipDocument,
+                'kip_document_path' => $kipDocument ?? '0',
                 // 'payment_term' => $request->payment_term,
             ]
         );
@@ -402,10 +382,11 @@ class ReservationController extends Controller
         try {
             $transaction = DB::transaction(function () use ($request, $room, $user, $kipDocument) {
 
-                $lockedRoom = Room::where('id', $room->id)->lockForUpdate()->firstOrFail();
+                $lockedRoom = Room::where('room_id', $room->room_id)->lockForUpdate()->firstOrFail();
                 $lockedRoom->load('floor.building');
 
                 $capacity = (int) ($lockedRoom->floor?->room_capacity ?? 2);
+
                 $occupied = (int) ($lockedRoom->occupied ?? 0);
 
                 $activeReservationSlot = Reservation::where('room_id', $lockedRoom->id)
@@ -413,6 +394,9 @@ class ReservationController extends Controller
                     ->sum('slot_used');
 
                 $usedSlot = $occupied + $activeReservationSlot;
+
+                $monthlyPrice =
+                    (int) ($lockedRoom->floor->monthly_price ?? 0);
 
                 if ($request->occupancy_type === 'private') {
 
@@ -422,9 +406,7 @@ class ReservationController extends Controller
 
                     $slotUsed = $capacity;
 
-                    $pricePerMonth =
-                        ($lockedRoom->floor->monthly_price ?? 0)
-                        * $capacity;
+                    $pricePerMonth = $monthlyPrice;
                 } else {
 
                     if ($usedSlot >= $capacity) {
@@ -433,13 +415,23 @@ class ReservationController extends Controller
 
                     $slotUsed = 1;
 
-                    $pricePerMonth =
-                        $lockedRoom->floor->monthly_price ?? 0;
+                    $pricePerMonth = ceil(
+                        $monthlyPrice / $capacity
+                    );
                 }
 
+                // $duration = $this->calculateDurationMonth();
+                // $startDate = now()->startOfDay();
+                // $endDate = $startDate->copy()->addMonths($duration);
+
                 $duration = $this->calculateDurationMonth();
+
                 $startDate = now()->startOfDay();
-                $endDate = $startDate->copy()->addMonths($duration);
+
+                $endDate = $startDate
+                    ->copy()
+                    ->addMonths($duration)
+                    ->endOfMonth();
 
                 $totalPrice = $pricePerMonth * $duration;
                 $fullSemesterPrice = $pricePerMonth * $duration;
@@ -465,8 +457,8 @@ class ReservationController extends Controller
                 $reservation = Reservation::create([
                     'reservation_code' => $this->generateReservationCode(),
                     // 'reservation_code' => null,
-                    'room_id' => $lockedRoom->id,
-                    'user_id' => $user->id,
+                    'room_id' => $lockedRoom->room_id,
+                    'user_id' => $user->user_id,
                     'contact_name' => $request->guest_name,
                     'contact_phone' => $request->contact_phone,
                     'contact_email' => $request->contact_email,
@@ -487,6 +479,8 @@ class ReservationController extends Controller
                     'status' => 'pending',
                     'special_request' => $request->special_request,
                     'payment_term' => $request->payment_term,
+                    'occupancy_period_id' => $request->occupancy_period_id,
+                    'reservation_type' => 'new',
 
                 ]);
                 if (!$isInstallment) {
@@ -495,9 +489,9 @@ class ReservationController extends Controller
                     $invoiceAmount = ceil($fullSemesterPrice / 2);
                 }
                 $invoice = Invoice::create([
-                    'user_id' => $user->id,
-                    'reservation_id' => $reservation->id,
-                    'room_id' => $lockedRoom->id,
+                    'user_id' => $user->user_id,
+                    'reservation_id' => $reservation->reservation_id,
+                    'room_id' => $lockedRoom->room_id,
                     'invoice_number' => $this->generateInvoiceNumber(),
                     'amount' => $invoiceAmount,
                     'status' => 'pending',
@@ -508,11 +502,11 @@ class ReservationController extends Controller
 
                     Invoice::create([
 
-                        'user_id' => $user->id,
+                        'user_id' => $user->user_id,
 
-                        'reservation_id' => $reservation->id,
+                        'reservation_id' => $reservation->reservation_id,
 
-                        'room_id' => $lockedRoom->id,
+                        'room_id' => $lockedRoom->room_id,
 
                         'invoice_number' => $this->generateInvoiceNumber(),
 
@@ -527,8 +521,8 @@ class ReservationController extends Controller
                 }
 
                 $transaction = PaymentTransaction::create([
-                    'invoice_id' => $invoice->id,
-                    'user_id' => $user->id,
+                    'invoice_id' => $invoice->invoice_id,
+                    'user_id' => $user->user_id,
                     'order_id' => $orderId,
                     'payment_gateway' => 'midtrans',
                     'transaction_status' => 'pending',
@@ -536,11 +530,11 @@ class ReservationController extends Controller
                     'expired_at' => $expiredAt,
                     'order_hash' => hash(
                         'sha256',
-                        $reservation->id . '|' . $orderId . '|' . config('app.key')
+                        $reservation->reservation_id . '|' . $orderId . '|' . config('app.key')
                     ),
                 ]);
 
-                ExpirePendingReservationJob::dispatch($reservation->id);
+                ExpirePendingReservationJob::dispatch($reservation->reservation_id);
 
                 return $transaction;
             });
@@ -656,8 +650,8 @@ class ReservationController extends Controller
 
     private function genderMatches(string $userGender, string $buildingGender): bool
     {
-        return ($userGender === 'laki-laki' && $buildingGender === 'putra')
+        return ($userGender === 'laki-laki' && $buildingGender === 'laki-laki')
             ||
-            ($userGender === 'perempuan' && $buildingGender === 'putri');
+            ($userGender === 'perempuan' && $buildingGender === 'perempuan');
     }
 }

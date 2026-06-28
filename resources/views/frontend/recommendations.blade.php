@@ -33,19 +33,19 @@
                 class="pointer-events-none absolute right-0 top-0 z-10 h-full w-10 bg-gradient-to-l from-white to-transparent">
             </div>
 
-            <button onclick="scrollRecommendation(-1)"
+            <button id="btnPrev" onclick="scrollRecommendation(-1)"
                 class="absolute -left-1 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-[#1368f0] hover:text-white transition">
                 <i class="bi bi-chevron-left"></i>
             </button>
 
-            <button onclick="scrollRecommendation(1)"
+            <button id="btnNext" onclick="scrollRecommendation(1)"
                 class="absolute -right-1 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-[#1368f0] hover:text-white transition">
                 <i class="bi bi-chevron-right"></i>
             </button>
 
 
             <div id="recommendationWrapper" class="overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth">
-                <div id="recommendationTrack" class="flex gap-6 w-max pr-4">
+                <div id="recommendationTrack" class="flex gap-6 w-max px-14 md:px-6">
                     @forelse ($items as $it)
                         @php
                             $room = $it->room;
@@ -75,21 +75,17 @@
                                 ->slug('-')
                                 ->value();
 
-                            if (!empty($room->foto)) {
-                                if (\Illuminate\Support\Str::startsWith($room->foto, ['images/', '/images/'])) {
-                                    $imgUrl = asset(ltrim($room->foto, '/'));
-                                } elseif (\Illuminate\Support\Str::contains($room->foto, '/')) {
-                                    $imgUrl = asset('images/' . ltrim($room->foto, '/'));
-                                } else {
-                                    $imgUrl = asset('images/' . $gedungFolder . '/' . $room->foto);
-                                }
-                            } else {
-                                $imgUrl = $fallbackImg;
+                            $imgUrl = $fallbackImg;
+
+                            if ($room->photos->isNotEmpty()) {
+                                $primaryPhoto = $room->photos->sortBy('order')->sortByDesc('is_primary')->first();
+
+                                $imgUrl = asset($primaryPhoto->path);
                             }
                         @endphp
 
-                        <a href="{{ route('cari-kamar.show', ['room' => $room->id]) }}"
-                            class="group block w-[290px] md:w-[310px] flex-shrink-0 rounded-[28px] overflow-hidden border border-slate-200 bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <a href="{{ route('cari-kamar.show', ['room' => $room->room_id]) }}"
+                            class="group block w-[290px] md:w-[310px] flex-shrink-0 rounded-[10px] overflow-hidden border border-slate-200 bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
                             <div class="h-48 bg-slate-100 relative overflow-hidden">
                                 <img src="{{ $imgUrl }}"

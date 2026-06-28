@@ -140,13 +140,13 @@
 
                                             </span>
 
-                                            <span
+                                            {{-- <span
                                                 class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-black uppercase {{ $paymentBadgeClass }}">
 
                                                 Pembayaran :
                                                 {{ strtoupper($paymentStatus) }}
 
-                                            </span>
+                                            </span> --}}
 
                                         </div>
 
@@ -185,7 +185,7 @@
                                         @if (Route::has('Reservation.ticket.download') &&
                                                 in_array($reservation->status, ['paid', 'approved', 'active']) &&
                                                 in_array($reservation->payment_status, ['paid', 'settlement']))
-                                            <a href="{{ route('Reservation.ticket.download', $reservation->id) }}"
+                                            <a href="{{ route('Reservation.ticket.download', $reservation->reservation_id) }}"
                                                 class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
 
                                                 Download Tiket

@@ -16,18 +16,81 @@
                 </p>
             </div>
 
-            <x-button.button-menu href="{{ route('admin.floors.create') }}" variant="primary" size="md">
-
+            <x-button.button-menu href="{{ route('admin.floors.create') }}" type="button" variant="primary" size="lg">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
                 Tambah Lantai
 
             </x-button.button-menu>
         </div>
+        <form id="filterForm" method="GET" class="mb-6 rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
 
-        <div class="relative overflow-x-auto bg-white shadow-sm rounded-[28px] border border-slate-200">
+            <div class="grid gap-4 lg:grid-cols-4">
 
-            <table class="w-full min-w-[900px] text-sm text-left text-slate-700">
+                {{-- SEARCH --}}
+                <div class="lg:col-span-2">
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Pencarian
+                    </label>
 
-                <thead class="text-xs uppercase bg-slate-50 border-b border-slate-200 text-slate-500">
+                    <input id="searchInput" type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari nomor lantai..."
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100">
+                </div>
+
+                {{-- GEDUNG --}}
+                <div>
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Gedung
+                    </label>
+
+                    <select name="building_id"
+                        class="auto-filter w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+
+                        <option value="">Semua Gedung</option>
+
+                        @foreach ($buildings as $building)
+                            <option value="{{ $building->building_id }}" @selected(request('building_id') == $building->building_id)>
+                                {{ $building->name }}
+                            </option>
+                        @endforeach
+
+                    </select>
+                </div>
+
+                {{-- ACTION --}}
+                <div>
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-transparent">
+                        Action
+                    </label>
+
+                    <div class="flex gap-2">
+
+                        <button type="submit"
+                            class="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white hover:bg-violet-700">
+
+                            Filter
+
+                        </button>
+
+                        <a href="{{ route('admin.floors.index') }}"
+                            class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">
+
+                            Reset
+
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </form>
+        <div class="relative overflow-x-auto bg-white shadow-sm  rounded-[10px] border border-slate-200">
+
+            <table class="w-full min-w-[1300px] text-sm text-left text-slate-700">
+                <thead class="text-xs uppercase bg-slate-50 border-b border-slate-200 text-slate-500 text-center">
                     <tr>
                         <th class="px-6 py-4 font-black">No</th>
                         <th class="px-6 py-4 font-black">Gedung</th>
@@ -39,7 +102,7 @@
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                     @forelse ($floors as $floor)
                         <tr class="bg-white hover:bg-slate-50 transition">
@@ -78,41 +141,31 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <div class="flex items-center justify-center gap-2">
+                                <div class="flex items-center justify-center gap-2 whitespace-nowrap">
+
                                     <a href="{{ route('admin.floors.show', $floor) }}"
-                                        class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
+                                        class="rounded-xl bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-600 hover:text-white">
+                                        Detail
                                     </a>
 
                                     <a href="{{ route('admin.floors.edit', $floor) }}"
-                                        class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white flex items-center justify-center transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M16.862 4.487l1.651 1.651M4 20h4.586a1 1 0 00.707-.293l9.414-9.414a2 2 0 000-2.828l-2.172-2.172a2 2 0 00-2.828 0L4.293 14.707A1 1 0 004 15.414V20z" />
-                                        </svg>
+                                        class="rounded-xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-600 transition hover:bg-amber-500 hover:text-white">
+                                        Edit
                                     </a>
 
                                     <form action="{{ route('admin.floors.destroy', $floor) }}" method="POST"
-                                        class="form-delete">
+                                        class="form-delete inline">
+
                                         @csrf
                                         @method('DELETE')
 
                                         <button type="submit"
-                                            class="w-10 h-10 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M10 3h4" />
-                                            </svg>
+                                            class="rounded-xl bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-600 hover:text-white">
+                                            Hapus
                                         </button>
+
                                     </form>
+
                                 </div>
                             </td>
 
@@ -128,10 +181,11 @@
                 </tbody>
 
             </table>
-            <div class="border-t border-slate-200 bg-white px-6 py-4">
-                <x-ui.pagination :paginator="$floors" />
-            </div>
 
+
+        </div>
+        <div class="border-t border-slate-200 px-6 py-4">
+            <x-ui.pagination :paginator="$floors" />
         </div>
 
     </div>

@@ -20,7 +20,7 @@
             <div class="space-y-6">
 
                 {{-- HEADER --}}
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                     <div class="p-6 flex flex-col md:flex-row md:items-center gap-5">
 
@@ -54,7 +54,7 @@
                 </div>
 
                 {{-- AKADEMIK --}}
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                     <div class="px-6 py-4 border-b border-slate-100">
                         <h2 class="text-lg font-black text-slate-900">
@@ -66,7 +66,7 @@
 
                         <table class="w-full">
 
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                                 <tr>
                                     <td class="w-[260px] px-6 py-4 text-sm font-bold text-slate-500">
@@ -146,7 +146,7 @@
                 </div>
 
                 {{-- PRIBADI --}}
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                     <div class="px-6 py-4 border-b border-slate-100">
                         <h2 class="text-lg font-black text-slate-900">
@@ -158,7 +158,7 @@
 
                         <table class="w-full">
 
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                                 <tr>
                                     <td class="w-[260px] px-6 py-4 text-sm font-bold text-slate-500">
@@ -225,7 +225,7 @@
                 </div>
 
                 {{-- ORANG TUA --}}
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                     <div class="px-6 py-4 border-b border-slate-100">
                         <h2 class="text-lg font-black text-slate-900">
@@ -237,7 +237,7 @@
 
                         <table class="w-full">
 
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                                 <tr>
                                     <td class="w-[260px] px-6 py-4 text-sm font-bold text-slate-500">
@@ -295,7 +295,7 @@
                 </div>
 
                 {{-- DOKUMEN --}}
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                     <div class="px-6 py-4 border-b border-slate-100">
                         <h2 class="text-lg font-black text-slate-900">
@@ -307,7 +307,7 @@
 
                         <table class="w-full">
 
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                                 {{-- FOTO --}}
                                 <tr>
@@ -373,7 +373,7 @@
 
                                                 <img id="preview-stnk"
                                                     src="{{ asset('storage/' . $profile->stnk_path) }}"
-                                                    class="w-24 h-24 rounded-2xl object-cover border border-slate-200">                                                     
+                                                    class="w-24 h-24 rounded-2xl object-cover border border-slate-200">
                                                 <x-button.button-menu title="Lihat STNK" :href="asset('storage/' . $profile->stnk_path)" target="_blank"
                                                     color="dark" />
 

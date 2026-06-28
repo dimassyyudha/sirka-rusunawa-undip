@@ -54,7 +54,8 @@
                     <h4 class="card-title">Data Reservasi</h4>
 
                     <div class="d-flex gap-2">
-                        <a href="{{ route('admin.reservations.edit', $reservation->id) }}" class="btn btn-warning btn-sm">
+                        <a href="{{ route('admin.reservations.edit', $reservation->reservation_id) }}"
+                            class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-square"></i> Edit
                         </a>
                     </div>

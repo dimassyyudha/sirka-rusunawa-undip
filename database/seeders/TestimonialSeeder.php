@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Occupant;
-use App\Models\RoomReview;
+use App\Models\Testimonial;
 
-class RoomReviewSeeder extends Seeder
+class TestimonialSeeder extends Seeder
 {
     public function run(): void
     {
@@ -24,7 +24,7 @@ class RoomReviewSeeder extends Seeder
             ->get();
 
         foreach ($occupants as $occupant) {
-            RoomReview::updateOrCreate(
+            Testimonial::updateOrCreate(
                 [
                     'room_id' => $occupant->room_id,
                     'user_id' => $occupant->user_id,

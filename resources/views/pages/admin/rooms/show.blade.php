@@ -34,7 +34,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <div class="lg:col-span-2 bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="lg:col-span-2 bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <h3 class="text-lg font-black text-slate-900 mb-5">Informasi Kamar</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <h3 class="text-lg font-black text-slate-900 mb-5">Fasilitas</h3>
 
                 <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 min-h-[160px]">
@@ -115,7 +115,7 @@
 
         </div>
 
-        <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+        <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                 <div>
                     <h3 class="text-lg font-black text-slate-900">
@@ -144,7 +144,7 @@
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
                         @forelse ($room->penghuni as $penghuni)
                             <tr class="hover:bg-slate-50 transition">
                                 <td class="px-5 py-4 font-semibold">

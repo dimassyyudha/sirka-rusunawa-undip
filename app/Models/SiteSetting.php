@@ -2,43 +2,83 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SiteSetting extends Model
 {
+    use HasFactory;
+
+    /**
+     * Table
+     */
     protected $table = 'site_settings';
 
-    protected $fillable = ['key', 'value'];
+    /**
+     * Primary Key
+     */
+    protected $primaryKey = 'setting_id';
 
+    public $incrementing = false;
+
+    protected $keyType = 'string';
     protected $casts = [
         'value' => 'array',
     ];
+    /**
+     * Mass Assignment
+     */
+    protected $fillable = [
+        'setting_id',
+        'key',
+        'value',
+    ];
 
-    public static function getValue(string $key, array $default = []): array
+
+    /**
+     * Boot
+     */
+    protected static function boot()
     {
-        $row = static::where('key', $key)->first();
+        parent::boot();
 
-        if (! $row || ! is_array($row->value)) return $default;
+        static::creating(function ($setting) {
 
-        return array_merge($default, $row->value);
+            if (!$setting->setting_id) {
+
+                $last = self::orderByDesc('setting_id')->first();
+
+                $number = $last
+                    ? ((int) substr($last->setting_id, 3)) + 1
+                    : 1;
+
+                $setting->setting_id =
+                    'SET' . str_pad($number, 6, '0', STR_PAD_LEFT);
+            }
+        });
     }
 
-    public static function setValue(string $key, array $value): void
+
+    /*
+    |--------------------------------------------------------------------------
+    | HELPER METHODS
+    |--------------------------------------------------------------------------
+    */
+
+    public static function getValue($key, $default = null)
     {
-        $row = static::firstOrNew(['key' => $key]);
-
-        $current = is_array($row->value) ? $row->value : [];
-
-        $row->value = array_merge($current, $value);
-        $row->save();
+        return static::where('key', $key)->value('value') ?? $default;
     }
 
-    // REPLACE total (bukan merge) biar delete slide bener-bener hilang
-    public static function putValue(string $key, array $value): void
+    public static function setValue($key, $value)
     {
-        static::updateOrCreate(
+        return static::updateOrCreate(
             ['key' => $key],
             ['value' => $value]
         );
+    }
+    public static function putValue($key, $value)
+    {
+        return static::setValue($key, $value);
     }
 }

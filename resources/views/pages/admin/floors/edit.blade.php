@@ -4,7 +4,7 @@
 @section('page_title', 'Edit Lantai')
 
 @section('content')
-    <div class="max-w-3xl space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -24,7 +24,7 @@
         </div>
 
         <form action="{{ route('admin.floors.update', $floor) }}" method="POST"
-            class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6 space-y-5">
+            class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6 space-y-5">
 
             @csrf
             @method('PUT')
@@ -33,18 +33,18 @@
                 <label class="block text-sm font-bold text-slate-700 mb-2">
                     Gedung
                 </label>
-
                 <select name="building_id" required
                     class="w-full rounded-2xl border border-slate-200 px-4 py-3 bg-white focus:ring-4 focus:ring-violet-200 focus:border-violet-500 focus:outline-none">
                     <option value="">Pilih gedung</option>
 
                     @foreach ($buildings as $building)
-                        <option value="{{ $building->id }}"
-                            {{ old('building_id', $floor->building_id) == $building->id ? 'selected' : '' }}>
+                        <option value="{{ $building->building_id }}"
+                            {{ old('building_id', $floor->building_id) == $building->building_id ? 'selected' : '' }}>
                             {{ $building->name }}
                         </option>
                     @endforeach
                 </select>
+
 
                 @error('building_id')
                     <p class="text-sm text-red-600 mt-1 font-semibold">{{ $message }}</p>

@@ -111,11 +111,11 @@
                         return;
                     }
 
-                    if (gender === 'pria' && tipe !== 'putra') {
+                    if (gender === 'laki-laki' && tipe !== 'laki-laki') {
                         item.classList.add('hidden');
                     }
 
-                    if (gender === 'wanita' && tipe !== 'putri') {
+                    if (gender === 'perempuan' && tipe !== 'perempuan') {
                         item.classList.add('hidden');
                     }
 
@@ -175,8 +175,8 @@
                 .forEach(el => {
 
                     el.classList.remove(
-                        'mobile-gender-pria',
-                        'mobile-gender-putri'
+                        'mobile-gender-Laki-Laki',
+                        'mobile-gender-Perempuan'
                     );
 
                     const input = el.querySelector('input');
@@ -185,12 +185,12 @@
 
                     if (input.checked) {
 
-                        if (input.value === 'pria') {
-                            el.classList.add('mobile-gender-pria');
+                        if (input.value === 'laki-laki') {
+                            el.classList.add('mobile-gender-Laki-Laki');
                         }
 
-                        if (input.value === 'wanita') {
-                            el.classList.add('mobile-gender-putri');
+                        if (input.value === 'perempuan') {
+                            el.classList.add('mobile-gender-Perempuan');
                         }
 
                     }
@@ -346,8 +346,8 @@
                         ?.toLowerCase();
 
                     if (
-                        (gender === 'pria' && tipe !== 'putra') ||
-                        (gender === 'wanita' && tipe !== 'putri')
+                        (gender === 'laki-laki' && tipe !== 'laki-laki') ||
+                        (gender === 'perempuan' && tipe !== 'perempuan')
                     ) {
 
                         gedung.checked = false;
@@ -400,5 +400,39 @@
     window.addEventListener('resize', () => {
         updateMobileBarOffset();
         updateMobileSpacer();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const btn = document.getElementById('gedungDropdownBtn');
+        const dropdown = document.getElementById('gedungDropdown');
+
+        if (btn && dropdown) {
+
+            btn.addEventListener('click', function(e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                dropdown.classList.toggle('hidden');
+
+            });
+
+        }
+
+        document.addEventListener('click', function(e) {
+
+            if (
+                btn &&
+                dropdown &&
+                !btn.contains(e.target) &&
+                !dropdown.contains(e.target)
+            ) {
+                dropdown.classList.add('hidden');
+            }
+
+        });
+
     });
 </script>

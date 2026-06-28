@@ -4,36 +4,35 @@
 @section('page_title', 'Detail Lantai')
 
 @section('content')
-    <div class="space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="text-2xl font-black text-slate-900">
                     Detail Lantai
                 </h2>
+
                 <p class="text-sm text-slate-500 mt-1">
-                    Informasi detail lantai Rusunawa
+                    Informasi lengkap gedung Rusunawa
                 </p>
+
+
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3">
+            <div class="flex flex-wrap gap-3">
+                <x-button.button-menu href="{{ route('admin.floors.edit', $floor) }}" variant="warning">
 
-                <x-button.button-menu href="{{ route('admin.floors.edit', $floor) }}" variant="warning" size="md">
-
-                    Edit
+                    Edit Lantai
 
                 </x-button.button-menu>
 
                 <x-button.button-menu href="{{ route('admin.floors.index') }}" variant="outline" size="md">
-
                     Kembali
-
                 </x-button.button-menu>
-
             </div>
         </div>
 
-        <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
             <div class="p-6 border-b border-slate-100">
                 <h3 class="text-xl font-black text-slate-900">

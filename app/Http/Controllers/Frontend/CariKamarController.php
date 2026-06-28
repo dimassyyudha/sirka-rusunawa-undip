@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Room;
-use App\Models\Floor;
 use App\Models\Building;
+use App\Models\Floor;
+use App\Models\Occupant;
+use App\Models\Room;
 
 class CariKamarController extends Controller
 {
@@ -22,10 +23,10 @@ class CariKamarController extends Controller
             'floor.building'
         ])
             ->where('rooms.status', 'tersedia')
-            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
-            ->join('buildings', 'floors.building_id', '=', 'buildings.id')
+            ->join('floors', 'rooms.floor_id', '=', 'floors.floor_id')
+            ->join('buildings', 'floors.building_id', '=', 'buildings.building_id')
             ->where('buildings.is_active', true)
-            ->whereRaw('rooms.occupied < floors.room_capacity')
+            // ->whereRaw('rooms.occupied < floors.room_capacity')
             ->select([
                 'rooms.*',
                 'floors.floor_number as lantai',
@@ -36,12 +37,12 @@ class CariKamarController extends Controller
                 'buildings.gender_type',
             ]);
 
-        if ($gender === 'pria') {
-            $rooms->where('buildings.gender_type', 'putra');
+        if ($gender === 'laki-laki') {
+            $rooms->where('buildings.gender_type', 'laki-laki');
         }
 
-        if ($gender === 'wanita') {
-            $rooms->where('buildings.gender_type', 'putri');
+        if ($gender === 'perempuan') {
+            $rooms->where('buildings.gender_type', 'perempuan');
         }
 
         if ($gedung) {
@@ -61,11 +62,43 @@ class CariKamarController extends Controller
             $rooms->orderByRaw('(COALESCE(floors.room_capacity, 2) - COALESCE(rooms.occupied, 0)) DESC');
         } else {
             $rooms->orderBy('buildings.code')
-                ->orderBy('floors.floor_number')
                 ->orderBy('rooms.kode_kamar');
         }
 
         $rooms = $rooms->paginate(10)->withQueryString();
+
+        $rooms->getCollection()->transform(function ($room) {
+
+            $room->occupied = Occupant::where('room_id', $room->room_id)
+                ->where('status', 'active')
+                ->count();
+
+            $reservation = \App\Models\Reservation::where('room_id', $room->room_id)
+                ->whereIn('status', ['active', 'approved'])
+                ->latest()
+                ->first();
+
+            if ($reservation?->occupancy_type === 'private') {
+
+                $room->slots = 0;
+            } else {
+
+                $room->slots =
+                    max(
+                        0,
+                        ((int) $room->capacity) -
+                            ((int) $room->occupied)
+                    );
+            }
+
+            return $room;
+        });
+
+        $rooms->setCollection(
+            $rooms->getCollection()
+                ->filter(fn($room) => $room->slots > 0)
+                ->values()
+        );
 
         $gedungsList = Building::query()
             ->where('is_active', true)
@@ -80,7 +113,7 @@ class CariKamarController extends Controller
             'buildings',
             'floors.building_id',
             '=',
-            'buildings.id'
+            'buildings.building_id'
         )
             ->where('buildings.is_active', true)
             ->select(
@@ -88,7 +121,6 @@ class CariKamarController extends Controller
                 'floors.floor_number',
                 'floors.total_rooms'
             );
-
         $floorInfo = $floorInfoQuery
             ->orderBy('buildings.code')
             ->orderBy('floors.floor_number')
@@ -124,18 +156,37 @@ class CariKamarController extends Controller
         $harga = (int) ($room->floor?->monthly_price ?? 0);
         $room->load([
             'floor.building',
-            'reviews.user',
+            'testimonials.user',
         ]);
 
-        $visibleReviews = $room->reviews
+        $visibleTestimonials = $room->testimonials
             ->where('is_visible', true);
 
-        $averageRating = round($visibleReviews->avg('rating') ?? 0, 1);
-        $totalReviews = $visibleReviews->count();
+        $averageRating = round($visibleTestimonials->avg('rating') ?? 0, 1);
+        $totalTestimonials = $visibleTestimonials->count();
+
+        // $capacity = (int) ($room->floor?->room_capacity ?? 2);
+        // $occupied = (int) ($room->occupied ?? 0);
+        // $slots = max(0, $capacity - $occupied);
+
+        $reservation = \App\Models\Reservation::where('room_id', $room->room_id)
+            ->whereIn('status', ['active', 'approved'])
+            ->latest()
+            ->first();
 
         $capacity = (int) ($room->floor?->room_capacity ?? 2);
-        $occupied = (int) ($room->occupied ?? 0);
-        $slots = max(0, $capacity - $occupied);
+
+        $occupied = Occupant::where('room_id', $room->room_id)
+            ->where('status', 'active')
+            ->count();
+
+        if ($reservation?->occupancy_type === 'private') {
+
+            $slots = 0;
+        } else {
+
+            $slots = max(0, $capacity - $occupied);
+        }
 
         $harga = (int) ($room->floor?->monthly_price ?? 0);
 
@@ -160,25 +211,53 @@ class CariKamarController extends Controller
             $reserveMessage = 'Kamar sudah penuh.';
         } elseif ($user) {
 
-            $userGender = strtolower($user->gender);
-
-            $buildingGender = strtolower(
-                $room->floor?->building?->gender_type
-            );
-
-            $genderMatch =
-                ($userGender === 'laki-laki' && $buildingGender === 'putra')
-                ||
-                ($userGender === 'perempuan' && $buildingGender === 'putri');
-
-            if (!$genderMatch) {
+            // ADMIN
+            if ($user->role === 'admin') {
 
                 $canReserve = false;
 
                 $reserveMessage =
-                    $buildingGender === 'putra'
-                    ? 'Kamar ini hanya tersedia untuk mahasiswa laki-laki.'
-                    : 'Kamar ini hanya tersedia untuk mahasiswa perempuan.';
+                    'Admin tidak dapat melakukan reservasi kamar.';
+            }
+
+            // SUDAH PUNYA KAMAR AKTIF
+            elseif (
+                Occupant::where('user_id', $user->user_id)
+                ->where('status', 'active')
+                ->exists()
+            ) {
+
+                $canReserve = false;
+
+                $reserveMessage =
+                    'Anda sudah memiliki kamar aktif.';
+            }
+
+            // CEK GENDER
+            else {
+
+                $userGender = strtolower($user->gender);
+
+                $buildingGender = strtolower(
+                    $room->floor?->building?->gender_type
+                );
+
+                $genderMatch =
+                    ($userGender === 'laki-laki' &&
+                        $buildingGender === 'laki-laki')
+                    ||
+                    ($userGender === 'perempuan' &&
+                        $buildingGender === 'perempuan');
+
+                if (!$genderMatch) {
+
+                    $canReserve = false;
+
+                    $reserveMessage =
+                        $buildingGender === 'laki-laki'
+                        ? 'Kamar ini hanya tersedia untuk mahasiswa laki-laki.'
+                        : 'Kamar ini hanya tersedia untuk mahasiswa perempuan.';
+                }
             }
         }
         $gallery = [];
@@ -265,9 +344,9 @@ class CariKamarController extends Controller
             'fasilitasList',
 
             // review
-            'visibleReviews',
+            'visibleTestimonials',
             'averageRating',
-            'totalReviews'
+            'totalTestimonials'
         ));
     }
 }

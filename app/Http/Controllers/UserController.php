@@ -39,7 +39,7 @@ class UserController extends Controller
             'password' => 'required|min:8',
             'role' => 'required|in:admin,staff,kades',
             // Nama input di form adalah 'profile_photo'
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png',
         ]);
 
         $data['name']     = $request->name;
@@ -82,7 +82,7 @@ class UserController extends Controller
             'name' => 'required|max:100',
             'email' => ['required', 'email', 'unique:users,email,' . $id],
             'role' => 'required|in:admin,staff,kades',
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png',
         ]);
 
         $dataUser->name = $request->name;

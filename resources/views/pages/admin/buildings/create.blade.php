@@ -4,15 +4,22 @@
 @section('page_title', 'Tambah Gedung')
 
 @section('content')
-    <div class="max-w-3xl space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6">
 
-        <div>
-            <h2 class="text-2xl font-black text-slate-900">Tambah Gedung</h2>
-            <p class="text-sm text-slate-500 mt-1">Tambahkan data gedung baru</p>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900">Tambah Gedung</h2>
+                <p class="text-sm text-slate-500 mt-1">Tambahkan data gedung baru</p>
+            </div>
+
+            <x-button.button-menu href="{{ route('admin.buildings.index') }}" variant="outline" size="md">
+                Kembali
+            </x-button.button-menu>
         </div>
 
+
         <form action="{{ route('admin.buildings.store') }}" method="POST"
-            class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6 space-y-5">
+            class="bg-white rounded-[20px] border border-slate-200 shadow-sm p-8 lg:p-10 space-y-6">
             @csrf
 
             <div>
@@ -40,8 +47,8 @@
                 <select name="gender_type"
                     class="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:ring-2 focus:ring-[#070B55] focus:outline-none">
                     <option value="">Pilih tipe</option>
-                    <option value="putra" {{ old('gender_type') == 'putra' ? 'selected' : '' }}>Putra</option>
-                    <option value="putri" {{ old('gender_type') == 'putri' ? 'selected' : '' }}>Putri</option>
+                    <option value="Laki-Laki" {{ old('gender_type') == 'laki-laki' ? 'selected' : '' }}>Laki-Laki</option>
+                    <option value="Perempuan" {{ old('gender_type') == 'perempuan' ? 'selected' : '' }}>Perempuan</option>
                 </select>
                 @error('gender_type')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -88,18 +95,23 @@
 
             </div>
 
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-4">
 
+                <x-button.button-menu type="submit" variant="primary" size="md" class="w-full sm:w-auto" data-confirm
+                    data-confirm-title="Apakah data sudah sesuai?" data-confirm-text="Pastikan data sudah sesuai."
+                    data-confirm-button-text="Ya, simpan">
 
-            <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                <button type="submit"
-                    class="px-6 py-3 rounded-2xl bg-[#070B55] text-white font-black hover:bg-[#0B1170] transition">
-                    Simpan
-                </button>
+                    Simpan Data
 
-                <a href="{{ route('admin.buildings.index') }}"
-                    class="px-6 py-3 rounded-2xl bg-slate-100 text-slate-700 font-black hover:bg-slate-200 text-center transition">
+                </x-button.button-menu>
+
+                <x-button.button-menu href="{{ route('admin.buildings.index') }}" variant="outline" size="md"
+                    class="w-full sm:w-auto">
+
                     Batal
-                </a>
+
+                </x-button.button-menu>
+
             </div>
 
         </form>

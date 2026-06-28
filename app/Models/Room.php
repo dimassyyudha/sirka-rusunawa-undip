@@ -2,69 +2,143 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
-    use HasUlids;
+    use HasFactory;
 
-    protected $keyType = 'string';
+    protected $table = 'rooms';
+
+    protected $primaryKey = 'room_id';
+
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     protected $fillable = [
+        'room_id',
         'floor_id',
         'kode_kamar',
         'occupied',
         'fasilitas',
         'status',
     ];
-    public function penghuni()
+
+    protected static function boot()
     {
-        return $this->hasMany(StudentProfile::class, 'room_id')
-            ->where('status_mahasiswa', 'penghuni');
+        parent::boot();
+
+        static::creating(function ($room) {
+
+            if (!$room->room_id) {
+
+                $last = self::orderByDesc('room_id')->first();
+
+                $number = $last
+                    ? (int) substr($last->room_id, 2) + 1
+                    : 1;
+
+                $room->room_id = 'RM' . str_pad($number, 6, '0', STR_PAD_LEFT);
+            }
+            if (empty($room->fasilitas)) {
+                $room->fasilitas = '';
+            }
+        });
     }
 
-    public function Reservations()
-    {
-        return $this->hasMany(Reservation::class);
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
 
-    public function occupants()
-    {
-        return $this->hasMany(Occupant::class);
-    }
-
+    /**
+     * Floor
+     */
     public function floor()
     {
-        return $this->belongsTo(Floor::class);
+        return $this->belongsTo(
+            Floor::class,
+            'floor_id',
+            'floor_id'
+        );
     }
 
-    public function getBuildingAttribute()
+    /**
+     * Student Profiles
+     */
+    public function studentProfiles()
     {
-        return $this->floor?->building;
+        return $this->hasMany(
+            StudentProfile::class,
+            'room_id',
+            'room_id'
+        );
     }
 
-    public function getMonthlyPriceAttribute()
+    /**
+     * Reservations
+     */
+    public function reservations()
     {
-        return $this->floor?->monthly_price;
+        return $this->hasMany(
+            Reservation::class,
+            'room_id',
+            'room_id'
+        );
     }
 
-    public function getRoomCapacityAttribute()
+    /**
+     * Invoices
+     */
+    public function invoices()
     {
-        return $this->floor?->room_capacity;
-    }
-    public function reviews()
-    {
-        return $this->hasMany(\App\Models\RoomReview::class);
+        return $this->hasMany(
+            Invoice::class,
+            'room_id',
+            'room_id'
+        );
     }
 
-    public function activeOccupants()
+    /**
+     * Occupants
+     */
+    public function occupants()
     {
-        return $this->hasMany(\App\Models\Occupant::class)->where('status', 'active');
+        return $this->hasMany(
+            Occupant::class,
+            'room_id',
+            'room_id'
+        );
+    }
+
+    /**
+     * Testimonials
+     */
+    public function testimonials()
+    {
+        return $this->hasMany(
+            Testimonial::class,
+            'room_id',
+            'room_id'
+        );
+    }
+    public function penghuni()
+    {
+        return $this->hasMany(
+            Occupant::class,
+            'room_id',
+            'room_id'
+        );
     }
     public function photos()
     {
-        return $this->hasMany(\App\Models\RoomPhoto::class, 'room_id');
+        return $this->hasMany(
+            RoomPhoto::class,
+            'room_id',
+            'room_id'
+        );
     }
 }

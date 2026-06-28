@@ -16,22 +16,22 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <p class="text-sm font-semibold text-slate-500">Total Kamar</p>
                 <h3 class="text-3xl font-black text-slate-900 mt-2">{{ $totalRooms }}</h3>
             </div>
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <p class="text-sm font-semibold text-slate-500">Kamar Tersedia</p>
                 <h3 class="text-3xl font-black text-emerald-600 mt-2">{{ $availableRooms }}</h3>
             </div>
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <p class="text-sm font-semibold text-slate-500">Kamar Terisi</p>
                 <h3 class="text-3xl font-black text-orange-600 mt-2">{{ $occupiedRooms }}</h3>
             </div>
 
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6">
                 <p class="text-sm font-semibold text-slate-500">Kamar Penuh</p>
                 <h3 class="text-3xl font-black text-red-600 mt-2">{{ $fullRooms }}</h3>
             </div>
@@ -43,7 +43,7 @@
             <div class="xl:col-span-2 space-y-6">
 
                 {{-- STATISTIK GEDUNG --}}
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                     <div class="px-6 py-5 border-b border-slate-100">
                         <h3 class="text-lg font-black text-slate-900">Statistik Gedung</h3>
@@ -63,7 +63,7 @@
                                 </tr>
                             </thead>
 
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 text-center whitespace-nowrap">
 
                                 @forelse($statsByBuilding as $stat)
                                     <tr class="hover:bg-slate-50">
@@ -104,7 +104,7 @@
                 </div>
 
                 {{-- PEMASUKAN --}}
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm overflow-hidden">
 
                     <div class="px-6 py-5 border-b border-slate-100">
                         <h3 class="text-lg font-black text-slate-900">Pemasukan Gedung</h3>
@@ -116,8 +116,13 @@
 
                             <thead class="bg-slate-50">
                                 <tr>
-                                    <th class="px-6 py-4 text-left font-black text-slate-600">Gedung</th>
-                                    <th class="px-6 py-4 text-right font-black text-slate-600">Pemasukan</th>
+                                    <th class="px-6 py-4 text-left font-black text-slate-600">
+                                        Gedung
+                                    </th>
+
+                                    <th class="px-6 py-4 text-right font-black text-slate-600">
+                                        Pemasukan
+                                    </th>
                                 </tr>
                             </thead>
 
@@ -167,7 +172,7 @@
             {{-- CHART --}}
             <div class="xl:col-span-1">
 
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-6 ">
+                <div class="bg-white rounded-[10px] border border-slate-200 shadow-sm p-6 ">
 
                     <div class="pb-5 border-b border-slate-100">
                         <h3 class="text-lg font-black">Grafik Hunian</h3>

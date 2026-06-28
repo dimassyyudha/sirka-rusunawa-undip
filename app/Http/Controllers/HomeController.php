@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Building;
+use App\Models\Recommendation;
 use App\Models\Room;
 use App\Models\SiteSetting;
-use App\Models\Recommendation;
+use App\Models\Testimonial;
 
 class HomeController extends Controller
 {
@@ -66,14 +67,14 @@ class HomeController extends Controller
         $totalRooms = Room::count();
 
         $availableRooms = (int) Room::query()
-            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
+            ->join('floors', 'rooms.floor_id', '=', 'floors.floor_id')
             ->where('rooms.status', 'tersedia')
             ->whereRaw('(COALESCE(floors.room_capacity, 2) - COALESCE(rooms.occupied, 0)) > 0')
             ->count();
 
         $availableByBuildingRaw = Room::query()
-            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
-            ->join('buildings', 'floors.building_id', '=', 'buildings.id')
+            ->join('floors', 'rooms.floor_id', '=', 'floors.floor_id')
+            ->join('buildings', 'floors.building_id', '=', 'buildings.building_id')
             ->selectRaw('UPPER(buildings.code) as gedung, COUNT(*) as total')
             ->where('rooms.status', 'tersedia')
             ->whereRaw('(COALESCE(floors.room_capacity, 2) - COALESCE(rooms.occupied, 0)) > 0')
@@ -98,9 +99,8 @@ class HomeController extends Controller
         }
 
         $totalCapacity = (int) Room::query()
-            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
+            ->join('floors', 'rooms.floor_id', '=', 'floors.floor_id')
             ->sum('floors.room_capacity');
-
         $totalOccupied = (int) Room::query()->sum('occupied');
 
         $occupancyRate = $totalCapacity > 0
@@ -116,12 +116,16 @@ class HomeController extends Controller
         ]);
 
 
-        // ===== RECOMMENDATIONS =====
-        $recommendations = Recommendation::with('room.floor.building')
+        $recommendations = Recommendation::with([
+            'room.photos',
+            'room.floor.building',
+        ])
+
             ->where('is_active', true)
             ->orderBy('sort_order', 'asc')
             ->get()
             ->filter(function ($item) {
+
                 $room = $item->room;
 
                 if (!$room || !$room->floor || !$room->floor->building) {
@@ -142,6 +146,8 @@ class HomeController extends Controller
             'subtitle' => 'Proses reservasi dirancang sederhana, transparan, dan mudah dipahami mahasiswa.',
             'items' => [],
         ]);
+
+        $testimonials = Testimonial::with('user')->get();
 
         $footer = SiteSetting::getValue('footer', [
             'brand' => 'SIRKA Rusunawa UNDIP',
@@ -165,7 +171,7 @@ class HomeController extends Controller
             'availableByBuilding',
             'occupancyRate',
             'recommendations',
-            // 'tentang',
+            'testimonials',
             'kenapa',
             'alur',
             'footer',
@@ -179,7 +185,8 @@ class HomeController extends Controller
 
     public function testimoni()
     {
-        return view('frontend.testimoni');
+        $testimonials = Testimonial::with('user')->get();
+        return view('frontend.testimonials.index', compact('testimonials'));
     }
 
     public function tentang()

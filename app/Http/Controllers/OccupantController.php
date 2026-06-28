@@ -37,7 +37,7 @@ class OccupantController extends Controller
     {
         $validated = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
-            'room_id' => ['required', 'exists:rooms,id'],
+            'room_id' => ['required', 'exists:rooms,room_id'],
             'reservation_id' => ['nullable', 'exists:reservations,id'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -76,7 +76,7 @@ class OccupantController extends Controller
     {
         $validated = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
-            'room_id' => ['required', 'exists:rooms,id'],
+            'room_id' => ['required', 'exists:rooms,room_id'],
             'reservation_id' => ['nullable', 'exists:reservations,id'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],

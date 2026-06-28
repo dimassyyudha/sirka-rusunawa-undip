@@ -7,17 +7,103 @@ use App\Models\Invoice;
 use App\Models\OccupancyPeriod;
 use App\Models\Occupant;
 use App\Models\Reservation;
+use App\Mail\RegistrationOpenMail;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OccupancyPeriodController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $periods = OccupancyPeriod::latest()->paginate(10);
+        $query = OccupancyPeriod::query();
 
-        return view('pages.admin.occupancy-periods.index', compact('periods'));
+        /*
+    |--------------------------------------------------------------------------
+    | SEARCH
+    |--------------------------------------------------------------------------
+    */
+        if ($request->filled('search')) {
+
+            $query->where(
+                'name',
+                'like',
+                '%' . $request->search . '%'
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | SEMESTER
+    |--------------------------------------------------------------------------
+    */
+        if ($request->filled('semester')) {
+
+            $query->where(
+                'semester_type',
+                $request->semester
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | STATUS
+    |--------------------------------------------------------------------------
+    */
+        if ($request->filled('status')) {
+
+            $query->where(
+                'status',
+                $request->status
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | TAHUN AKADEMIK
+    |--------------------------------------------------------------------------
+    */
+        if ($request->filled('academic_year')) {
+
+            $query->whereRaw(
+                "CONCAT(academic_year_start,'/',academic_year_end) LIKE ?",
+                ['%' . $request->academic_year . '%']
+            );
+        }
+
+        $periods = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $allPeriods = OccupancyPeriod::all();
+
+        $totalPeriods = $allPeriods->count();
+
+        $openCount = $allPeriods
+            ->where('status', 'open')
+            ->count();
+
+        $upcomingCount = $allPeriods
+            ->where('status', 'upcoming')
+            ->count();
+
+        $closedCount = $allPeriods
+            ->where('status', 'close')
+            ->count();
+
+        return view(
+            'pages.admin.occupancy-periods.index',
+            compact(
+                'periods',
+                'totalPeriods',
+                'openCount',
+                'upcomingCount',
+                'closedCount'
+            )
+        );
     }
 
     public function create()
@@ -72,7 +158,6 @@ class OccupancyPeriodController extends Controller
             ->with('success', 'Periode registrasi ulang berhasil dibuat.');
     }
 
-
     public function show(OccupancyPeriod $occupancyPeriod)
     {
         $periods = OccupancyPeriod::query()
@@ -80,52 +165,128 @@ class OccupancyPeriodController extends Controller
             ->orderByRaw("FIELD(semester_type, 'ganjil', 'genap')")
             ->get();
 
-        if (request()->filled('period_id')) {
-            $selectedPeriod = OccupancyPeriod::findOrFail(request('period_id'));
+        if (
+            request()->filled('period_id') && request('period_id') !== $occupancyPeriod->occupancy_period_id
+        ) {
 
-            return redirect()
-                ->route('admin.occupancy-periods.show', $selectedPeriod);
+            return redirect()->route(
+                'admin.occupancy-periods.show',
+                [
+                    'occupancyPeriod' => request('period_id'),
+
+                    'search' => request('search'),
+                    'status' => request('status'),
+                    'reservation_type' => request('reservation_type'),
+                ]
+            );
         }
 
-        $reservations = $occupancyPeriod->reservations()
+        $query = $occupancyPeriod->reservations()
             ->with([
                 'user.studentProfile',
                 'room.floor.building',
                 'previousRoom.floor.building',
-            ])
+            ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | SEARCH
+    |--------------------------------------------------------------------------
+    */
+
+        if ($search = request('search')) {
+
+            $query->where(function ($q) use ($search) {
+
+                $q->whereHas('user', function ($user) use ($search) {
+
+                    $user->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })
+
+                    ->orWhereHas('user.studentProfile', function ($profile) use ($search) {
+
+                        $profile->where('nim', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | JENIS PENGAJUAN
+    |--------------------------------------------------------------------------
+    */
+
+        if ($type = request('reservation_type')) {
+
+            $query->where(
+                'reservation_type',
+                $type
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | STATUS
+    |--------------------------------------------------------------------------
+    */
+
+        if ($status = request('status')) {
+
+            $query->where(
+                'status',
+                $status
+            );
+        }
+
+        $reservations = $query
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
         $summary = [
-            'extension' => $occupancyPeriod->reservations()->where('reservation_type', 'extension')->count(),
-            'transfer' => $occupancyPeriod->reservations()->where('reservation_type', 'transfer')->count(),
-            'checkout' => $occupancyPeriod->reservations()->where('reservation_type', 'checkout')->count(),
-            'pending' => $occupancyPeriod->reservations()->where('status', 'pending')->count(),
-            'approved' => $occupancyPeriod->reservations()->where('status', 'approved')->count(),
-            'rejected' => $occupancyPeriod->reservations()->where('status', 'rejected')->count(),
+
+            'extension' => $occupancyPeriod
+                ->reservations()
+                ->where('reservation_type', 'extension')
+                ->count(),
+
+            'transfer' => $occupancyPeriod
+                ->reservations()
+                ->where('reservation_type', 'transfer')
+                ->count(),
+
+            'checkout' => $occupancyPeriod
+                ->reservations()
+                ->where('reservation_type', 'checkout')
+                ->count(),
+
+            'pending' => $occupancyPeriod
+                ->reservations()
+                ->where('status', 'pending')
+                ->count(),
+
+            'approved' => $occupancyPeriod
+                ->reservations()
+                ->where('status', 'approved')
+                ->count(),
+
+            'rejected' => $occupancyPeriod
+                ->reservations()
+                ->where('status', 'rejected')
+                ->count(),
         ];
 
-        return view('pages.admin.occupancy-periods.show', compact(
-            'occupancyPeriod',
-            'periods',
-            'reservations',
-            'summary'
-        ));
+        return view(
+            'pages.admin.occupancy-periods.show',
+            compact(
+                'occupancyPeriod',
+                'periods',
+                'reservations',
+                'summary'
+            )
+        );
     }
-
-    // public function edit(OccupancyPeriod $occupancyPeriod)
-    // {
-    //     $currentYear = now()->year;
-
-    //     return view(
-    //         'pages.admin.occupancy-periods.edit',
-    //         compact(
-    //             'occupancyPeriod',
-    //             'currentYear'
-    //         )
-    //     );
-    // }
 
 
     public function edit(OccupancyPeriod $occupancyPeriod)
@@ -155,7 +316,7 @@ class OccupancyPeriodController extends Controller
             'payment_due_date' =>
             'nullable|date|after_or_equal:registration_start_date',
 
-            'status' => 'required|in:upcoming,open,closed',
+            'status' => 'required|in:upcoming,open,close',
 
             'notes' => 'nullable|string',
         ]);
@@ -259,37 +420,74 @@ class OccupancyPeriodController extends Controller
             return back()->with('error', 'Pilih data terlebih dahulu.');
         }
 
-        OccupancyPeriod::whereIn('id', $ids)->delete();
+        OccupancyPeriod::whereIn('occupancy_period_id', $ids)->delete();
 
         return back()->with('success', 'Periode berhasil dihapus.');
     }
 
-    public function openRegistration(OccupancyPeriod $occupancyPeriod)
-    {
+    // public function openRegistration(OccupancyPeriod $occupancyPeriod)
+    // {
+    //     OccupancyPeriod::query()
+    //         ->where('id', '!=', $occupancyPeriod->id)
+    //         ->where('status', 'open')
+    //         ->update([
+    //             'status' => 'upcoming',
+    //         ]);
+
+    //     $occupancyPeriod->update([
+    //         'status' => 'open',
+    //     ]);
+
+    //     return back()->with(
+    //         'success',
+    //         'Registrasi ulang berhasil dibuka.'
+    //     );
+    // }
+
+    public function openRegistration(
+        OccupancyPeriod $occupancyPeriod
+    ) {
         OccupancyPeriod::query()
-            ->where('id', '!=', $occupancyPeriod->id)
+            ->where('occupancy_period_id', '!=', $occupancyPeriod->occupancy_period_id)
             ->where('status', 'open')
             ->update([
-                'status' => 'upcoming',
+                'status' => 'upcoming'
             ]);
 
         $occupancyPeriod->update([
-            'status' => 'open',
+            'status' => 'open'
         ]);
+
+        $students = User::whereHas(
+            'studentProfile'
+        )->get();
+
+        foreach ($students as $student) {
+
+            Mail::to($student->email)
+                ->queue(
+                    new RegistrationOpenMail(
+                        $occupancyPeriod
+                    )
+                );
+        }
 
         return back()->with(
             'success',
-            'Registrasi ulang berhasil dibuka.'
+            'Registrasi dibuka dan notifikasi email berhasil dikirim.'
         );
     }
-
-
     public function closeRegistration(OccupancyPeriod $occupancyPeriod)
     {
-        if ($occupancyPeriod->computed_status !== 'open') {
-            return back()->with('error', 'Periode hanya dapat ditutup jika registrasi sedang dibuka.');
+        // if ($occupancyPeriod->computed_status !== 'open') {
+        //     return back()->with('error', 'Periode hanya dapat ditutup jika registrasi sedang dibuka.');
+        // }
+        if ($occupancyPeriod->status !== 'open') {
+            return back()->with(
+                'error',
+                'Periode hanya dapat ditutup jika registrasi sedang dibuka.'
+            );
         }
-
         DB::transaction(function () use ($occupancyPeriod) {
             $approvedReservations = $occupancyPeriod->reservations()
                 ->with([
@@ -322,7 +520,7 @@ class OccupancyPeriodController extends Controller
                         ['user_id' => $reservation->user_id],
                         [
                             'room_id' => $reservation->room_id,
-                            'reservation_id' => $reservation->id,
+                            'reservation_id' => $reservation->reservation_id,
                             'status' => 'active',
                             'end_date' => $reservation->end_date,
                         ]
@@ -343,18 +541,18 @@ class OccupancyPeriodController extends Controller
 
                     if ($oldRoomId && $newRoomId && $oldRoomId !== $newRoomId) {
                         DB::table('rooms')
-                            ->where('id', $oldRoomId)
+                            ->where('room_id', $oldRoomId)
                             ->where('occupied', '>', 0)
                             ->decrement('occupied');
 
                         DB::table('rooms')
-                            ->where('id', $newRoomId)
+                            ->where('room_id', $newRoomId)
                             ->increment('occupied');
                     }
 
                     $profile->update([
                         'status_mahasiswa' => 'penghuni',
-                        'status_mahasiswa' => 'penghuni',
+                        // 'status_mahasiswa' => 'penghuni',
                         'room_id' => $newRoomId,
                     ]);
 
@@ -362,7 +560,7 @@ class OccupancyPeriodController extends Controller
                         ['user_id' => $reservation->user_id],
                         [
                             'room_id' => $newRoomId,
-                            'reservation_id' => $reservation->id,
+                            'reservation_id' => $reservation->reservation_id,
                             'status' => 'active',
                             'start_date' => $activeOccupant?->start_date ?? $reservation->start_date,
                             'end_date' => $reservation->end_date,
@@ -382,7 +580,7 @@ class OccupancyPeriodController extends Controller
                         ['user_id' => $reservation->user_id],
                         [
                             'room_id' => $reservation->room_id,
-                            'reservation_id' => $reservation->id,
+                            'reservation_id' => $reservation->reservation_id,
                             'status' => 'active',
                             'start_date' => $activeOccupant?->start_date ?? $reservation->start_date,
                             'end_date' => $reservation->end_date,
@@ -401,7 +599,7 @@ class OccupancyPeriodController extends Controller
 
                     $profile->update([
                         'status_mahasiswa' => 'tidak_penghuni',
-                        'status_mahasiswa' => 'bukan_penghuni',
+                        // 'status_mahasiswa' => 'bukan_penghuni',
                         'room_id' => null,
                     ]);
 
@@ -412,7 +610,7 @@ class OccupancyPeriodController extends Controller
                         ->update([
                             'status' => 'inactive',
                             'room_id' => null,
-                            'reservation_id' => $reservation->id,
+                            'reservation_id' => $reservation->reservation_id,
                             'end_date' => $reservation->end_date ?? now(),
                         ]);
                 }
@@ -487,7 +685,7 @@ class OccupancyPeriodController extends Controller
         }
 
         $reservations = Reservation::with(['occupancyPeriod', 'room.floor'])
-            ->whereIn('id', $ids)
+            ->whereIn('reservation_id', $ids)
             ->get();
 
         foreach ($reservations as $reservation) {
@@ -540,7 +738,7 @@ class OccupancyPeriodController extends Controller
         Invoice::updateOrCreate(
             [
                 'user_id' => $reservation->user_id,
-                'reservation_id' => $reservation->id,
+                'reservation_id' => $reservation->reservation_id,
             ],
             [
 
@@ -565,7 +763,10 @@ class OccupancyPeriodController extends Controller
             return true;
         }
 
-        return Invoice::where('reservation_id', $reservation->id)
+        return Invoice::where(
+            'reservation_id',
+            $reservation->reservation_id
+        )
             ->whereIn('status', ['paid', 'settlement'])
             ->exists();
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SiteSetting;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -52,12 +53,14 @@ class FooterSeeder extends Seeder
             'copyright' => '© ' . date('Y') . ' SIRKA Rusunawa UNDIP. All rights reserved.',
         ];
 
-        DB::table('site_settings')->updateOrInsert(
-            ['key' => 'footer'],
+        SiteSetting::updateOrCreate(
+
             [
-                'value' => json_encode($payload, JSON_UNESCAPED_UNICODE),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'key' => 'footer',
+            ],
+
+            [
+               'value' => $payload,
             ]
         );
     }

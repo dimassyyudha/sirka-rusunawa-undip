@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
 
-            $table->ulid('id')->primary();
+            $table->char('user_id', 10)->primary();
 
             /*
             |--------------------------------------------------------------------------
@@ -51,12 +51,12 @@ return new class extends Migration
             $table->enum('gender', [
                 'laki-laki',
                 'perempuan',
-            ])->default('laki-laki');
+            ]);
 
             $table->string('number_phone', 20);
 
             $table->string('profile_photo')
-                ->nullable();
+                ->default('0');
 
             /*
             |--------------------------------------------------------------------------
@@ -95,7 +95,7 @@ return new class extends Migration
 
             $table->string('id')->primary();
 
-            $table->ulid('user_id')
+            $table->char('user_id', 10)
                 ->nullable()
                 ->index();
 

@@ -66,7 +66,7 @@
             @if ($reservation)
 
                 @php
-                    $invoice = \App\Models\Invoice::where('reservation_id', $reservation->id)
+                    $invoice = \App\Models\Invoice::where('reservation_id', $reservation->reservation_id)
                         ->where('user_id', auth()->id())
                         ->latest()
                         ->first();
@@ -86,11 +86,13 @@
                             </p>
 
                             <p class="mt-1 font-black text-slate-900">
-                                @if ($reservation->reservation_type === 'extension')
+                                @if ($reservation->reservation_type === 'new')
+                                    Reservasi Awal
+                                @elseif ($reservation->reservation_type === 'extension')
                                     Perpanjang Sewa
                                 @elseif ($reservation->reservation_type === 'transfer')
                                     Pindah Kamar
-                                @else
+                                @elseif ($reservation->reservation_type === 'checkout')
                                     Akhiri Kontrak
                                 @endif
                             </p>

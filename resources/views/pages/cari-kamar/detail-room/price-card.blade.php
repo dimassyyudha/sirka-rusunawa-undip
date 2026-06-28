@@ -237,7 +237,7 @@
             @auth
 
                 @if (auth()->user()->role !== 'admin')
-                    <a href="{{ route('Reservation.create', $room->id) }}" target="_blank"
+                    <a href="{{ route('Reservation.create', $room->room_id) }}" target="_blank"
                         class="flex items-center justify-center
                                rounded-2xl bg-orange-500
                                px-5 py-4
@@ -259,7 +259,7 @@
                     </button>
                 @endif
             @else
-                <a href="{{ route('login', ['redirect' => url()->current()]) }}" 
+                <a href="{{ route('login', ['redirect' => url()->current()]) }}"
                     class="flex items-center justify-center
                            rounded-2xl bg-orange-500
                            px-5 py-4

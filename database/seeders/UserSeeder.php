@@ -24,8 +24,9 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
                 'gender' => 'laki-laki',
                 'number_phone' => '081234567890',
-                'profile_photo' => null,
-            ]
+                'profile_photo' => '0',
+            ],
+
         );
 
 
